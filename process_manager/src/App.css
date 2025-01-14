@@ -1,0 +1,39 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.start-page {
+  text-align: center;
+  padding: 50px;
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.create {
+  background-color: #87ceeb;
+  color: white;
+}
+
+.edit {
+  background-color: #f4a261;
+  color: white;
+}
+
+.execute {
+  background-color: #2a9d8f;
+  color: white;
+}
