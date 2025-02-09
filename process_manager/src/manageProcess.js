@@ -3,13 +3,14 @@ import axios from 'axios';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
-import { customRoleExtension } from './customRoleExtension';
+import { customExtension } from './customExtension';
 
 function CreateProcess() {
   const [processName, setProcessName] = useState('');
   const [processList, setProcessList] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
   const [role, setRole] = useState('');
+  const [description, setDescription] = useState('');
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
 
@@ -18,7 +19,7 @@ function CreateProcess() {
       container: bpmnEditorRef.current,
       additionalModules: [],
       moddleExtensions: {
-        customRole: customRoleExtension
+        role: customExtension
       }
     });
 
@@ -29,6 +30,7 @@ function CreateProcess() {
       setSelectedElement(element);
       const businessObject = element.businessObject;
       setRole(businessObject.role || '');
+      setDescription(businessObject.description || ''); // Fetch description
     });
 
     fetchProcesses();
@@ -52,7 +54,15 @@ function CreateProcess() {
     const modeling = bpmnModeler.current.get('modeling');
     const elementRegistry = bpmnModeler.current.get('elementRegistry');
     const element = elementRegistry.get(selectedElement.id);
-    modeling.updateProperties(element, { role });
+    modeling.updateProperties(element, { 'role:role': role });
+  };
+
+  const handleSaveDescription = () => {
+    if (!selectedElement) return;
+    const modeling = bpmnModeler.current.get('modeling');
+    const elementRegistry = bpmnModeler.current.get('elementRegistry');
+    const element = elementRegistry.get(selectedElement.id);
+    modeling.updateProperties(element, { description }); // Save description
   };
 
   const handleSaveToDatabase = () => {
@@ -118,7 +128,7 @@ function CreateProcess() {
       </div>
 
       <div style={{ marginTop: '20px', border: '1px solid black', padding: '10px' }}>
-        <h3>Assign Role to Element</h3>
+        <h3>Assign Role and Description to Element</h3>
         <div style={{ marginBottom: '10px' }}>
           <input
             type="text"
@@ -128,6 +138,16 @@ function CreateProcess() {
             style={{ marginRight: '10px', padding: '5px' }}
           />
           <button onClick={handleSaveRole} style={{ padding: '5px 10px' }}>Save Role</button>
+        </div>
+        <div style={{ marginBottom: '10px' }}>
+          <input
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            style={{ marginRight: '10px', padding: '5px' }}
+          />
+          <button onClick={handleSaveDescription} style={{ padding: '5px 10px' }}>Save Description</button>
         </div>
         <div>
           <strong>Selected Element:</strong> {selectedElement ? selectedElement.id : 'None'}
@@ -139,8 +159,10 @@ function CreateProcess() {
 
 export default CreateProcess;
 
-
 //TODO: fill ProcessName in, during process loading
 //TODO: Instead of giving the opportunity to fill the blanks, implement pre-defined roles the user can choose
 //TODO: Add a description for each element, that will be displayed in executingProcess
 //TODO: change delete process => only user with permission should be able to delete processes
+//TODO: put process name and save button into box below. remove single save button for name and description, only one save button for everthing
+//TODO: sleceted element should display the name of the element
+//TODO: Role and description should be loaded out of database with process

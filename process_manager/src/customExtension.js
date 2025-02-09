@@ -1,5 +1,5 @@
-export const customRoleExtension = {
-    name: 'CustomRoleExtension',
+export const customExtension = {
+    name: 'CustomExtension',
     uri: 'http://example.com/schema/bpmn/role',
     prefix: 'role',
     xml: {
@@ -7,11 +7,16 @@ export const customRoleExtension = {
     },
     types: [
       {
-        name: 'Role',
+        name: 'customExtension',
         extends: ['bpmn:BaseElement'],
         properties: [
           {
             name: 'role',
+            isAttr: true,
+            type: 'String'
+          },
+          {
+            name: 'description',  
             isAttr: true,
             type: 'String'
           }

@@ -7,10 +7,9 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 
 function ExecuteProcess() {
   const [processList, setProcessList] = useState([]);
-  const [currentElementIndex, setCurrentElementIndex] = useState(0);
-  const [elements, setElements] = useState([]);
-  const [sequenceOrder, setSequenceOrder] = useState([]);
-  const [activeElement, setActiveElement] = useState(null);
+  const [currentElement, setCurrentElement] = useState(null);
+  const [sequenceMap, setSequenceMap] = useState({});
+  const [gatewayChoices, setGatewayChoices] = useState([]);
   const [processName, setProcessName] = useState('');
   const [selectedProcess, setSelectedProcess] = useState(null);
   const [isNavigationMode, setIsNavigationMode] = useState(false);
@@ -47,47 +46,42 @@ function ExecuteProcess() {
   const handleStartProcess = async () => {
     if (!selectedProcess) return;
     setIsNavigationMode(true);
-
     try {
-      const { xml } = selectedProcess;
       const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_", removeNSPrefix: true });
-      const parsedXML = parser.parse(xml);
-
-      const processElements = viewerRef.current.get('elementRegistry').filter(el => el.type);
-      const sequenceFlows = parsedXML.definitions.process.sequenceFlow || [];
-
+      const parsedXML = parser.parse(selectedProcess.xml);
+      
       const flowMap = {};
-      sequenceFlows.forEach(flow => {
-        flowMap[flow["@_sourceRef"]] = flow["@_targetRef"];
-      });
-
-      let currentElement = 'StartEvent_1';
-      const orderedElements = [];
-      const visitedElements = new Set();
-
-      while (currentElement) {
-        const element = processElements.find(el => el.id === currentElement);
-        if (element && !visitedElements.has(element.id)) {
-          orderedElements.push(element);
-          visitedElements.add(element.id);
+      parsedXML.definitions.process.sequenceFlow.forEach(flow => {
+        if (!flowMap[flow["@_sourceRef"]]) {
+          flowMap[flow["@_sourceRef"]] = [];
         }
-        currentElement = flowMap[currentElement];
-      }
-
-      setElements(processElements);
-      setSequenceOrder(orderedElements);
-      setCurrentElementIndex(0);
-      setActiveElement(orderedElements[0]);
+        flowMap[flow["@_sourceRef"]].push({
+          target: flow["@_targetRef"],
+          name: flow["@_name"] || 'Unnamed Flow'
+        });
+      });
+      setSequenceMap(flowMap);
+      handleNextStep('StartEvent_1');
     } catch (err) {
       console.error('Error starting process:', err);
     }
   };
 
-  const handleNextStep = () => {
-    if (currentElementIndex + 1 < sequenceOrder.length) {
-      const nextIndex = currentElementIndex + 1;
-      setCurrentElementIndex(nextIndex);
-      setActiveElement(sequenceOrder[nextIndex]);
+  const handleNextStep = (nextId) => {
+    if (!nextId) return;
+    const nextElements = sequenceMap[nextId] || [];
+    
+    if (nextElements.length > 1) {
+      setGatewayChoices(nextElements);
+    } else {
+      setGatewayChoices([]);
+      const element = viewerRef.current.get('elementRegistry').find(el => el.id === nextId);
+      setCurrentElement({
+        ...element,
+        name: element.businessObject.name || 'Unnamed',
+        role: element.businessObject.get('role:role') || 'No role assigned',
+        description: element.businessObject.get('role:description') || 'No description'
+      });
     }
   };
 
@@ -115,24 +109,42 @@ function ExecuteProcess() {
         </div>
 
         {isNavigationMode && (
-          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px', border: '1px solid black' }}>
-            {activeElement ? (
+          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '400px', border: '1px solid black' }}>
+            {currentElement ? (
               <div style={{ padding: '20px', textAlign: 'center' }}>
-                <h3>{activeElement.id}</h3>
-                <p>Type: {activeElement.type}</p>
+                <h3>{currentElement.name}</h3>
+                <p>Role: {currentElement.role}</p>
+                <p>Description: {currentElement.description}</p>
               </div>
             ) : (
               <p>No active element</p>
+            )}
+            {gatewayChoices.length > 0 ? (
+              <div>
+                <h4>Choose Path:</h4>
+                {gatewayChoices.map(choice => (
+                  <button 
+                    key={choice.target} 
+                    onClick={() => handleNextStep(choice.target)}
+                    style={{ margin: '5px' }}
+                  >
+                    {choice.name}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button 
+                onClick={() => handleNextStep(sequenceMap[currentElement?.id]?.[0]?.target)} 
+                style={{ marginTop: '10px' }}
+              >
+                Next →
+              </button>
             )}
           </div>
         )}
 
         {selectedProcess && !isNavigationMode && (
           <button onClick={handleStartProcess} style={{ marginTop: '10px' }}>Start</button>
-        )}
-
-        {isNavigationMode && sequenceOrder.length > 0 && (
-          <button onClick={handleNextStep} style={{ alignSelf: 'flex-end', marginTop: '10px' }}>Next →</button>
         )}
       </div>
     </div>
@@ -147,10 +159,11 @@ export default ExecuteProcess;
 
 
 
-//TODO: Make process window bigger, in best case even responsive.
-//TODO: fix execution of gateways, it should be chooseable which way to go, and not automatically choose for the user
+//TODO: Change design more like manageProcess
 //TODO: display more helpful details for navigation, like name, role and description
 //TODO: include logic for close-button, so it will close the current navigation of a process
 //TODO: send messages to User, if the element requieres there work
 //TODO: aktueller Stand bei der Ausführung des Prozess soll zwischengespeichert werden, sodass dieser wieder geladen und an gleicher stelle fortgesetzt werden kann.
-//TODO: mehere Instanzen eines Prozesses sollten gleichzeitig gestartet und durchgeführt werden => dafür eine Liste für angelgte/gespeicherte Prozesse und eine Liste für aktive Prozesse
+//TODO: mehere Instanzen eines Prozesses sollten gleichzeitig gestartet und durchgeführt werden => dafür eine Liste für angelgte/gespeicherte Prozesse und eine Liste für aktive Prozessees
+//TODO: Gateway desicion should display flow names and not actities
+//TODO: if it is the last element remove the next button and add a button with Finish Process
