@@ -138,3 +138,9 @@ function CreateProcess() {
 }
 
 export default CreateProcess;
+
+
+//TODO: fill ProcessName in, during process loading
+//TODO: Instead of giving the opportunity to fill the blanks, implement pre-defined roles the user can choose
+//TODO: Add a description for each element, that will be displayed in executingProcess
+//TODO: change delete process => only user with permission should be able to delete processes

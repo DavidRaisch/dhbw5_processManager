@@ -9,11 +9,8 @@ function StartPage() {
     <div className="start-page">
       <h1>Process Manager</h1>
       <div className="button-container">
-        <button onClick={() => navigate('/create-process')} className="button create">
-          Create Process
-        </button>
-        <button onClick={() => navigate('/edit-process')} className="button edit">
-          Edit Process
+        <button onClick={() => navigate('/manage-process')} className="button manage">
+          Manage Process
         </button>
         <button onClick={() => navigate('/execute-process')} className="button execute">
           Execute Process
@@ -24,3 +21,6 @@ function StartPage() {
 }
 
 export default StartPage;
+
+
+//TODO: implement a login page, before landing on the starting page, which is also important for role managemnet 
