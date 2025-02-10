@@ -1,3 +1,4 @@
+// backend.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -13,30 +14,37 @@ mongoose.connect('mongodb://localhost:27017/bpmn', { useNewUrlParser: true, useU
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 
-// Define a schema and model for BPMN processes
+// Process Schema & Model
 const processSchema = new mongoose.Schema({
   name: { type: String, required: true },
   xml: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
-
 const Process = mongoose.model('Process', processSchema);
 
-// API Routes
-// Save a process (overwrite if name already exists)
+// Instance Schema & Model
+const instanceSchema = new mongoose.Schema({
+  processId: { type: mongoose.Schema.Types.ObjectId, ref: 'Process', required: true },
+  processName: { type: String, required: true },
+  xml: { type: String, required: true },
+  currentElement: { type: Object, default: null },
+  sequenceMap: { type: Object, default: {} },
+  gatewayChoices: { type: Array, default: [] },
+  position: { type: String, required: true },
+  status: { type: String, required: true, default: 'running' },
+  created: { type: Date, default: Date.now },
+});
+const Instance = mongoose.model('Instance', instanceSchema);
+
+// API Routes for Processes
 app.post('/api/processes', async (req, res) => {
   const { name, xml } = req.body;
-
   if (!name || !xml) {
     return res.status(400).json({ error: 'Name and XML are required' });
   }
-
   try {
-    // Check if a process with the same name already exists
     const existingProcess = await Process.findOne({ name });
-
     if (existingProcess) {
-      // Overwrite the existing process
       existingProcess.xml = xml;
       await existingProcess.save();
       return res.json({
@@ -44,8 +52,6 @@ app.post('/api/processes', async (req, res) => {
         process: existingProcess,
       });
     }
-
-    // Create a new process if no existing process was found
     const newProcess = new Process({ name, xml });
     await newProcess.save();
     res.json({
@@ -57,7 +63,6 @@ app.post('/api/processes', async (req, res) => {
   }
 });
 
-// Get all processes
 app.get('/api/processes', async (req, res) => {
   try {
     const processes = await Process.find();
@@ -67,7 +72,6 @@ app.get('/api/processes', async (req, res) => {
   }
 });
 
-// Get a single process by ID
 app.get('/api/processes/:id', async (req, res) => {
   try {
     const process = await Process.findById(req.params.id);
@@ -80,7 +84,6 @@ app.get('/api/processes/:id', async (req, res) => {
   }
 });
 
-// Delete a process by ID
 app.delete('/api/processes/:id', async (req, res) => {
   try {
     const process = await Process.findByIdAndDelete(req.params.id);
@@ -90,6 +93,36 @@ app.delete('/api/processes/:id', async (req, res) => {
     res.json({ message: 'Process deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Error deleting process' });
+  }
+});
+
+// API Routes for Active Instances
+app.post('/api/instances', async (req, res) => {
+  try {
+    const instance = new Instance(req.body);
+    await instance.save();
+    res.json({ message: "Instance created", instance });
+  } catch(err) {
+    res.status(500).json({ error: "Error creating instance" });
+  }
+});
+
+app.get('/api/instances', async (req, res) => {
+  try {
+    const instances = await Instance.find();
+    res.json(instances);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching instances" });
+  }
+});
+
+app.put('/api/instances/:id', async (req, res) => {
+  try {
+    const instance = await Instance.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!instance) return res.status(404).json({ error: "Instance not found" });
+    res.json({ message: "Instance updated", instance });
+  } catch (err) {
+    res.status(500).json({ error: "Error updating instance" });
   }
 });
 
