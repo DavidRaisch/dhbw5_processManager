@@ -11,7 +11,7 @@ function ExecuteProcess() {
   const [processList, setProcessList] = useState([]);
   // Instances that are still running
   const [activeInstances, setActiveInstances] = useState([]);
-  // Instances that have finished (archived)
+  // Instances that have finished or canceled (archived)
   const [archivedInstances, setArchivedInstances] = useState([]);
   // Currently selected instance (by _id)
   const [selectedInstanceId, setSelectedInstanceId] = useState(null);
@@ -20,7 +20,7 @@ function ExecuteProcess() {
   const viewerRef = useRef(null);
   const bpmnContainerRef = useRef(null);
 
-  // On mount, initialize the BPMN viewer and fetch processes/instances
+  // On mount, initialize the BPMN viewer and fetch processes/instances.
   useEffect(() => {
     viewerRef.current = new NavigatedViewer({
       container: bpmnContainerRef.current,
@@ -85,7 +85,7 @@ function ExecuteProcess() {
       const response = await axios.get('http://localhost:5001/api/instances');
       const instances = response.data;
       const active = instances.filter((inst) => inst.status === 'running');
-      const archived = instances.filter((inst) => inst.status === 'finished');
+      const archived = instances.filter((inst) => inst.status !== 'running');
       setActiveInstances(active);
       setArchivedInstances(archived);
     } catch (err) {
@@ -98,7 +98,7 @@ function ExecuteProcess() {
     try {
       const response = await axios.put(`http://localhost:5001/api/instances/${instanceId}`, updatedData);
       const updatedInstance = response.data.instance;
-      if (updatedInstance.status === 'finished') {
+      if (updatedInstance.status !== 'running') {
         // Remove from activeInstances and add to archivedInstances.
         setActiveInstances((prev) => prev.filter((inst) => inst._id !== instanceId));
         setArchivedInstances((prev) => [...prev, updatedInstance]);
@@ -202,7 +202,7 @@ function ExecuteProcess() {
     updateInstance(instanceId, { position: target, currentElement: newElement, gatewayChoices: [] });
   };
 
-  // Finish the process: update its status to finished.
+  // Finish the process: update its status to "finished".
   const finishProcess = (instanceId) => {
     updateInstance(instanceId, { status: 'finished' });
     if (selectedInstanceId === instanceId) {
@@ -210,14 +210,22 @@ function ExecuteProcess() {
     }
   };
 
-  // Compute the selected instance (active or archived)
+  // Cancel the process: update its status to "canceled".
+  const cancelProcess = (instanceId) => {
+    updateInstance(instanceId, { status: 'canceled' });
+    if (selectedInstanceId === instanceId) {
+      setSelectedInstanceId(null);
+    }
+  };
+
+  // Compute the selected instance (active or archived).
   const selectedInstance =
     activeInstances.find((i) => i._id === selectedInstanceId) ||
     archivedInstances.find((i) => i._id === selectedInstanceId);
 
   // For active instances, get the next available flows from the sequence map.
   const nextElements =
-    selectedInstance && selectedInstance.status !== 'finished'
+    selectedInstance && selectedInstance.status === 'running'
       ? selectedInstance.sequenceMap[selectedInstance.position] || []
       : [];
 
@@ -278,36 +286,31 @@ function ExecuteProcess() {
           </ul>
         </div>
 
-        <div
-          style={{
-            marginTop: '20px',
-            maxHeight: '200px',
-            overflowY: 'scroll',
-            borderTop: '1px solid gray',
-            paddingTop: '10px'
-          }}
-        >
+        {/* Archived Processes section */}
+        <div style={{ marginTop: '20px', borderTop: '1px solid gray', paddingTop: '10px' }}>
           <h3>Archived Processes</h3>
-          <ul>
-            {archivedInstances.map((instance) => (
-              <li
-                key={instance._id}
-                style={{
-                  cursor: 'pointer',
-                  padding: '5px',
-                  borderBottom: '1px solid lightgray'
-                }}
-                onClick={() => {
-                  setSelectedInstanceId(instance._id);
-                  setSelectedProcess(null);
-                }}
-              >
-                {instance.processName} (#{instance._id})
-                <br />
-                <small>{new Date(instance.created).toLocaleTimeString()}</small>
-              </li>
-            ))}
-          </ul>
+          <div style={{ maxHeight: '200px', overflowY: 'auto', overflowX: 'hidden' }}>
+            <ul>
+              {archivedInstances.map((instance) => (
+                <li
+                  key={instance._id}
+                  style={{
+                    cursor: 'pointer',
+                    padding: '5px',
+                    borderBottom: '1px solid lightgray'
+                  }}
+                  onClick={() => {
+                    setSelectedInstanceId(instance._id);
+                    setSelectedProcess(null);
+                  }}
+                >
+                  {instance.processName} (#{instance._id})
+                  <br />
+                  <small>{new Date(instance.created).toLocaleTimeString()}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -352,13 +355,13 @@ function ExecuteProcess() {
               border: '1px solid black'
             }}
           >
-            {/* If the selected instance is archived, show its status only */}
-            {selectedInstance && selectedInstance.status === 'finished' ? (
+            {/* If the selected instance is archived (finished or canceled), show its status only */}
+            {selectedInstance && selectedInstance.status !== 'running' ? (
               <div style={{ padding: '20px', textAlign: 'center' }}>
                 <h3>Process Status: {selectedInstance.status}</h3>
               </div>
             ) : (
-              // Otherwise, display active process details and navigation
+              // Otherwise, display active process details and navigation controls.
               <>
                 {selectedInstance?.currentElement ? (
                   <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -400,6 +403,12 @@ function ExecuteProcess() {
                     )}
                   </div>
                 )}
+                {/* Only show Cancel Process if nextElements exist (i.e. Finish Process is not shown) */}
+                {nextElements.length > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                    <button onClick={() => cancelProcess(selectedInstanceId)}>Cancel Process</button>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -418,13 +427,10 @@ export default ExecuteProcess;
 
 
 
-
-
 /** Requiered Improvments */
 //TODO: include logic for close-button, so it will close the current navigation of a process
 //TODO: send messages to User, if the element requieres there work
 //TODO: Name of active instance should be set at the top, not just process name, but a individual name (maybe process + ID displayed additionally to the individual name)
-//TODO: Button to cancel an active Process => moves the process from the active Process lsit to the archived list and display the status canceledt  
 
 
 /** Additional Improvments */
