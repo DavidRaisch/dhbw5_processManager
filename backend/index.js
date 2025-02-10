@@ -26,6 +26,7 @@ const Process = mongoose.model('Process', processSchema);
 const instanceSchema = new mongoose.Schema({
   processId: { type: mongoose.Schema.Types.ObjectId, ref: 'Process', required: true },
   processName: { type: String, required: true },
+  instanceName: { type: String, required: true }, // <-- New Field Added!
   xml: { type: String, required: true },
   currentElement: { type: Object, default: null },
   sequenceMap: { type: Object, default: {} },
@@ -96,7 +97,7 @@ app.delete('/api/processes/:id', async (req, res) => {
   }
 });
 
-// API Routes for Active Instances
+// API Routes for Instances
 app.post('/api/instances', async (req, res) => {
   try {
     const instance = new Instance(req.body);

@@ -11,6 +11,7 @@
     "bpmn-js-properties-panel": "^5.31.1",
     "cra-template": "1.2.0",
     "fast-xml-parser": "^4.5.1",
+    "inherits-browser": "^0.1.0",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-dnd": "^16.0.1",

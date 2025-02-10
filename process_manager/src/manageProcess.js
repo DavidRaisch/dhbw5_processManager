@@ -25,12 +25,15 @@ function CreateProcess() {
 
     bpmnModeler.current.createDiagram().catch(console.error);
 
+    // When an element is clicked, update the selected element and load its role/description.
     bpmnModeler.current.on('element.click', (event) => {
       const element = event.element;
       setSelectedElement(element);
       const businessObject = element.businessObject;
-      setRole(businessObject.role || '');
-      setDescription(businessObject.description || ''); // Fetch description
+      // Attempt to load the role from different possible keys.
+      const loadedRole = businessObject['role:role'] || businessObject.role || '';
+      setRole(loadedRole);
+      setDescription(businessObject.description || '');
     });
 
     fetchProcesses();
@@ -39,6 +42,16 @@ function CreateProcess() {
       bpmnModeler.current.destroy();
     };
   }, []);
+
+  // Automatically update the BPMN element whenever role or description changes.
+  useEffect(() => {
+    if (selectedElement) {
+      const modeling = bpmnModeler.current.get('modeling');
+      const elementRegistry = bpmnModeler.current.get('elementRegistry');
+      const element = elementRegistry.get(selectedElement.id);
+      modeling.updateProperties(element, { role, description });
+    }
+  }, [role, description, selectedElement]);
 
   const fetchProcesses = async () => {
     try {
@@ -49,22 +62,7 @@ function CreateProcess() {
     }
   };
 
-  const handleSaveRole = () => {
-    if (!selectedElement) return;
-    const modeling = bpmnModeler.current.get('modeling');
-    const elementRegistry = bpmnModeler.current.get('elementRegistry');
-    const element = elementRegistry.get(selectedElement.id);
-    modeling.updateProperties(element, { 'role:role': role });
-  };
-
-  const handleSaveDescription = () => {
-    if (!selectedElement) return;
-    const modeling = bpmnModeler.current.get('modeling');
-    const elementRegistry = bpmnModeler.current.get('elementRegistry');
-    const element = elementRegistry.get(selectedElement.id);
-    modeling.updateProperties(element, { description }); // Save description
-  };
-
+  // Save the entire diagram (including any role/description changes) along with the process name.
   const handleSaveToDatabase = () => {
     if (!processName) {
       alert('Please enter a process name.');
@@ -72,7 +70,8 @@ function CreateProcess() {
     }
 
     bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
-      axios.post('http://localhost:5001/api/processes', { name: processName, xml })
+      axios
+        .post('http://localhost:5001/api/processes', { name: processName, xml })
         .then((response) => {
           alert(response.data.message);
           fetchProcesses();
@@ -84,12 +83,23 @@ function CreateProcess() {
     });
   };
 
+  // When loading a process, update the process name and reset role/description.
   const handleLoadProcess = (process) => {
-    bpmnModeler.current.importXML(process.xml).catch((err) => console.error('Error loading process:', err));
+    bpmnModeler.current
+      .importXML(process.xml)
+      .then(() => {
+        setProcessName(process.name);
+        // Reset selected element and clear role and description
+        setSelectedElement(null);
+        setRole('');
+        setDescription('');
+      })
+      .catch((err) => console.error('Error loading process:', err));
   };
 
   const handleDeleteProcess = (id) => {
-    axios.delete(`http://localhost:5001/api/processes/${id}`)
+    axios
+      .delete(`http://localhost:5001/api/processes/${id}`)
       .then(() => {
         alert('Process deleted');
         fetchProcesses();
@@ -99,19 +109,16 @@ function CreateProcess() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ marginBottom: '20px' }}>
-        <input
-          type="text"
-          placeholder="Process Name"
-          value={processName}
-          onChange={(e) => setProcessName(e.target.value)}
-          style={{ marginRight: '10px', padding: '5px' }}
-        />
-        <button onClick={handleSaveToDatabase} style={{ padding: '5px 10px' }}>Save to Database</button>
-      </div>
-
+      {/* Editor and saved processes */}
       <div style={{ display: 'flex', gap: '20px' }}>
-        <div style={{ flex: 1, border: '1px solid black', height: '400px', position: 'relative' }}>
+        <div
+          style={{
+            flex: 1,
+            border: '1px solid black',
+            height: '400px',
+            position: 'relative'
+          }}
+        >
           <div ref={bpmnEditorRef} style={{ width: '100%', height: '100%' }}></div>
         </div>
 
@@ -120,14 +127,36 @@ function CreateProcess() {
           {processList.map((process) => (
             <div key={process._id} style={{ marginBottom: '10px' }}>
               <div>{process.name}</div>
-              <button onClick={() => handleLoadProcess(process)} style={{ marginRight: '5px' }}>Load</button>
+              <button
+                onClick={() => handleLoadProcess(process)}
+                style={{ marginRight: '5px' }}
+              >
+                Load
+              </button>
               <button onClick={() => handleDeleteProcess(process._id)}>Delete</button>
             </div>
           ))}
         </div>
       </div>
 
+      {/* Bottom container with two sections */}
       <div style={{ marginTop: '20px', border: '1px solid black', padding: '10px' }}>
+        {/* Process Information Section */}
+        <h3>Process Information</h3>
+        <div style={{ marginBottom: '20px' }}>
+          <input
+            type="text"
+            placeholder="Process Name"
+            value={processName}
+            onChange={(e) => setProcessName(e.target.value)}
+            style={{ marginRight: '10px', padding: '5px' }}
+          />
+          <button onClick={handleSaveToDatabase} style={{ padding: '5px 10px' }}>
+            Save to Database
+          </button>
+        </div>
+
+        {/* Role and Description Section */}
         <h3>Assign Role and Description to Element</h3>
         <div style={{ marginBottom: '10px' }}>
           <input
@@ -137,7 +166,6 @@ function CreateProcess() {
             onChange={(e) => setRole(e.target.value)}
             style={{ marginRight: '10px', padding: '5px' }}
           />
-          <button onClick={handleSaveRole} style={{ padding: '5px 10px' }}>Save Role</button>
         </div>
         <div style={{ marginBottom: '10px' }}>
           <input
@@ -147,10 +175,9 @@ function CreateProcess() {
             onChange={(e) => setDescription(e.target.value)}
             style={{ marginRight: '10px', padding: '5px' }}
           />
-          <button onClick={handleSaveDescription} style={{ padding: '5px 10px' }}>Save Description</button>
         </div>
         <div>
-          <strong>Selected Element:</strong> {selectedElement ? selectedElement.id : 'None'}
+          <strong>Selected Element:</strong> {selectedElement ? selectedElement.businessObject.name || selectedElement.id : 'None'}
         </div>
       </div>
     </div>
@@ -159,10 +186,10 @@ function CreateProcess() {
 
 export default CreateProcess;
 
-//TODO: fill ProcessName in, during process loading
+
+
+//TODO: Include a rule to prevent Start_Event1 from getting deleted/removed => use https://github.com/bpmn-io/bpmn-js-examples/tree/main/custom-modeling-rules to do so
+
 //TODO: Instead of giving the opportunity to fill the blanks, implement pre-defined roles the user can choose
-//TODO: Add a description for each element, that will be displayed in executingProcess
+//TODO: make role and description requiered for each element to save the process
 //TODO: change delete process => only user with permission should be able to delete processes
-//TODO: put process name and save button into box below. remove single save button for name and description, only one save button for everthing
-//TODO: sleceted element should display the name of the element
-//TODO: Role and description should be loaded out of database with process

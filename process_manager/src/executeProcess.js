@@ -17,6 +17,8 @@ function ExecuteProcess() {
   const [selectedInstanceId, setSelectedInstanceId] = useState(null);
   // Currently selected process template (when starting a new instance)
   const [selectedProcess, setSelectedProcess] = useState(null);
+  // New instance name input value (when creating an instance)
+  const [newInstanceName, setNewInstanceName] = useState("");
   const viewerRef = useRef(null);
   const bpmnContainerRef = useRef(null);
 
@@ -25,7 +27,7 @@ function ExecuteProcess() {
     viewerRef.current = new NavigatedViewer({
       container: bpmnContainerRef.current,
       zoomScroll: false,
-      moveCanvas: false
+      moveCanvas: false,
     });
     fetchProcesses();
     fetchInstances();
@@ -113,11 +115,16 @@ function ExecuteProcess() {
   };
 
   // Create a new instance for a given process and persist it.
-  const createNewInstance = async (process) => {
+  // Now using the provided instanceName from the input.
+  const createNewInstance = async (process, instanceName) => {
+    if (!instanceName) {
+      alert("Please enter an instance name.");
+      return;
+    }
     const parser = new XMLParser({
       ignoreAttributes: false,
       attributeNamePrefix: "@_",
-      removeNSPrefix: true
+      removeNSPrefix: true,
     });
     const parsedXML = parser.parse(process.xml);
     const flowMap = {};
@@ -133,20 +140,21 @@ function ExecuteProcess() {
       }
       flowMap[flow["@_sourceRef"]].push({
         target: flow["@_targetRef"],
-        name: flow["@_name"] || 'Unnamed Flow'
+        name: flow["@_name"] || 'Unnamed Flow',
       });
     });
 
     const newInstanceData = {
       processId: process._id || process.id,
       processName: process.name,
+      instanceName, // Use the instance name provided in the input.
       xml: process.xml,
       currentElement: null,
       sequenceMap: flowMap,
       gatewayChoices: [],
       position: 'StartEvent_1',
       status: 'running',
-      created: new Date()
+      created: new Date(),
     };
 
     try {
@@ -155,6 +163,7 @@ function ExecuteProcess() {
       setActiveInstances((prev) => [...prev, savedInstance]);
       setSelectedInstanceId(savedInstance._id);
       setSelectedProcess(null);
+      setNewInstanceName(""); // reset the instance name input
 
       await viewerRef.current.importXML(process.xml);
       viewerRef.current.get('canvas').zoom('fit-viewport');
@@ -174,7 +183,7 @@ function ExecuteProcess() {
           id: element.id,
           name: element.businessObject.name || 'Unnamed',
           role: element.businessObject.get('role:role') || 'No role assigned',
-          description: element.businessObject.get('role:description') || 'No description'
+          description: element.businessObject.get('role:description') || 'No description',
         }
       : null;
   };
@@ -238,7 +247,7 @@ function ExecuteProcess() {
         flexDirection: 'row',
         width: '100%',
         maxWidth: '1400px',
-        margin: '0 auto'
+        margin: '0 auto',
       }}
     >
       {/* Left Sidebar */}
@@ -263,7 +272,7 @@ function ExecuteProcess() {
 
         <div style={{ marginTop: '20px' }}>
           <h3>Active Instances</h3>
-          <ul>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
             {activeInstances.map((instance) => (
               <li
                 key={instance._id}
@@ -271,16 +280,22 @@ function ExecuteProcess() {
                   cursor: 'pointer',
                   padding: '5px',
                   backgroundColor: selectedInstanceId === instance._id ? '#e0f0ff' : 'white',
-                  borderBottom: '1px solid lightgray'
+                  borderBottom: '1px solid lightgray',
                 }}
                 onClick={() => {
                   setSelectedInstanceId(instance._id);
                   setSelectedProcess(null);
                 }}
               >
-                {instance.processName} (#{instance._id})
-                <br />
-                <small>{new Date(instance.created).toLocaleTimeString()}</small>
+                <div>
+                  <strong>{instance.instanceName}</strong>
+                </div>
+                <div>
+                  <em>{instance.processName}</em>
+                </div>
+                <div>
+                  <small>{new Date(instance.created).toLocaleString()}</small>
+                </div>
               </li>
             ))}
           </ul>
@@ -289,24 +304,30 @@ function ExecuteProcess() {
         {/* Archived Processes section */}
         <div style={{ marginTop: '20px', borderTop: '1px solid gray', paddingTop: '10px' }}>
           <h3>Archived Processes</h3>
-          <div style={{ maxHeight: '200px', overflowY: 'auto', overflowX: 'hidden' }}>
-            <ul>
+          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+            <ul style={{ listStyle: 'none', padding: 0 }}>
               {archivedInstances.map((instance) => (
                 <li
                   key={instance._id}
                   style={{
                     cursor: 'pointer',
                     padding: '5px',
-                    borderBottom: '1px solid lightgray'
+                    borderBottom: '1px solid lightgray',
                   }}
                   onClick={() => {
                     setSelectedInstanceId(instance._id);
                     setSelectedProcess(null);
                   }}
                 >
-                  {instance.processName} (#{instance._id})
-                  <br />
-                  <small>{new Date(instance.created).toLocaleTimeString()}</small>
+                  <div>
+                    <strong>{instance.instanceName}</strong>
+                  </div>
+                  <div>
+                    <em>{instance.processName}</em>
+                  </div>
+                  <div>
+                    <small>{new Date(instance.created).toLocaleString()}</small>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -317,24 +338,43 @@ function ExecuteProcess() {
       {/* Main Content */}
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingLeft: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-          <input
-            type="text"
-            value={
-              selectedProcess
-                ? selectedProcess.name
-                : ([...activeInstances, ...archivedInstances].find((i) => i._id === selectedInstanceId)?.processName ||
-                    'Select a process')
-            }
-            readOnly
-            placeholder="Process Name"
-            style={{ flex: 1 }}
-          />
-          <div>
-            {selectedProcess && (
-              <button onClick={() => createNewInstance(selectedProcess)} style={{ marginRight: '10px' }}>
+          {selectedProcess ? (
+            // If a process is selected for starting a new instance,
+            // show two input fields: one for the process name (read-only)
+            // and one to enter the instance name.
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+              <input
+                type="text"
+                value={selectedProcess.name}
+                readOnly
+                style={{ marginRight: '10px', flex: 1 }}
+              />
+              <input
+                type="text"
+                placeholder="Enter instance name"
+                value={newInstanceName}
+                onChange={(e) => setNewInstanceName(e.target.value)}
+                style={{ marginRight: '10px', flex: 1 }}
+              />
+              <button onClick={() => createNewInstance(selectedProcess, newInstanceName)}>
                 Start New Instance
               </button>
-            )}
+            </div>
+          ) : (
+            // Otherwise, display the selected instance details (if any).
+            <input
+              type="text"
+              value={
+                selectedInstance
+                  ? `${selectedInstance.instanceName} - ${selectedInstance.processName}`
+                  : 'Select a process'
+              }
+              readOnly
+              placeholder="Process Name"
+              style={{ flex: 1 }}
+            />
+          )}
+          <div>
             <button>Close</button>
           </div>
         </div>
@@ -352,9 +392,24 @@ function ExecuteProcess() {
               alignItems: 'center',
               justifyContent: 'center',
               height: '400px',
-              border: '1px solid black'
+              border: '1px solid black',
             }}
           >
+            {/* Navigation Window Header with Instance Details */}
+            {selectedInstance && (
+              <div
+                style={{
+                  borderBottom: '1px solid gray',
+                  padding: '5px',
+                  width: '100%',
+                  textAlign: 'center',
+                }}
+              >
+                <strong>{selectedInstance.instanceName}</strong> -{' '}
+                <em>{selectedInstance.processName}</em> -{' '}
+                <small>{new Date(selectedInstance.created).toLocaleString()}</small>
+              </div>
+            )}
             {/* If the selected instance is archived (finished or canceled), show its status only */}
             {selectedInstance && selectedInstance.status !== 'running' ? (
               <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -427,12 +482,15 @@ export default ExecuteProcess;
 
 
 
+
+
 /** Requiered Improvments */
 //TODO: include logic for close-button, so it will close the current navigation of a process
 //TODO: send messages to User, if the element requieres there work
-//TODO: Name of active instance should be set at the top, not just process name, but a individual name (maybe process + ID displayed additionally to the individual name)
+//TODO: Trennstrich sollte die größe des Navigationsfensters haben
 
 
 /** Additional Improvments */
 //TODO: Change design more like manageProcess => process list and active list should be same size like displaying the process, and archived list should be same size as navigation/status report.
 //TODO: sort activeProcesses, so the newest process is on top
+//TODO: Search Bar for available Processes
