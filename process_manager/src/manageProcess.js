@@ -10,10 +10,14 @@ function CreateProcess() {
   const [processName, setProcessName] = useState('');
   const [processList, setProcessList] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
+  // Instead of freeform role input, we'll let the user select from a list.
   const [role, setRole] = useState('');
   const [description, setDescription] = useState('');
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
+
+  // Define the role options the user can choose from.
+  const roleOptions = ['Admin', 'Manager', 'Employee'];
 
   useEffect(() => {
     bpmnModeler.current = new BpmnModeler({
@@ -55,6 +59,36 @@ function CreateProcess() {
     }
   }, [role, description, selectedElement]);
 
+  // Helper function to validate that every element (except flows and process) has both a role and a description.
+  const validateDiagram = () => {
+    const elementRegistry = bpmnModeler.current.get('elementRegistry');
+    const errors = [];
+
+    elementRegistry.getAll().forEach((element) => {
+      const bo = element.businessObject;
+      if (bo) {
+        // Exclude flows (SequenceFlow) and process elements from validation.
+        if (bo.$type === 'bpmn:SequenceFlow' || bo.$type === 'bpmn:Process') {
+          return;
+        }
+
+        // Use either bo.role or bo['role:role'] (if defined via moddle extension)
+        const roleValue = (bo.role || bo['role:role'] || '').trim();
+        if (roleValue === '') {
+          errors.push(`${bo.name || element.id} is missing a role.`);
+        }
+
+        // Validate description.
+        const descValue = (bo.description || '').trim();
+        if (descValue === '') {
+          errors.push(`${bo.name || element.id} is missing a description.`);
+        }
+      }
+    });
+
+    return errors;
+  };
+
   const fetchProcesses = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/processes');
@@ -68,6 +102,13 @@ function CreateProcess() {
   const handleSaveToDatabase = () => {
     if (!processName) {
       alert('Please enter a process name.');
+      return;
+    }
+
+    // Validate that every element (except flows and process) has a role and a description.
+    const errors = validateDiagram();
+    if (errors.length > 0) {
+      alert('Error: Not every element has a role and a description:\n' + errors.join('\n'));
       return;
     }
 
@@ -104,7 +145,7 @@ function CreateProcess() {
       .importXML(process.xml)
       .then(() => {
         setProcessName(process.name);
-        // Reset selected element and clear role and description
+        // Reset selected element and clear role and description.
         setSelectedElement(null);
         setRole('');
         setDescription('');
@@ -178,13 +219,19 @@ function CreateProcess() {
         {/* Role and Description Section */}
         <h3>Assign Role and Description to Element</h3>
         <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            placeholder="Role"
+          {/* Replace the freeform text input with a select dropdown */}
+          <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
             style={{ marginRight: '10px', padding: '5px' }}
-          />
+          >
+            <option value="">Select Role</option>
+            {roleOptions.map((option, index) => (
+              <option key={index} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
         <div style={{ marginBottom: '10px' }}>
           <input
@@ -214,6 +261,16 @@ export default CreateProcess;
 
 
 
-//TODO: Instead of giving the opportunity to fill the blanks, implement pre-defined roles the user can choose
-//TODO: make role and description requiered for each element to save the process
+
+
+
 //TODO: change delete process => only user with permission should be able to delete processes
+//TODO: include a css file, to make the site more appealing
+
+
+/** Things to clear */
+//TODO: does flows and process need a role and description? Do role and description have to be mandatory in general?
+//TODO: should flows after gateways be requiered to be named?
+
+//TODO: should the creating a new process be priveliged to some user?
+//TODO: make creating a process procecss dependable on role of the user: Employer: needs permission from supervisior to create new process; Manager: can simply create a new Process

@@ -22,21 +22,36 @@ function ExecuteProcess() {
   const viewerRef = useRef(null);
   const bpmnContainerRef = useRef(null);
 
-  // On mount, initialize the BPMN viewer and fetch processes/instances.
+  // Fetch processes and instances on mount.
   useEffect(() => {
-    viewerRef.current = new NavigatedViewer({
-      container: bpmnContainerRef.current,
-      zoomScroll: false,
-      moveCanvas: false,
-    });
     fetchProcesses();
     fetchInstances();
-    return () => viewerRef.current.destroy();
   }, []);
 
-  // Whenever the selected process or instance changes, load its diagram.
+  // Clean up the viewer on unmount.
+  useEffect(() => {
+    return () => {
+      if (viewerRef.current) {
+        viewerRef.current.destroy();
+        viewerRef.current = null;
+      }
+    };
+  }, []);
+
+  // This effect both re‑creates the viewer (if needed) and loads the diagram.
   useEffect(() => {
     const loadDiagram = async () => {
+      // If a process (or instance) is selected and there is no viewer,
+      // create one.
+      if ((selectedProcess || selectedInstanceId) && !viewerRef.current) {
+        viewerRef.current = new NavigatedViewer({
+          container: bpmnContainerRef.current,
+          zoomScroll: false,
+          moveCanvas: false,
+        });
+      }
+      // If no viewer exists, nothing to load.
+      if (!viewerRef.current) return;
       try {
         if (selectedProcess) {
           await viewerRef.current.importXML(selectedProcess.xml);
@@ -57,21 +72,7 @@ function ExecuteProcess() {
     loadDiagram();
   }, [selectedProcess, selectedInstanceId, activeInstances, archivedInstances]);
 
-  // If a running instance is selected and it has multiple next steps but no gateway choices yet,
-  // update it so that the available choices appear.
-  useEffect(() => {
-    if (selectedInstanceId) {
-      const instance = activeInstances.find((i) => i._id === selectedInstanceId);
-      if (instance) {
-        const flows = instance.sequenceMap ? (instance.sequenceMap[instance.position] || []) : [];
-        if (flows.length > 1 && (!instance.gatewayChoices || instance.gatewayChoices.length === 0)) {
-          updateInstance(instance._id, { gatewayChoices: flows });
-        }
-      }
-    }
-  }, [selectedInstanceId, activeInstances]);
-
-  // Fetch all available process templates from the backend.
+  // Fetch available process templates from the backend.
   const fetchProcesses = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/processes');
@@ -81,7 +82,7 @@ function ExecuteProcess() {
     }
   };
 
-  // Fetch all instances and separate them into active and archived based on their status.
+  // Fetch instances and separate them into active and archived.
   const fetchInstances = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/instances');
@@ -114,8 +115,7 @@ function ExecuteProcess() {
     }
   };
 
-  // Create a new instance for a given process and persist it.
-  // Now using the provided instanceName from the input.
+  // Create a new instance for a given process.
   const createNewInstance = async (process, instanceName) => {
     if (!instanceName) {
       alert("Please enter an instance name.");
@@ -165,6 +165,7 @@ function ExecuteProcess() {
       setSelectedProcess(null);
       setNewInstanceName(""); // reset the instance name input
 
+      // Load the new instance diagram.
       await viewerRef.current.importXML(process.xml);
       viewerRef.current.get('canvas').zoom('fit-viewport');
 
@@ -175,7 +176,7 @@ function ExecuteProcess() {
     }
   };
 
-  // Retrieve the BPMN element's state (name, role, description) from the viewer.
+  // Retrieve an element's state from the viewer.
   const getElementState = (elementId) => {
     const element = viewerRef.current.get('elementRegistry').find((el) => el.id === elementId);
     return element
@@ -211,19 +212,36 @@ function ExecuteProcess() {
     updateInstance(instanceId, { position: target, currentElement: newElement, gatewayChoices: [] });
   };
 
-  // Finish the process: update its status to "finished".
-  const finishProcess = (instanceId) => {
-    updateInstance(instanceId, { status: 'finished' });
+  // Finish the process: update status and destroy the viewer.
+  const finishProcess = async (instanceId) => {
+    await updateInstance(instanceId, { status: 'finished' });
     if (selectedInstanceId === instanceId) {
       setSelectedInstanceId(null);
     }
+    clearViewer();
   };
 
-  // Cancel the process: update its status to "canceled".
-  const cancelProcess = (instanceId) => {
-    updateInstance(instanceId, { status: 'canceled' });
+  // Cancel the process: update status and destroy the viewer.
+  const cancelProcess = async (instanceId) => {
+    await updateInstance(instanceId, { status: 'canceled' });
     if (selectedInstanceId === instanceId) {
       setSelectedInstanceId(null);
+    }
+    clearViewer();
+  };
+
+  // Handler for the Close button: destroy the viewer and reset selections.
+  const handleClose = () => {
+    clearViewer();
+    setSelectedInstanceId(null);
+    setSelectedProcess(null);
+  };
+
+  // Helper to destroy the viewer.
+  const clearViewer = () => {
+    if (viewerRef.current) {
+      viewerRef.current.destroy();
+      viewerRef.current = null;
     }
   };
 
@@ -339,9 +357,7 @@ function ExecuteProcess() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingLeft: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
           {selectedProcess ? (
-            // If a process is selected for starting a new instance,
-            // show two input fields: one for the process name (read-only)
-            // and one to enter the instance name.
+            // Process selected for starting a new instance.
             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
               <input
                 type="text"
@@ -361,7 +377,7 @@ function ExecuteProcess() {
               </button>
             </div>
           ) : (
-            // Otherwise, display the selected instance details (if any).
+            // Otherwise, show the selected instance details.
             <input
               type="text"
               value={
@@ -375,10 +391,11 @@ function ExecuteProcess() {
             />
           )}
           <div>
-            <button>Close</button>
+            <button onClick={handleClose}>Close</button>
           </div>
         </div>
 
+        {/* BPMN Viewer Container */}
         <div style={{ flex: 1, height: '500px', border: '1px solid black', overflow: 'hidden' }}>
           <div ref={bpmnContainerRef} style={{ width: '100%', height: '100%' }}></div>
         </div>
@@ -401,7 +418,7 @@ function ExecuteProcess() {
                 style={{
                   borderBottom: '1px solid gray',
                   padding: '5px',
-                  width: '100%',
+                  alignSelf: 'stretch', // This forces the header to fill the parent's width
                   textAlign: 'center',
                 }}
               >
@@ -410,7 +427,7 @@ function ExecuteProcess() {
                 <small>{new Date(selectedInstance.created).toLocaleString()}</small>
               </div>
             )}
-            {/* If the selected instance is archived (finished or canceled), show its status only */}
+            {/* Display status if the instance is archived */}
             {selectedInstance && selectedInstance.status !== 'running' ? (
               <div style={{ padding: '20px', textAlign: 'center' }}>
                 <h3>Process Status: {selectedInstance.status}</h3>
@@ -458,7 +475,7 @@ function ExecuteProcess() {
                     )}
                   </div>
                 )}
-                {/* Only show Cancel Process if nextElements exist (i.e. Finish Process is not shown) */}
+                {/* Show Cancel Process only if there are next elements */}
                 {nextElements.length > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
                     <button onClick={() => cancelProcess(selectedInstanceId)}>Cancel Process</button>
@@ -484,13 +501,12 @@ export default ExecuteProcess;
 
 
 
+
 /** Requiered Improvments */
-//TODO: include logic for close-button, so it will close the current navigation of a process
 //TODO: send messages to User, if the element requieres there work
-//TODO: Trennstrich sollte die größe des Navigationsfensters haben
+//TODO: include a css file, to make the site more appealing
 
 
 /** Additional Improvments */
-//TODO: Change design more like manageProcess => process list and active list should be same size like displaying the process, and archived list should be same size as navigation/status report.
 //TODO: sort activeProcesses, so the newest process is on top
 //TODO: Search Bar for available Processes
