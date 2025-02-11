@@ -4,6 +4,7 @@ import BpmnModeler from 'bpmn-js/lib/Modeler';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import { customExtension } from './customExtension';
+import customRules from './customRules';  // our custom rules module
 
 function CreateProcess() {
   const [processName, setProcessName] = useState('');
@@ -17,7 +18,9 @@ function CreateProcess() {
   useEffect(() => {
     bpmnModeler.current = new BpmnModeler({
       container: bpmnEditorRef.current,
-      additionalModules: [],
+      additionalModules: [
+        customRules  // Include our custom rules module.
+      ],
       moddleExtensions: {
         role: customExtension
       }
@@ -30,7 +33,6 @@ function CreateProcess() {
       const element = event.element;
       setSelectedElement(element);
       const businessObject = element.businessObject;
-      // Attempt to load the role from different possible keys.
       const loadedRole = businessObject['role:role'] || businessObject.role || '';
       setRole(loadedRole);
       setDescription(businessObject.description || '');
@@ -80,6 +82,19 @@ function CreateProcess() {
           console.error('Error saving process:', err);
           alert('An error occurred while saving the process.');
         });
+    });
+  };
+
+  // Create a new blank process.
+  const handleCreateNewProcess = () => {
+    bpmnModeler.current.createDiagram().then(() => {
+      // Clear out the current process information and selected element.
+      setProcessName('');
+      setSelectedElement(null);
+      setRole('');
+      setDescription('');
+    }).catch((err) => {
+      console.error('Error creating new diagram:', err);
     });
   };
 
@@ -139,7 +154,7 @@ function CreateProcess() {
         </div>
       </div>
 
-      {/* Bottom container with two sections */}
+      {/* Bottom container with Process Information and Role/Description */}
       <div style={{ marginTop: '20px', border: '1px solid black', padding: '10px' }}>
         {/* Process Information Section */}
         <h3>Process Information</h3>
@@ -151,8 +166,12 @@ function CreateProcess() {
             onChange={(e) => setProcessName(e.target.value)}
             style={{ marginRight: '10px', padding: '5px' }}
           />
-          <button onClick={handleSaveToDatabase} style={{ padding: '5px 10px' }}>
+          <button onClick={handleSaveToDatabase} style={{ padding: '5px 10px', marginRight: '10px' }}>
             Save to Database
+          </button>
+          {/* New "Create New Process" button */}
+          <button onClick={handleCreateNewProcess} style={{ padding: '5px 10px' }}>
+            Create New Process
           </button>
         </div>
 
@@ -177,7 +196,10 @@ function CreateProcess() {
           />
         </div>
         <div>
-          <strong>Selected Element:</strong> {selectedElement ? selectedElement.businessObject.name || selectedElement.id : 'None'}
+          <strong>Selected Element:</strong>{' '}
+          {selectedElement
+            ? selectedElement.businessObject.name || selectedElement.id
+            : 'None'}
         </div>
       </div>
     </div>
@@ -188,7 +210,9 @@ export default CreateProcess;
 
 
 
-//TODO: Include a rule to prevent Start_Event1 from getting deleted/removed => use https://github.com/bpmn-io/bpmn-js-examples/tree/main/custom-modeling-rules to do so
+
+
+
 
 //TODO: Instead of giving the opportunity to fill the blanks, implement pre-defined roles the user can choose
 //TODO: make role and description requiered for each element to save the process
