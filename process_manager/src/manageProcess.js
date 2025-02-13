@@ -263,7 +263,7 @@ export default CreateProcess;
 
 
 
-
+//TODO: implement a project requieremtn for each process in General (for example: process 1 - auto; process 2 - Software;)
 //TODO: change delete process => only user with permission should be able to delete processes
 //TODO: include a css file, to make the site more appealing
 

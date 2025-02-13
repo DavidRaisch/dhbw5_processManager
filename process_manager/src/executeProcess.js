@@ -503,6 +503,8 @@ export default ExecuteProcess;
 
 
 /** Requiered Improvments */
+//TODO: Send notification to Manager specific matching to the project the Manager leads and the Process is assigned to
+//TODO: User can only See the process assigned to their project
 //TODO: send messages to User, if the element requieres there work
 //TODO: include a css file, to make the site more appealing
 

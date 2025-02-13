@@ -147,4 +147,6 @@ function UserManagement() {
 export default UserManagement;
 
 
+//TODO: User should be able to have multiple project
+//TODO: Usermanagment needs to be able to modify the according project of a user
 //TODO: Change password optional, only role change should be possible
