@@ -3,16 +3,124 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 
-// Initialize the app
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/bpmn', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
+mongoose
+  .connect('mongodb://localhost:27017/bpmn', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('MongoDB connected');
+  })
   .catch(err => console.error(err));
+
+/* ====================
+   USER SCHEMA & MODEL
+   ==================== */
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true }, // stored hashed
+  role: { type: String, required: true, enum: ['Admin', 'Manager', 'Employee'] },
+});
+const User = mongoose.model('User', userSchema);
+
+
+/* =====================
+   LOGIN ENDPOINT
+   ===================== */
+   app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required.' });
+    }
+    try {
+      const user = await User.findOne({ username });
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials.' });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid credentials.' });
+      }
+      // Return user details (omit the password)
+      return res.json({
+        message: 'Login successful',
+        user: { username: user.username, role: user.role },
+      });
+    } catch (err) {
+      return res.status(500).json({ error: 'Server error' });
+    }
+  });
+app.post('/api/users', async (req, res) => {
+  const { username, password, role } = req.body;
+  if (!username || !password || !role) {
+    return res.status(400).json({ error: 'Username, password, and role are required.' });
+  }
+  try {
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists.' });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const newUser = new User({ username, password: hashedPassword, role });
+    await newUser.save();
+    res.json({ message: 'User created successfully', user: { username, role } });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+// GET /api/users - Retrieves all users (excluding their passwords)
+app.get('/api/users', async (req, res) => {
+  try {
+    // Exclude the password field by using projection: { password: 0 }
+    const users = await User.find({}, { password: 0 });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: 'Error retrieving users' });
+  }
+});
+// Update a user
+app.put('/api/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { username, role, password } = req.body;
+  try {
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    
+    if (username) user.username = username;
+    if (role) user.role = role;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+    
+    await user.save();
+    const userWithoutPassword = { _id: user._id, username: user.username, role: user.role };
+    res.json({ message: 'User updated successfully', user: userWithoutPassword });
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating user.' });
+  }
+});
+
+// Delete a user
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    res.json({ message: 'User deleted successfully.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error deleting user.' });
+  }
+});
+
+
+/* ====================
+   PROCESS & INSTANCE ROUTES
+   ==================== */
 
 // Process Schema & Model
 const processSchema = new mongoose.Schema({

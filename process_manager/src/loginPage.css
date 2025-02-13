@@ -1,0 +1,14 @@
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .form-field {
+    margin-bottom: 15px;
+  }
+  .error {
+    color: red;
+  }
+  
