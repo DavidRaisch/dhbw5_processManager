@@ -1,17 +1,19 @@
 // StartPage.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './startPage.css';
-import { 
-  FiSettings, 
-  FiPlayCircle, 
-  FiUsers, 
-  FiLogOut 
-} from 'react-icons/fi';
+import { FiSettings, FiPlayCircle, FiUsers, FiLogOut, FiBell } from 'react-icons/fi';
 
 function StartPage() {
   const navigate = useNavigate();
   const user = JSON.parse(sessionStorage.getItem('user'));
+  const [notifications, setNotifications] = useState([]);
+
+  // Load notifications from localStorage on mount.
+  useEffect(() => {
+    const storedNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
+    setNotifications(storedNotifications);
+  }, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem('user');
@@ -20,24 +22,37 @@ function StartPage() {
 
   return (
     <div className="start-page">
+      {/* User Role Badge */}
       {user && (
         <div className="user-role-badge">
           <span>{user.username}</span>
         </div>
       )}
-      
-      <button 
-        className="logout-button"
-        onClick={handleLogout}
-        aria-label="Logout"
-      >
+
+      {/* Logout Button */}
+      <button className="logout-button" onClick={handleLogout} aria-label="Logout">
         <FiLogOut size={16} />
         Logout
       </button>
 
       <h1 className="page-title">Process Manager</h1>
 
+      {/* Notification Button */}
+      <div className="notifications-button-container">
+        <button 
+          className="notifications-button" 
+          onClick={() => navigate('/notifications')}
+        >
+          <FiBell size={20} />
+          Notifications
+          {notifications.length > 0 && (
+            <span className="notification-count">{notifications.length}</span>
+          )}
+        </button>
+      </div>
+
       <div className="button-container">
+        {/* Show Process Buttons for Employees/Managers */}
         {(user?.role === 'Employee' || user?.role === 'Manager') && (
           <>
             <button 
@@ -47,7 +62,6 @@ function StartPage() {
               <FiSettings size={20} />
               Manage Process
             </button>
-            
             <button 
               onClick={() => navigate('/execute-process')} 
               className="action-button execute"
@@ -58,6 +72,7 @@ function StartPage() {
           </>
         )}
         
+        {/* Show User Management only for Admins */}
         {user?.role === 'Admin' && (
           <button 
             onClick={() => navigate('/manage-users')} 
@@ -78,7 +93,8 @@ export default StartPage;
 
 
 
+
 /** Additional Add-Ons */
-//TODO: get role of user as a dropdown in the top left corner
+//TODO: get role of user and associated project as a dropdown in the top left corner
 //TODO: get a custom password change site for only the individual user also in the dropdown menu
 //TODO: admin only user managment, no process rights, except if it is possible to get two roles

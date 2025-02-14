@@ -18,8 +18,92 @@ mongoose
   .catch(err => console.error(err));
 
 /* ====================
+   NOTIFICATION SCHEMA & MODEL
+   ===================== */
+const notificationSchema = new mongoose.Schema({
+  message: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
+  instanceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Instance', required: true },
+  requestedBy: { type: String, required: true },
+  requestedById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  targetRole: { type: String, enum: ['Admin', 'Manager', 'Employee'], default: 'Manager' },
+  status: { type: String, enum: ['pending', 'approved', 'dismissed'], default: 'pending' },
+});
+const Notification = mongoose.model('Notification', notificationSchema);
+
+/* ====================
+   NOTIFICATION ENDPOINTS
+   ===================== */
+
+// Create a new notification
+app.post('/api/notifications', async (req, res) => {
+  const { message, instanceId, requestedBy, requestedById, targetRole, status } = req.body;
+  if (!message || !instanceId || !requestedBy || !requestedById) {
+    return res.status(400).json({ error: 'Missing required fields for notification.' });
+  }
+  try {
+    const notification = new Notification({
+      message,
+      instanceId,
+      requestedBy,
+      requestedById,
+      targetRole: targetRole || 'Manager',
+      status: status || 'pending',
+    });
+    await notification.save();
+    res.json({ message: 'Notification created', notification });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error creating notification' });
+  }
+});
+
+// Get notifications (optionally filter by targetRole via query parameter)
+app.get('/api/notifications', async (req, res) => {
+  const { targetRole } = req.query;
+  try {
+    const filter = targetRole ? { targetRole } : {};
+    const notifications = await Notification.find(filter);
+    res.json(notifications);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching notifications' });
+  }
+});
+
+// Delete a notification by ID
+app.delete('/api/notifications/:id', async (req, res) => {
+  try {
+    const notification = await Notification.findByIdAndDelete(req.params.id);
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found.' });
+    }
+    res.json({ message: 'Notification deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting notification.' });
+  }
+});
+// PUT /api/notifications/:id
+// This endpoint updates an existing notification with any fields provided in the request body.
+app.put('/api/notifications/:id', async (req, res) => {
+  const updates = req.body; // Expected to include fields like targetRole, status, message, etc.
+  try {
+    const notification = await Notification.findByIdAndUpdate(req.params.id, updates, { new: true });
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found.' });
+    }
+    res.json({ message: 'Notification updated successfully.', notification });
+  } catch (err) {
+    console.error('Error updating notification:', err);
+    res.status(500).json({ error: 'Error updating notification.' });
+  }
+});
+
+
+/* ====================
    USER SCHEMA & MODEL
-   ==================== */
+   ===================== */
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true }, // stored hashed
@@ -27,33 +111,33 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-
 /* =====================
    LOGIN ENDPOINT
    ===================== */
-   app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required.' });
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
+  }
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
     }
-    try {
-      const user = await User.findOne({ username });
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials.' });
-      }
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ error: 'Invalid credentials.' });
-      }
-      // Return user details (omit the password)
-      return res.json({
-        message: 'Login successful',
-        user: { username: user.username, role: user.role },
-      });
-    } catch (err) {
-      return res.status(500).json({ error: 'Server error' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
     }
-  });
+    // Return user details (omit the password) and include the _id.
+    return res.json({
+      message: 'Login successful',
+      user: { _id: user._id, username: user.username, role: user.role },
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 app.post('/api/users', async (req, res) => {
   const { username, password, role } = req.body;
   if (!username || !password || !role) {
@@ -68,11 +152,13 @@ app.post('/api/users', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = new User({ username, password: hashedPassword, role });
     await newUser.save();
-    res.json({ message: 'User created successfully', user: { username, role } });
+    // Return the new user's _id along with username and role.
+    res.json({ message: 'User created successfully', user: { _id: newUser._id, username, role } });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 // GET /api/users - Retrieves all users (excluding their passwords)
 app.get('/api/users', async (req, res) => {
   try {
@@ -83,6 +169,7 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Error retrieving users' });
   }
 });
+
 // Update a user
 app.put('/api/users/:id', async (req, res) => {
   const { id } = req.params;
@@ -116,7 +203,6 @@ app.delete('/api/users/:id', async (req, res) => {
     res.status(500).json({ error: 'Error deleting user.' });
   }
 });
-
 
 /* ====================
    PROCESS & INSTANCE ROUTES

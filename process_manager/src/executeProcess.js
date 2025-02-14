@@ -1,5 +1,5 @@
-// ExecuteProcess.js
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom'; // Ensure useLocation is imported
 import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer';
@@ -7,6 +7,9 @@ import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 
 function ExecuteProcess() {
+  const location = useLocation();
+  const instanceIdFromNotification = location.state?.instanceId;
+
   // List of BPMN process templates
   const [processList, setProcessList] = useState([]);
   // Instances that are still running
@@ -22,11 +25,23 @@ function ExecuteProcess() {
   const viewerRef = useRef(null);
   const bpmnContainerRef = useRef(null);
 
+  // Get current logged-in user from sessionStorage
+  // Ensure your login endpoint returns _id along with username and role
+  const currentUser = JSON.parse(sessionStorage.getItem('user'));
+
   // Fetch processes and instances on mount.
   useEffect(() => {
     fetchProcesses();
     fetchInstances();
   }, []);
+
+  // If an instance ID was passed from a notification, select it.
+  useEffect(() => {
+    if (instanceIdFromNotification) {
+      setSelectedInstanceId(instanceIdFromNotification);
+      setSelectedProcess(null);
+    }
+  }, [instanceIdFromNotification]);
 
   // Clean up the viewer on unmount.
   useEffect(() => {
@@ -41,8 +56,6 @@ function ExecuteProcess() {
   // This effect both re‑creates the viewer (if needed) and loads the diagram.
   useEffect(() => {
     const loadDiagram = async () => {
-      // If a process (or instance) is selected and there is no viewer,
-      // create one.
       if ((selectedProcess || selectedInstanceId) && !viewerRef.current) {
         viewerRef.current = new NavigatedViewer({
           container: bpmnContainerRef.current,
@@ -50,7 +63,6 @@ function ExecuteProcess() {
           moveCanvas: false,
         });
       }
-      // If no viewer exists, nothing to load.
       if (!viewerRef.current) return;
       try {
         if (selectedProcess) {
@@ -102,7 +114,6 @@ function ExecuteProcess() {
       const response = await axios.put(`http://localhost:5001/api/instances/${instanceId}`, updatedData);
       const updatedInstance = response.data.instance;
       if (updatedInstance.status !== 'running') {
-        // Remove from activeInstances and add to archivedInstances.
         setActiveInstances((prev) => prev.filter((inst) => inst._id !== instanceId));
         setArchivedInstances((prev) => [...prev, updatedInstance]);
       } else {
@@ -147,7 +158,7 @@ function ExecuteProcess() {
     const newInstanceData = {
       processId: process._id || process.id,
       processName: process.name,
-      instanceName, // Use the instance name provided in the input.
+      instanceName,
       xml: process.xml,
       currentElement: null,
       sequenceMap: flowMap,
@@ -163,7 +174,7 @@ function ExecuteProcess() {
       setActiveInstances((prev) => [...prev, savedInstance]);
       setSelectedInstanceId(savedInstance._id);
       setSelectedProcess(null);
-      setNewInstanceName(""); // reset the instance name input
+      setNewInstanceName("");
 
       // Load the new instance diagram.
       await viewerRef.current.importXML(process.xml);
@@ -196,10 +207,8 @@ function ExecuteProcess() {
 
     const nextElements = instance.sequenceMap[instance.position] || [];
     if (nextElements.length > 1) {
-      // More than one possible next step: show gateway choices.
       updateInstance(instanceId, { gatewayChoices: nextElements });
     } else if (nextElements.length === 1) {
-      // Single next step: auto-advance.
       const newPosition = nextElements[0]?.target;
       const newElement = getElementState(newPosition);
       updateInstance(instanceId, { position: newPosition, currentElement: newElement, gatewayChoices: [] });
@@ -245,7 +254,7 @@ function ExecuteProcess() {
     }
   };
 
-  // Compute the selected instance (active or archived).
+  // Compute the selected instance.
   const selectedInstance =
     activeInstances.find((i) => i._id === selectedInstanceId) ||
     archivedInstances.find((i) => i._id === selectedInstanceId);
@@ -255,6 +264,38 @@ function ExecuteProcess() {
     selectedInstance && selectedInstance.status === 'running'
       ? selectedInstance.sequenceMap[selectedInstance.position] || []
       : [];
+
+  // Notification request function.
+  const requestApproval = async () => {
+    // Ensure we have a valid user ID (your login should store _id in sessionStorage)
+    const requestedById = currentUser._id;
+    if (requestedById == null) {
+      console.error("No user id found in session.");
+      alert("No user id found, please login again." + currentUser._id + currentUser.username);
+      return;
+    }
+    if (currentUser.role === 'Employee' && selectedInstance.currentElement.role !== 'Employee') {
+      const newNotification = {
+        message: `User ${currentUser.username} attempted to proceed on instance "${selectedInstance.instanceName}" (step: ${selectedInstance.currentElement.name}) but doesn't have permission.`,
+        instanceId: selectedInstance._id,
+        requestedBy: currentUser.username,
+        requestedById,
+        targetRole: 'Manager',
+        status: 'pending'
+      };
+      try {
+        const response = await axios.post('http://localhost:5001/api/notifications', newNotification);
+        if (response.data.message) {
+          alert('Approval request sent to Manager.');
+        }
+      } catch (err) {
+        console.error('Error sending approval request:', err.response ? err.response.data : err);
+        alert('Error sending approval request.');
+      }
+    } else {
+      alert('You are not authorized to request approval for this step.');
+    }
+  };
 
   return (
     <div
@@ -319,7 +360,6 @@ function ExecuteProcess() {
           </ul>
         </div>
 
-        {/* Archived Processes section */}
         <div style={{ marginTop: '20px', borderTop: '1px solid gray', paddingTop: '10px' }}>
           <h3>Archived Processes</h3>
           <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
@@ -357,7 +397,6 @@ function ExecuteProcess() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingLeft: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
           {selectedProcess ? (
-            // Process selected for starting a new instance.
             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
               <input
                 type="text"
@@ -377,7 +416,6 @@ function ExecuteProcess() {
               </button>
             </div>
           ) : (
-            // Otherwise, show the selected instance details.
             <input
               type="text"
               value={
@@ -395,7 +433,6 @@ function ExecuteProcess() {
           </div>
         </div>
 
-        {/* BPMN Viewer Container */}
         <div style={{ flex: 1, height: '500px', border: '1px solid black', overflow: 'hidden' }}>
           <div ref={bpmnContainerRef} style={{ width: '100%', height: '100%' }}></div>
         </div>
@@ -412,13 +449,12 @@ function ExecuteProcess() {
               border: '1px solid black',
             }}
           >
-            {/* Navigation Window Header with Instance Details */}
             {selectedInstance && (
               <div
                 style={{
                   borderBottom: '1px solid gray',
                   padding: '5px',
-                  alignSelf: 'stretch', // This forces the header to fill the parent's width
+                  alignSelf: 'stretch',
                   textAlign: 'center',
                 }}
               >
@@ -427,13 +463,11 @@ function ExecuteProcess() {
                 <small>{new Date(selectedInstance.created).toLocaleString()}</small>
               </div>
             )}
-            {/* Display status if the instance is archived */}
             {selectedInstance && selectedInstance.status !== 'running' ? (
               <div style={{ padding: '20px', textAlign: 'center' }}>
                 <h3>Process Status: {selectedInstance.status}</h3>
               </div>
             ) : (
-              // Otherwise, display active process details and navigation controls.
               <>
                 {selectedInstance?.currentElement ? (
                   <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -444,42 +478,51 @@ function ExecuteProcess() {
                 ) : (
                   <p>No active element</p>
                 )}
-
-                {selectedInstance?.gatewayChoices && selectedInstance.gatewayChoices.length > 0 ? (
-                  <div>
-                    <h4>Choose Path:</h4>
-                    {selectedInstance.gatewayChoices.map((choice) => (
-                      <button
-                        key={choice.target}
-                        onClick={() => handleGatewayChoice(selectedInstanceId, choice.target)}
-                        style={{ margin: '5px' }}
-                      >
-                        {choice.name}
-                      </button>
-                    ))}
+                {selectedInstance?.currentElement &&
+                currentUser.role === 'Employee' &&
+                selectedInstance.currentElement.role !== 'Employee' ? (
+                  <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                    <p>You do not have permission to complete this step.</p>
+                    <button onClick={requestApproval}>Request Manager Approval</button>
                   </div>
                 ) : (
-                  <div>
-                    {nextElements.length === 0 ? (
-                      <button onClick={() => finishProcess(selectedInstanceId)} style={{ marginTop: '10px' }}>
-                        Finish Process
-                      </button>
+                  <>
+                    {selectedInstance?.gatewayChoices && selectedInstance.gatewayChoices.length > 0 ? (
+                      <div>
+                        <h4>Choose Path:</h4>
+                        {selectedInstance.gatewayChoices.map((choice) => (
+                          <button
+                            key={choice.target}
+                            onClick={() => handleGatewayChoice(selectedInstanceId, choice.target)}
+                            style={{ margin: '5px' }}
+                          >
+                            {choice.name}
+                          </button>
+                        ))}
+                      </div>
                     ) : (
-                      <button
-                        onClick={() => handleNextStep(selectedInstanceId)}
-                        style={{ marginTop: '10px' }}
-                        disabled={!selectedInstance?.position}
-                      >
-                        Next →
-                      </button>
+                      <div>
+                        {nextElements.length === 0 ? (
+                          <button onClick={() => finishProcess(selectedInstanceId)} style={{ marginTop: '10px' }}>
+                            Finish Process
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleNextStep(selectedInstanceId)}
+                            style={{ marginTop: '10px' }}
+                            disabled={!selectedInstance?.position}
+                          >
+                            Next →
+                          </button>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
-                {/* Show Cancel Process only if there are next elements */}
-                {nextElements.length > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                    <button onClick={() => cancelProcess(selectedInstanceId)}>Cancel Process</button>
-                  </div>
+                    {nextElements.length > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                        <button onClick={() => cancelProcess(selectedInstanceId)}>Cancel Process</button>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -502,11 +545,14 @@ export default ExecuteProcess;
 
 
 
+
+
 /** Requiered Improvments */
 //TODO: Send notification to Manager specific matching to the project the Manager leads and the Process is assigned to
 //TODO: User can only See the process assigned to their project
 //TODO: send messages to User, if the element requieres there work
 //TODO: include a css file, to make the site more appealing
+//TODO: employees can only send request to cancel instance
 
 
 /** Additional Improvments */

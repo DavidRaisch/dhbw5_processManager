@@ -1,3 +1,4 @@
+// CreateProcess.js
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
@@ -16,15 +17,16 @@ function CreateProcess() {
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
 
+  // Get logged in user from sessionStorage.
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  
   // Define the role options the user can choose from.
   const roleOptions = ['Admin', 'Manager', 'Employee'];
 
   useEffect(() => {
     bpmnModeler.current = new BpmnModeler({
       container: bpmnEditorRef.current,
-      additionalModules: [
-        customRules  // Include our custom rules module.
-      ],
+      additionalModules: [ customRules ],
       moddleExtensions: {
         role: customExtension
       }
@@ -71,14 +73,10 @@ function CreateProcess() {
         if (bo.$type === 'bpmn:SequenceFlow' || bo.$type === 'bpmn:Process') {
           return;
         }
-
-        // Use either bo.role or bo['role:role'] (if defined via moddle extension)
         const roleValue = (bo.role || bo['role:role'] || '').trim();
         if (roleValue === '') {
           errors.push(`${bo.name || element.id} is missing a role.`);
         }
-
-        // Validate description.
         const descValue = (bo.description || '').trim();
         if (descValue === '') {
           errors.push(`${bo.name || element.id} is missing a description.`);
@@ -105,7 +103,6 @@ function CreateProcess() {
       return;
     }
 
-    // Validate that every element (except flows and process) has a role and a description.
     const errors = validateDiagram();
     if (errors.length > 0) {
       alert('Error: Not every element has a role and a description:\n' + errors.join('\n'));
@@ -129,7 +126,6 @@ function CreateProcess() {
   // Create a new blank process.
   const handleCreateNewProcess = () => {
     bpmnModeler.current.createDiagram().then(() => {
-      // Clear out the current process information and selected element.
       setProcessName('');
       setSelectedElement(null);
       setRole('');
@@ -145,7 +141,6 @@ function CreateProcess() {
       .importXML(process.xml)
       .then(() => {
         setProcessName(process.name);
-        // Reset selected element and clear role and description.
         setSelectedElement(null);
         setRole('');
         setDescription('');
@@ -165,16 +160,9 @@ function CreateProcess() {
 
   return (
     <div style={{ padding: '20px' }}>
-      {/* Editor and saved processes */}
+      {/* Editor and Saved Processes */}
       <div style={{ display: 'flex', gap: '20px' }}>
-        <div
-          style={{
-            flex: 1,
-            border: '1px solid black',
-            height: '400px',
-            position: 'relative'
-          }}
-        >
+        <div style={{ flex: 1, border: '1px solid black', height: '400px', position: 'relative' }}>
           <div ref={bpmnEditorRef} style={{ width: '100%', height: '100%' }}></div>
         </div>
 
@@ -183,21 +171,20 @@ function CreateProcess() {
           {processList.map((process) => (
             <div key={process._id} style={{ marginBottom: '10px' }}>
               <div>{process.name}</div>
-              <button
-                onClick={() => handleLoadProcess(process)}
-                style={{ marginRight: '5px' }}
-              >
+              <button onClick={() => handleLoadProcess(process)} style={{ marginRight: '5px' }}>
                 Load
               </button>
-              <button onClick={() => handleDeleteProcess(process._id)}>Delete</button>
+              {/* Delete button visible only for Manager */}
+              {user?.role === 'Manager' && (
+                <button onClick={() => handleDeleteProcess(process._id)}>Delete</button>
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Bottom container with Process Information and Role/Description */}
+      {/* Bottom Container with Process Information and Role/Description */}
       <div style={{ marginTop: '20px', border: '1px solid black', padding: '10px' }}>
-        {/* Process Information Section */}
         <h3>Process Information</h3>
         <div style={{ marginBottom: '20px' }}>
           <input
@@ -210,16 +197,13 @@ function CreateProcess() {
           <button onClick={handleSaveToDatabase} style={{ padding: '5px 10px', marginRight: '10px' }}>
             Save to Database
           </button>
-          {/* New "Create New Process" button */}
           <button onClick={handleCreateNewProcess} style={{ padding: '5px 10px' }}>
             Create New Process
           </button>
         </div>
 
-        {/* Role and Description Section */}
         <h3>Assign Role and Description to Element</h3>
         <div style={{ marginBottom: '10px' }}>
-          {/* Replace the freeform text input with a select dropdown */}
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
@@ -244,9 +228,7 @@ function CreateProcess() {
         </div>
         <div>
           <strong>Selected Element:</strong>{' '}
-          {selectedElement
-            ? selectedElement.businessObject.name || selectedElement.id
-            : 'None'}
+          {selectedElement ? (selectedElement.businessObject.name || selectedElement.id) : 'None'}
         </div>
       </div>
     </div>
@@ -262,10 +244,12 @@ export default CreateProcess;
 
 
 
-
 //TODO: implement a project requieremtn for each process in General (for example: process 1 - auto; process 2 - Software;)
 //TODO: change delete process => only user with permission should be able to delete processes
 //TODO: include a css file, to make the site more appealing
+
+
+//TODO: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored
 
 
 /** Things to clear */

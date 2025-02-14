@@ -1,0 +1,40 @@
+/* notifications.css */
+.notifications-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .notifications-page h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .notifications-page ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .notifications-page li {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+  }
+  
+  .notifications-page button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .notifications-page button:hover {
+    background-color: #0056b3;
+  }
+  
+  

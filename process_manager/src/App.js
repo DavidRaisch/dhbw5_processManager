@@ -7,6 +7,7 @@ import ManageProcess from './manageProcess';
 import ExecuteProcess from './executeProcess';
 import UserManagement from './userManagement';
 import PrivateRoute from './privateRoute';
+import Notifications from './notificationPage';
 
 function App() {
   return (
@@ -42,6 +43,14 @@ function App() {
           element={
             <PrivateRoute>
               <ExecuteProcess />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
             </PrivateRoute>
           }
         />
