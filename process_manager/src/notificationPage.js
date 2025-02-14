@@ -144,6 +144,6 @@ export default Notifications;
 
 
 
-//TODO: Click on the notification should navigate to the /execute-process page, in best case opens directly the instance that is referenced in the notification
-//TODO: if manager makes neccessary steps => it should notify specific user that was working on it => therefore the userid has to be submitted or saved with the notification, so later a notification
-//Notification shouldnt be send to everyone => only the specific user requiered, there fore every user needs a individual notification page
+
+//TODO: notifiaction should filter according to the assigned projects of the user.
+//TODO: not only filter by role (manager), but also by projects assigned

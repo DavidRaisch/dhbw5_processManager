@@ -11,9 +11,10 @@ function CreateProcess() {
   const [processName, setProcessName] = useState('');
   const [processList, setProcessList] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
-  // Instead of freeform role input, we'll let the user select from a list.
   const [role, setRole] = useState('');
   const [description, setDescription] = useState('');
+  const [availableProjects, setAvailableProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(''); // state for project assignment
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
 
@@ -45,6 +46,7 @@ function CreateProcess() {
     });
 
     fetchProcesses();
+    fetchAvailableProjects();
 
     return () => {
       bpmnModeler.current.destroy();
@@ -96,7 +98,17 @@ function CreateProcess() {
     }
   };
 
-  // Save the entire diagram (including any role/description changes) along with the process name.
+  // Fetch available projects for assignment.
+  const fetchAvailableProjects = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/projects');
+      setAvailableProjects(response.data);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+    }
+  };
+
+  // Save the entire diagram (including any role/description changes) along with the process name and selected project.
   const handleSaveToDatabase = () => {
     if (!processName) {
       alert('Please enter a process name.');
@@ -111,7 +123,7 @@ function CreateProcess() {
 
     bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
       axios
-        .post('http://localhost:5001/api/processes', { name: processName, xml })
+        .post('http://localhost:5001/api/processes', { name: processName, xml, project: selectedProject })
         .then((response) => {
           alert(response.data.message);
           fetchProcesses();
@@ -130,12 +142,13 @@ function CreateProcess() {
       setSelectedElement(null);
       setRole('');
       setDescription('');
+      setSelectedProject(''); // Reset project selection
     }).catch((err) => {
       console.error('Error creating new diagram:', err);
     });
   };
 
-  // When loading a process, update the process name and reset role/description.
+  // When loading a process, update the process name, reset role/description, and load its assigned project.
   const handleLoadProcess = (process) => {
     bpmnModeler.current
       .importXML(process.xml)
@@ -144,6 +157,8 @@ function CreateProcess() {
         setSelectedElement(null);
         setRole('');
         setDescription('');
+        // If process.project exists, set selectedProject to its _id (if populated) or use it directly.
+        setSelectedProject(process.project ? process.project._id || process.project : '');
       })
       .catch((err) => console.error('Error loading process:', err));
   };
@@ -171,6 +186,9 @@ function CreateProcess() {
           {processList.map((process) => (
             <div key={process._id} style={{ marginBottom: '10px' }}>
               <div>{process.name}</div>
+              <div>
+                <em>{process.project ? process.project.name : 'No Project'}</em>
+              </div>
               <button onClick={() => handleLoadProcess(process)} style={{ marginRight: '5px' }}>
                 Load
               </button>
@@ -194,6 +212,18 @@ function CreateProcess() {
             onChange={(e) => setProcessName(e.target.value)}
             style={{ marginRight: '10px', padding: '5px' }}
           />
+          <select
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
+            style={{ marginRight: '10px', padding: '5px' }}
+          >
+            <option value="">Select Project</option>
+            {availableProjects.map((project) => (
+              <option key={project._id} value={project._id}>
+                {project.name}
+              </option>
+            ))}
+          </select>
           <button onClick={handleSaveToDatabase} style={{ padding: '5px 10px', marginRight: '10px' }}>
             Save to Database
           </button>
@@ -244,11 +274,11 @@ export default CreateProcess;
 
 
 
+
+
 //TODO: implement a project requieremtn for each process in General (for example: process 1 - auto; process 2 - Software;)
-//TODO: change delete process => only user with permission should be able to delete processes
+//TODO: change delete process => check if it shouldnt even be displayed for employees or if the should be able to request a deletion
 //TODO: include a css file, to make the site more appealing
-
-
 //TODO: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored
 
 

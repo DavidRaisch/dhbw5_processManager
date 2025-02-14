@@ -84,10 +84,10 @@ app.delete('/api/notifications/:id', async (req, res) => {
     res.status(500).json({ error: 'Error deleting notification.' });
   }
 });
-// PUT /api/notifications/:id
-// This endpoint updates an existing notification with any fields provided in the request body.
+
+// Update an existing notification
 app.put('/api/notifications/:id', async (req, res) => {
-  const updates = req.body; // Expected to include fields like targetRole, status, message, etc.
+  const updates = req.body;
   try {
     const notification = await Notification.findByIdAndUpdate(req.params.id, updates, { new: true });
     if (!notification) {
@@ -102,12 +102,23 @@ app.put('/api/notifications/:id', async (req, res) => {
 
 
 /* ====================
-   USER SCHEMA & MODEL
+   PROJECT SCHEMA & MODEL
+   ===================== */
+const projectSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String },
+  createdAt: { type: Date, default: Date.now },
+});
+const Project = mongoose.model('Project', projectSchema);
+
+/* ====================
+   USER SCHEMA & MODEL (updated to include projects)
    ===================== */
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }, // stored hashed
+  password: { type: String, required: true },
   role: { type: String, required: true, enum: ['Admin', 'Manager', 'Employee'] },
+  projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
 });
 const User = mongoose.model('User', userSchema);
 
@@ -121,14 +132,9 @@ app.post('/api/login', async (req, res) => {
   }
   try {
     const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials.' });
-    }
+    if (!user) return res.status(401).json({ error: 'Invalid credentials.' });
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials.' });
-    }
-    // Return user details (omit the password) and include the _id.
+    if (!isMatch) return res.status(401).json({ error: 'Invalid credentials.' });
     return res.json({
       message: 'Login successful',
       user: { _id: user._id, username: user.username, role: user.role },
@@ -138,62 +144,66 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Create User Endpoint (POST /api/users)
 app.post('/api/users', async (req, res) => {
-  const { username, password, role } = req.body;
+  const { username, password, role, projects } = req.body;
   if (!username || !password || !role) {
     return res.status(400).json({ error: 'Username, password, and role are required.' });
   }
   try {
     const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists.' });
-    }
+    if (existingUser) return res.status(400).json({ error: 'User already exists.' });
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({ username, password: hashedPassword, role });
+    // Ensure projects array is unique (if provided)
+    const uniqueProjects = projects ? [...new Set(projects)] : [];
+    const newUser = new User({ username, password: hashedPassword, role, projects: uniqueProjects });
     await newUser.save();
-    // Return the new user's _id along with username and role.
-    res.json({ message: 'User created successfully', user: { _id: newUser._id, username, role } });
+    res.json({ 
+      message: 'User created successfully', 
+      user: { _id: newUser._id, username, role, projects: newUser.projects } 
+    });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// GET /api/users - Retrieves all users (excluding their passwords)
+// GET Users (GET /api/users) - Populate projects with only the name field.
 app.get('/api/users', async (req, res) => {
   try {
-    // Exclude the password field by using projection: { password: 0 }
-    const users = await User.find({}, { password: 0 });
+    const users = await User.find({}, { password: 0 }).populate('projects', 'name');
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: 'Error retrieving users' });
   }
 });
 
-// Update a user
+// Update User Endpoint (PUT /api/users/:id)
 app.put('/api/users/:id', async (req, res) => {
   const { id } = req.params;
-  const { username, role, password } = req.body;
+  const { username, role, password, projects } = req.body;
   try {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ error: 'User not found.' });
-    
     if (username) user.username = username;
     if (role) user.role = role;
     if (password) {
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
     }
-    
+    if (projects) {
+      // Ensure uniqueness
+      user.projects = [...new Set(projects)];
+    }
     await user.save();
-    const userWithoutPassword = { _id: user._id, username: user.username, role: user.role };
+    const userWithoutPassword = { _id: user._id, username: user.username, role: user.role, projects: user.projects };
     res.json({ message: 'User updated successfully', user: userWithoutPassword });
   } catch (err) {
     res.status(500).json({ error: 'Error updating user.' });
   }
 });
 
-// Delete a user
+// Delete User Endpoint (DELETE /api/users/:id)
 app.delete('/api/users/:id', async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -204,14 +214,71 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
+// Assign Projects Endpoint (POST /api/users/:userId/assign-projects)
+app.post('/api/users/:userId/assign-projects', async (req, res) => {
+  const { userId } = req.params;
+  const { projectIds } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    user.projects = [...new Set(projectIds)];
+    await user.save();
+    res.json({ message: 'User projects updated successfully', projects: user.projects });
+  } catch (err) {
+    res.status(500).json({ error: "Error updating user's projects" });
+  }
+});
+
+/* ====================
+   PROJECT MANAGEMENT ENDPOINTS
+   ===================== */
+
+// Create Project Endpoint (POST /api/projects)
+app.post('/api/projects', async (req, res) => {
+  const { name, description } = req.body;
+  if (!name) return res.status(400).json({ error: 'Project name is required.' });
+  try {
+    const newProject = new Project({ name, description });
+    await newProject.save();
+    res.json({ message: 'Project created successfully', project: newProject });
+  } catch (err) {
+    res.status(500).json({ error: 'Error creating project' });
+  }
+});
+
+// Get Projects (GET /api/projects)
+app.get('/api/projects', async (req, res) => {
+  try {
+    const projects = await Project.find();
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ error: 'Error retrieving projects' });
+  }
+});
+
+// Delete Project Endpoint (DELETE /api/projects/:id)
+app.delete('/api/projects/:id', async (req, res) => {
+  try {
+    const project = await Project.findByIdAndDelete(req.params.id);
+    if (!project) return res.status(404).json({ error: 'Project not found.' });
+    res.json({ message: 'Project deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error deleting project' });
+  }
+});
+
 /* ====================
    PROCESS & INSTANCE ROUTES
-   ==================== */
+   ===================== */
 
-// Process Schema & Model
+/* 
+   UPDATED PROCESS SCHEMA:
+   Now each process can be assigned to a project.
+*/
 const processSchema = new mongoose.Schema({
   name: { type: String, required: true },
   xml: { type: String, required: true },
+  project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
   createdAt: { type: Date, default: Date.now },
 });
 const Process = mongoose.model('Process', processSchema);
@@ -220,7 +287,7 @@ const Process = mongoose.model('Process', processSchema);
 const instanceSchema = new mongoose.Schema({
   processId: { type: mongoose.Schema.Types.ObjectId, ref: 'Process', required: true },
   processName: { type: String, required: true },
-  instanceName: { type: String, required: true }, // <-- New Field Added!
+  instanceName: { type: String, required: true },
   xml: { type: String, required: true },
   currentElement: { type: Object, default: null },
   sequenceMap: { type: Object, default: {} },
@@ -231,28 +298,24 @@ const instanceSchema = new mongoose.Schema({
 });
 const Instance = mongoose.model('Instance', instanceSchema);
 
-// API Routes for Processes
+// Process Endpoints remain similar, with population of project.
 app.post('/api/processes', async (req, res) => {
-  const { name, xml } = req.body;
-  if (!name || !xml) {
-    return res.status(400).json({ error: 'Name and XML are required' });
-  }
+  const { name, xml, project } = req.body;
+  if (!name || !xml) return res.status(400).json({ error: 'Name and XML are required' });
   try {
     const existingProcess = await Process.findOne({ name });
     if (existingProcess) {
       existingProcess.xml = xml;
+      existingProcess.project = project;
       await existingProcess.save();
       return res.json({
         message: 'Process with this name already exists and has been overwritten.',
         process: existingProcess,
       });
     }
-    const newProcess = new Process({ name, xml });
+    const newProcess = new Process({ name, xml, project });
     await newProcess.save();
-    res.json({
-      message: 'New process created successfully.',
-      process: newProcess,
-    });
+    res.json({ message: 'New process created successfully.', process: newProcess });
   } catch (err) {
     res.status(500).json({ error: 'Error saving process' });
   }
@@ -260,7 +323,7 @@ app.post('/api/processes', async (req, res) => {
 
 app.get('/api/processes', async (req, res) => {
   try {
-    const processes = await Process.find();
+    const processes = await Process.find().populate('project', 'name');
     res.json(processes);
   } catch (err) {
     res.status(500).json({ error: 'Error retrieving processes' });
@@ -269,10 +332,8 @@ app.get('/api/processes', async (req, res) => {
 
 app.get('/api/processes/:id', async (req, res) => {
   try {
-    const process = await Process.findById(req.params.id);
-    if (!process) {
-      return res.status(404).json({ error: 'Process not found' });
-    }
+    const process = await Process.findById(req.params.id).populate('project', 'name');
+    if (!process) return res.status(404).json({ error: 'Process not found' });
     res.json(process);
   } catch (err) {
     res.status(500).json({ error: 'Error retrieving process' });
@@ -282,16 +343,14 @@ app.get('/api/processes/:id', async (req, res) => {
 app.delete('/api/processes/:id', async (req, res) => {
   try {
     const process = await Process.findByIdAndDelete(req.params.id);
-    if (!process) {
-      return res.status(404).json({ error: 'Process not found' });
-    }
+    if (!process) return res.status(404).json({ error: 'Process not found' });
     res.json({ message: 'Process deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Error deleting process' });
   }
 });
 
-// API Routes for Instances
+// Instances endpoints remain unchanged.
 app.post('/api/instances', async (req, res) => {
   try {
     const instance = new Instance(req.body);
@@ -324,3 +383,9 @@ app.put('/api/instances/:id', async (req, res) => {
 // Start the server
 const PORT = 5001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+
+
+
+//TODO: make sure that the backend is able to not only filter by role (manager), but also by projects
+//TODO: notifiactions need a project information saved in the schema

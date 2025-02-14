@@ -114,6 +114,9 @@
   .manage-users {
     background: linear-gradient(135deg, #f83600 0%, #f9d423 100%);
   }
+  .manage-projects {
+    background: linear-gradient(135deg, #1ec10f 0%, #0bb9b0 100%);
+  }
   
   @media (max-width: 768px) {
     .button-container {
@@ -125,4 +128,5 @@
       font-size: 2rem;
       margin-top: 4rem;
     }
+
   }

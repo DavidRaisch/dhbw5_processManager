@@ -72,15 +72,24 @@ function StartPage() {
           </>
         )}
         
-        {/* Show User Management only for Admins */}
+        {/* Show User & Project Management only for Admins */}
         {user?.role === 'Admin' && (
-          <button 
-            onClick={() => navigate('/manage-users')} 
-            className="action-button manage-users"
-          >
-            <FiUsers size={20} />
-            Manage Users
-          </button>
+          <>
+            <button 
+              onClick={() => navigate('/manage-users')} 
+              className="action-button manage-users"
+            >
+              <FiUsers size={20} />
+              Manage Users
+            </button>
+            <button 
+              onClick={() => navigate('/manage-projects')} 
+              className="action-button manage-projects"
+            >
+              <FiSettings size={20} />
+              Manage Projects
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -88,6 +97,7 @@ function StartPage() {
 }
 
 export default StartPage;
+
 
 
 

@@ -1,3 +1,4 @@
+// ExecuteProcess.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom'; // Ensure useLocation is imported
 import axios from 'axios';
@@ -26,7 +27,6 @@ function ExecuteProcess() {
   const bpmnContainerRef = useRef(null);
 
   // Get current logged-in user from sessionStorage
-  // Ensure your login endpoint returns _id along with username and role
   const currentUser = JSON.parse(sessionStorage.getItem('user'));
 
   // Fetch processes and instances on mount.
@@ -265,13 +265,21 @@ function ExecuteProcess() {
       ? selectedInstance.sequenceMap[selectedInstance.position] || []
       : [];
 
+  // Helper: Retrieve the assigned project name by matching the process name.
+  const getAssignedProjectName = () => {
+    if (selectedInstance) {
+      const proc = processList.find(p => p.name === selectedInstance.processName);
+      return proc && proc.project && proc.project.name ? proc.project.name : "No Project Assigned";
+    }
+    return "";
+  };
+
   // Notification request function.
   const requestApproval = async () => {
-    // Ensure we have a valid user ID (your login should store _id in sessionStorage)
     const requestedById = currentUser._id;
     if (requestedById == null) {
       console.error("No user id found in session.");
-      alert("No user id found, please login again." + currentUser._id + currentUser.username);
+      alert("No user id found, please login again.");
       return;
     }
     if (currentUser.role === 'Employee' && selectedInstance.currentElement.role !== 'Employee') {
@@ -437,7 +445,8 @@ function ExecuteProcess() {
           <div ref={bpmnContainerRef} style={{ width: '100%', height: '100%' }}></div>
         </div>
 
-        {selectedInstanceId && (
+        {/* Navigation Window: Display selected instance details with assigned project */}
+        {selectedInstanceId && selectedInstance && (
           <div
             style={{
               marginTop: '10px',
@@ -449,20 +458,20 @@ function ExecuteProcess() {
               border: '1px solid black',
             }}
           >
-            {selectedInstance && (
-              <div
-                style={{
-                  borderBottom: '1px solid gray',
-                  padding: '5px',
-                  alignSelf: 'stretch',
-                  textAlign: 'center',
-                }}
-              >
-                <strong>{selectedInstance.instanceName}</strong> -{' '}
-                <em>{selectedInstance.processName}</em> -{' '}
-                <small>{new Date(selectedInstance.created).toLocaleString()}</small>
-              </div>
-            )}
+            <div
+              style={{
+                borderBottom: '1px solid gray',
+                padding: '5px',
+                alignSelf: 'stretch',
+                textAlign: 'center',
+              }}
+            >
+              <strong>{selectedInstance.instanceName}</strong> -{' '}
+              <em>{selectedInstance.processName}</em> -{' '}
+              <small>{new Date(selectedInstance.created).toLocaleString()}</small>
+              <br />
+              <small>Project: {getAssignedProjectName()}</small>
+            </div>
             {selectedInstance && selectedInstance.status !== 'running' ? (
               <div style={{ padding: '20px', textAlign: 'center' }}>
                 <h3>Process Status: {selectedInstance.status}</h3>
@@ -547,12 +556,14 @@ export default ExecuteProcess;
 
 
 
+
 /** Requiered Improvments */
 //TODO: Send notification to Manager specific matching to the project the Manager leads and the Process is assigned to
 //TODO: User can only See the process assigned to their project
-//TODO: send messages to User, if the element requieres there work
 //TODO: include a css file, to make the site more appealing
 //TODO: employees can only send request to cancel instance
+
+//TODO: notification should should put the according project
 
 
 /** Additional Improvments */

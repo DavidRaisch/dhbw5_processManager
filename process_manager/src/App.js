@@ -6,6 +6,7 @@ import StartPage from './startpage';
 import ManageProcess from './manageProcess';
 import ExecuteProcess from './executeProcess';
 import UserManagement from './userManagement';
+import ProjectManagement from './projectManagement'; // New separate project management page
 import PrivateRoute from './privateRoute';
 import Notifications from './notificationPage';
 
@@ -54,9 +55,19 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* New route for project creation/management */}
+        <Route
+          path="/manage-projects"
+          element={
+            <PrivateRoute>
+              <ProjectManagement />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
