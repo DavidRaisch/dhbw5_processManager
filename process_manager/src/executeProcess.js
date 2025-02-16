@@ -277,9 +277,18 @@ function ExecuteProcess() {
   // Notification request function.
   const requestApproval = async () => {
     const requestedById = currentUser._id;
-    if (requestedById == null) {
+    if (!requestedById) {
       console.error("No user id found in session.");
       alert("No user id found, please login again.");
+      return;
+    }
+    // Determine the project of the instance by matching the instance's processName
+    const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
+    const projectId = processOfInstance && processOfInstance.project 
+      ? (processOfInstance.project._id || processOfInstance.project)
+      : null;
+    if (!projectId) {
+      alert("No project assigned to the process.");
       return;
     }
     if (currentUser.role === 'Employee' && selectedInstance.currentElement.role !== 'Employee') {
@@ -289,7 +298,8 @@ function ExecuteProcess() {
         requestedBy: currentUser.username,
         requestedById,
         targetRole: 'Manager',
-        status: 'pending'
+        status: 'pending',
+        project: projectId  // Include the project ID
       };
       try {
         const response = await axios.post('http://localhost:5001/api/notifications', newNotification);
@@ -304,6 +314,7 @@ function ExecuteProcess() {
       alert('You are not authorized to request approval for this step.');
     }
   };
+  
 
   return (
     <div
@@ -558,12 +569,10 @@ export default ExecuteProcess;
 
 
 /** Requiered Improvments */
-//TODO: Send notification to Manager specific matching to the project the Manager leads and the Process is assigned to
 //TODO: User can only See the process assigned to their project
 //TODO: include a css file, to make the site more appealing
 //TODO: employees can only send request to cancel instance
 
-//TODO: notification should should put the according project
 
 
 /** Additional Improvments */

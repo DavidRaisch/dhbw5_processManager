@@ -276,7 +276,6 @@ export default CreateProcess;
 
 
 
-//TODO: implement a project requieremtn for each process in General (for example: process 1 - auto; process 2 - Software;)
 //TODO: change delete process => check if it shouldnt even be displayed for employees or if the should be able to request a deletion
 //TODO: include a css file, to make the site more appealing
 //TODO: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored

@@ -6,22 +6,52 @@ import './notificationPage.css';
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
+  const [userProjects, setUserProjects] = useState([]); // Array of project names
   const navigate = useNavigate();
   
-  // Ensure that your login process stores the full user object (including _id) in sessionStorage.
+  // currentUser from sessionStorage (this may only include _id, username, and role)
   const currentUser = JSON.parse(sessionStorage.getItem('user'));
 
-  // Fetch notifications from the backend when the component mounts.
+  // Fetch full user details (with projects) on mount
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/users/${currentUser._id}`);
+        const userDetails = response.data;
+        if (userDetails.projects && Array.isArray(userDetails.projects)) {
+          // Extract the project names from the populated projects
+          const names = userDetails.projects.map(proj => proj.name);
+          console.log("Fetched user project names:", names);
+          setUserProjects(names);
+        } else {
+          console.log("No projects found in user record");
+        }
+      } catch (err) {
+        console.error("Error fetching user details:", err);
+      }
+    };
+    fetchUserDetails();
+  }, [currentUser._id]);
+
+  // Once userProjects is fetched, load notifications.
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [userProjects]);
 
   const fetchNotifications = async () => {
     try {
-      // Retrieve notifications filtered by the current user's role.
-      const response = await axios.get('http://localhost:5001/api/notifications', {
-        params: { targetRole: currentUser.role },
+      // Build a comma-separated string of project names.
+      const projectQuery = userProjects.length > 0 ? userProjects.join(',') : '';
+      console.log("Fetching notifications with parameters:", {
+        targetRole: currentUser.role,
+        projectNames: projectQuery
       });
+      
+      // Retrieve notifications filtered by role and project names.
+      const response = await axios.get('http://localhost:5001/api/notifications', {
+        params: { targetRole: currentUser.role, projectNames: projectQuery },
+      });
+      console.log("Fetched notifications:", response.data);
       setNotifications(response.data);
     } catch (err) {
       console.error('Error fetching notifications:', err);
@@ -34,12 +64,6 @@ function Notifications() {
   };
 
   // Approve a notification.
-  // This function calls the backend PUT endpoint to update the notification.
-  // In this example, we set:
-  //  - targetRole to "Employee",
-  //  - status to "approved",
-  //  - message to "Your approval request has been approved."
-  // You can adjust these values as needed.
   const approveNotification = async (notificationId) => {
     try {
       const updates = {
@@ -49,9 +73,7 @@ function Notifications() {
       };
 
       await axios.put(`http://localhost:5001/api/notifications/${notificationId}`, updates);
-      
-      // Update the UI by removing the updated notification.
-      setNotifications((prev) => prev.filter((notif) => notif._id !== notificationId));
+      setNotifications(prev => prev.filter(notif => notif._id !== notificationId));
     } catch (err) {
       console.error('Error updating notification:', err.response?.data || err);
       alert('Error updating notification');
@@ -62,7 +84,7 @@ function Notifications() {
   const deleteNotification = async (notificationId) => {
     try {
       await axios.delete(`http://localhost:5001/api/notifications/${notificationId}`);
-      setNotifications((prev) => prev.filter((notif) => notif._id !== notificationId));
+      setNotifications(prev => prev.filter(notif => notif._id !== notificationId));
     } catch (err) {
       console.error('Error deleting notification:', err);
       alert('Error deleting notification');
@@ -95,9 +117,13 @@ function Notifications() {
               <div onClick={() => handleNotificationClick(notif)}>
                 <p>{notif.message}</p>
                 <small>{new Date(notif.timestamp).toLocaleString()}</small>
+                {notif.project && (
+                  <small style={{ display: 'block', fontStyle: 'italic' }}>
+                    Project: {notif.project.name}
+                  </small>
+                )}
               </div>
               <div>
-                {/* Only show the Accept button for pending notifications when the current user is a Manager */}
                 {currentUser.role === 'Manager' && notif.status === 'pending' && (
                   <button
                     onClick={(e) => {
@@ -125,7 +151,6 @@ function Notifications() {
       {notifications.length > 0 && (
         <button
           onClick={() => {
-            // Clear all notifications.
             notifications.forEach((notif) => {
               deleteNotification(notif._id);
             });
@@ -141,9 +166,3 @@ function Notifications() {
 
 export default Notifications;
 
-
-
-
-
-//TODO: notifiaction should filter according to the assigned projects of the user.
-//TODO: not only filter by role (manager), but also by projects assigned

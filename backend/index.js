@@ -20,16 +20,18 @@ mongoose
 /* ====================
    NOTIFICATION SCHEMA & MODEL
    ===================== */
-const notificationSchema = new mongoose.Schema({
-  message: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
-  instanceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Instance', required: true },
-  requestedBy: { type: String, required: true },
-  requestedById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  targetRole: { type: String, enum: ['Admin', 'Manager', 'Employee'], default: 'Manager' },
-  status: { type: String, enum: ['pending', 'approved', 'dismissed'], default: 'pending' },
-});
-const Notification = mongoose.model('Notification', notificationSchema);
+   const notificationSchema = new mongoose.Schema({
+    message: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    instanceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Instance', required: true },
+    requestedBy: { type: String, required: true },
+    requestedById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    targetRole: { type: String, enum: ['Admin', 'Manager', 'Employee'], default: 'Manager' },
+    status: { type: String, enum: ['pending', 'approved', 'dismissed'], default: 'pending' },
+    project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true }
+  });
+  const Notification = mongoose.model('Notification', notificationSchema);
+  
 
 /* ====================
    NOTIFICATION ENDPOINTS
@@ -37,8 +39,8 @@ const Notification = mongoose.model('Notification', notificationSchema);
 
 // Create a new notification
 app.post('/api/notifications', async (req, res) => {
-  const { message, instanceId, requestedBy, requestedById, targetRole, status } = req.body;
-  if (!message || !instanceId || !requestedBy || !requestedById) {
+  const { message, instanceId, requestedBy, requestedById, targetRole, status, project } = req.body;
+  if (!message || !instanceId || !requestedBy || !requestedById || !project) {
     return res.status(400).json({ error: 'Missing required fields for notification.' });
   }
   try {
@@ -49,6 +51,7 @@ app.post('/api/notifications', async (req, res) => {
       requestedById,
       targetRole: targetRole || 'Manager',
       status: status || 'pending',
+      project
     });
     await notification.save();
     res.json({ message: 'Notification created', notification });
@@ -58,18 +61,32 @@ app.post('/api/notifications', async (req, res) => {
   }
 });
 
-// Get notifications (optionally filter by targetRole via query parameter)
+
+// GET notifications filtered by targetRole and project names
 app.get('/api/notifications', async (req, res) => {
-  const { targetRole } = req.query;
+  const { targetRole, projectNames } = req.query;
   try {
-    const filter = targetRole ? { targetRole } : {};
-    const notifications = await Notification.find(filter);
+    let filter = {};
+    if (targetRole) filter.targetRole = targetRole;
+    // First, fetch notifications matching role
+    const notifications = await Notification.find(filter).populate('project', 'name');
+    // If projectNames is provided, filter in memory by comparing the populated project's name.
+    if (projectNames) {
+      const namesArray = projectNames.split(',').map(name => name.trim()).filter(name => name);
+      const filtered = notifications.filter(notif => 
+        notif.project && namesArray.includes(notif.project.name)
+      );
+      return res.json(filtered);
+    }
     res.json(notifications);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching notifications' });
   }
 });
+
+
+
 
 // Delete a notification by ID
 app.delete('/api/notifications/:id', async (req, res) => {
@@ -177,6 +194,18 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Error retrieving users' });
   }
 });
+
+// GET a single user with projects populated
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate('projects', 'name');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Error retrieving user' });
+  }
+});
+
 
 // Update User Endpoint (PUT /api/users/:id)
 app.put('/api/users/:id', async (req, res) => {
