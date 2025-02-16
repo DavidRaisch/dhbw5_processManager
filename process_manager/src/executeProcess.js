@@ -11,7 +11,7 @@ function ExecuteProcess() {
   const location = useLocation();
   const instanceIdFromNotification = location.state?.instanceId;
 
-  // List of BPMN process templates
+  // List of BPMN process templates (filtered by user's projects)
   const [processList, setProcessList] = useState([]);
   // Instances that are still running
   const [activeInstances, setActiveInstances] = useState([]);
@@ -23,17 +23,53 @@ function ExecuteProcess() {
   const [selectedProcess, setSelectedProcess] = useState(null);
   // New instance name input value (when creating an instance)
   const [newInstanceName, setNewInstanceName] = useState("");
+  // User's assigned project names (array of strings)
+  const [userProjects, setUserProjects] = useState([]);
+
   const viewerRef = useRef(null);
   const bpmnContainerRef = useRef(null);
 
-  // Get current logged-in user from sessionStorage
+  // Get current logged-in user from sessionStorage (may only include _id, username, role)
   const currentUser = JSON.parse(sessionStorage.getItem('user'));
 
-  // Fetch processes and instances on mount.
+  // Fetch full user details to get assigned projects.
   useEffect(() => {
-    fetchProcesses();
-    fetchInstances();
-  }, []);
+    const fetchUserDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/users/${currentUser._id}`);
+        const userDetails = response.data;
+        if (userDetails.projects && Array.isArray(userDetails.projects)) {
+          // Extract project names from populated projects.
+          const names = userDetails.projects.map(proj => proj.name);
+          console.log("Fetched user project names:", names);
+          setUserProjects(names);
+        }
+      } catch (err) {
+        console.error("Error fetching user details:", err);
+      }
+    };
+    fetchUserDetails();
+  }, [currentUser._id]);
+
+  // Once userProjects are loaded, fetch processes that match.
+  useEffect(() => {
+    if (userProjects.length > 0) {
+      fetchProcesses();
+    } else {
+      // If no projects assigned, clear processList.
+      setProcessList([]);
+    }
+  }, [userProjects]);
+
+  // Once processList is updated, fetch instances that belong to those processes.
+  useEffect(() => {
+    if (processList.length > 0) {
+      fetchInstances();
+    } else {
+      setActiveInstances([]);
+      setArchivedInstances([]);
+    }
+  }, [processList]);
 
   // If an instance ID was passed from a notification, select it.
   useEffect(() => {
@@ -84,23 +120,31 @@ function ExecuteProcess() {
     loadDiagram();
   }, [selectedProcess, selectedInstanceId, activeInstances, archivedInstances]);
 
-  // Fetch available process templates from the backend.
+  // Fetch processes and filter by assigned user projects.
   const fetchProcesses = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/processes');
-      setProcessList(response.data);
+      let processes = response.data;
+      // Filter processes: only include those whose populated project name is in userProjects.
+      processes = processes.filter(proc => 
+        proc.project && userProjects.includes(proc.project.name)
+      );
+      console.log("Filtered process list:", processes);
+      setProcessList(processes);
     } catch (err) {
       console.error('Error fetching processes:', err);
     }
   };
 
-  // Fetch instances and separate them into active and archived.
+  // Fetch instances and filter them by allowed process names.
   const fetchInstances = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/instances');
       const instances = response.data;
-      const active = instances.filter((inst) => inst.status === 'running');
-      const archived = instances.filter((inst) => inst.status !== 'running');
+      // Allowed process names from the filtered processList.
+      const allowedProcessNames = new Set(processList.map(p => p.name));
+      const active = instances.filter(inst => inst.status === 'running' && allowedProcessNames.has(inst.processName));
+      const archived = instances.filter(inst => inst.status !== 'running' && allowedProcessNames.has(inst.processName));
       setActiveInstances(active);
       setArchivedInstances(archived);
     } catch (err) {
@@ -108,17 +152,17 @@ function ExecuteProcess() {
     }
   };
 
-  // Helper to update an instance in the backend and adjust local state accordingly.
+  // Helper to update an instance in the backend.
   const updateInstance = async (instanceId, updatedData) => {
     try {
       const response = await axios.put(`http://localhost:5001/api/instances/${instanceId}`, updatedData);
       const updatedInstance = response.data.instance;
       if (updatedInstance.status !== 'running') {
-        setActiveInstances((prev) => prev.filter((inst) => inst._id !== instanceId));
-        setArchivedInstances((prev) => [...prev, updatedInstance]);
+        setActiveInstances(prev => prev.filter(inst => inst._id !== instanceId));
+        setArchivedInstances(prev => [...prev, updatedInstance]);
       } else {
-        setActiveInstances((prev) =>
-          prev.map((inst) => (inst._id === instanceId ? updatedInstance : inst))
+        setActiveInstances(prev =>
+          prev.map(inst => (inst._id === instanceId ? updatedInstance : inst))
         );
       }
     } catch (err) {
@@ -145,7 +189,7 @@ function ExecuteProcess() {
       ? parsedXML.definitions.process.sequenceFlow
       : [parsedXML.definitions.process.sequenceFlow];
 
-    sequenceFlows.forEach((flow) => {
+    sequenceFlows.forEach(flow => {
       if (!flowMap[flow["@_sourceRef"]]) {
         flowMap[flow["@_sourceRef"]] = [];
       }
@@ -171,7 +215,7 @@ function ExecuteProcess() {
     try {
       const response = await axios.post('http://localhost:5001/api/instances', newInstanceData);
       const savedInstance = response.data.instance;
-      setActiveInstances((prev) => [...prev, savedInstance]);
+      setActiveInstances(prev => [...prev, savedInstance]);
       setSelectedInstanceId(savedInstance._id);
       setSelectedProcess(null);
       setNewInstanceName("");
@@ -189,7 +233,7 @@ function ExecuteProcess() {
 
   // Retrieve an element's state from the viewer.
   const getElementState = (elementId) => {
-    const element = viewerRef.current.get('elementRegistry').find((el) => el.id === elementId);
+    const element = viewerRef.current.get('elementRegistry').find(el => el.id === elementId);
     return element
       ? {
           id: element.id,
@@ -202,7 +246,7 @@ function ExecuteProcess() {
 
   // Advance the process one step.
   const handleNextStep = (instanceId) => {
-    const instance = activeInstances.find((i) => i._id === instanceId);
+    const instance = activeInstances.find(i => i._id === instanceId);
     if (!instance) return;
 
     const nextElements = instance.sequenceMap[instance.position] || [];
@@ -221,7 +265,7 @@ function ExecuteProcess() {
     updateInstance(instanceId, { position: target, currentElement: newElement, gatewayChoices: [] });
   };
 
-  // Finish the process: update status and destroy the viewer.
+  // Finish the process.
   const finishProcess = async (instanceId) => {
     await updateInstance(instanceId, { status: 'finished' });
     if (selectedInstanceId === instanceId) {
@@ -230,7 +274,7 @@ function ExecuteProcess() {
     clearViewer();
   };
 
-  // Cancel the process: update status and destroy the viewer.
+  // Cancel the process.
   const cancelProcess = async (instanceId) => {
     await updateInstance(instanceId, { status: 'canceled' });
     if (selectedInstanceId === instanceId) {
@@ -239,7 +283,7 @@ function ExecuteProcess() {
     clearViewer();
   };
 
-  // Handler for the Close button: destroy the viewer and reset selections.
+  // Close the viewer.
   const handleClose = () => {
     clearViewer();
     setSelectedInstanceId(null);
@@ -256,16 +300,16 @@ function ExecuteProcess() {
 
   // Compute the selected instance.
   const selectedInstance =
-    activeInstances.find((i) => i._id === selectedInstanceId) ||
-    archivedInstances.find((i) => i._id === selectedInstanceId);
+    activeInstances.find(i => i._id === selectedInstanceId) ||
+    archivedInstances.find(i => i._id === selectedInstanceId);
 
-  // For active instances, get the next available flows from the sequence map.
+  // For active instances, get the next available flows.
   const nextElements =
     selectedInstance && selectedInstance.status === 'running'
       ? selectedInstance.sequenceMap[selectedInstance.position] || []
       : [];
 
-  // Helper: Retrieve the assigned project name by matching the process name.
+  // Helper: Retrieve the assigned project name for the selected instance.
   const getAssignedProjectName = () => {
     if (selectedInstance) {
       const proc = processList.find(p => p.name === selectedInstance.processName);
@@ -282,7 +326,7 @@ function ExecuteProcess() {
       alert("No user id found, please login again.");
       return;
     }
-    // Determine the project of the instance by matching the instance's processName
+    // Determine the project of the instance by matching processName.
     const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
     const projectId = processOfInstance && processOfInstance.project 
       ? (processOfInstance.project._id || processOfInstance.project)
@@ -299,7 +343,7 @@ function ExecuteProcess() {
         requestedById,
         targetRole: 'Manager',
         status: 'pending',
-        project: projectId  // Include the project ID
+        project: projectId
       };
       try {
         const response = await axios.post('http://localhost:5001/api/notifications', newNotification);
@@ -314,7 +358,6 @@ function ExecuteProcess() {
       alert('You are not authorized to request approval for this step.');
     }
   };
-  
 
   return (
     <div
@@ -568,8 +611,9 @@ export default ExecuteProcess;
 
 
 
+
 /** Requiered Improvments */
-//TODO: User can only See the process assigned to their project
+//TODO: User can only See the process and instances assigned to their project
 //TODO: include a css file, to make the site more appealing
 //TODO: employees can only send request to cancel instance
 
@@ -578,3 +622,7 @@ export default ExecuteProcess;
 /** Additional Improvments */
 //TODO: sort activeProcesses, so the newest process is on top
 //TODO: Search Bar for available Processes
+
+
+/** Notes for report */
+//Only processes and instances of the assigned projects are displayed for every user
