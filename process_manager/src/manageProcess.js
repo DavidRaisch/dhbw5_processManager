@@ -114,6 +114,11 @@ function CreateProcess() {
       alert('Please enter a process name.');
       return;
     }
+    // Check if a project is selected
+    if (!selectedProject) {
+      alert('Please select a project.');
+      return;
+    }
 
     const errors = validateDiagram();
     if (errors.length > 0) {
@@ -275,9 +280,11 @@ export default CreateProcess;
 
 
 
-
+//TODO: change error message if no project is assigned
 //TODO: change delete process => check if it shouldnt even be displayed for employees or if the should be able to request a deletion
 //TODO: include a css file, to make the site more appealing
+
+//** Additional */
 //TODO: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored
 
 

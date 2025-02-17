@@ -613,7 +613,6 @@ export default ExecuteProcess;
 
 
 /** Requiered Improvments */
-//TODO: User can only See the process and instances assigned to their project
 //TODO: include a css file, to make the site more appealing
 //TODO: employees can only send request to cancel instance
 
