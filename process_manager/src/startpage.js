@@ -110,7 +110,7 @@ function StartPage() {
                 onClick={() => navigate('/manage-process')}
                 className="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center"
               >
-                <FiSettings size={20} className="me-2" />
+                <FiSettings size={40} className="me-2" />
                 Manage Process
               </button>
             </div>
@@ -119,7 +119,7 @@ function StartPage() {
                 onClick={() => navigate('/execute-process')}
                 className="btn btn-info btn-lg w-100 d-flex align-items-center justify-content-center"
               >
-                <FiPlayCircle size={20} className="me-2" />
+                <FiPlayCircle size={40} className="me-2" />
                 Execute Process
               </button>
             </div>
@@ -133,7 +133,7 @@ function StartPage() {
                 onClick={() => navigate('/manage-users')}
                 className="btn btn-warning btn-lg w-100 d-flex align-items-center justify-content-center"
               >
-                <FiUsers size={20} className="me-2" />
+                <FiUsers size={40} className="me-2" />
                 Manage Users
               </button>
             </div>
@@ -142,7 +142,7 @@ function StartPage() {
                 onClick={() => navigate('/manage-projects')}
                 className="btn btn-secondary btn-lg w-100 d-flex align-items-center justify-content-center"
               >
-                <FiSettings size={20} className="me-2" />
+                <FiSettings size={40} className="me-2" />
                 Manage Projects
               </button>
             </div>
@@ -181,6 +181,5 @@ export default StartPage;
 
 
 /** Additional Add-Ons */
-//TODO: get role of user and associated project as a dropdown in the top left corner
 //TODO: get a custom password change site for only the individual user also in the dropdown menu
 

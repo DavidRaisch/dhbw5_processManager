@@ -64,4 +64,4 @@ export default LoginPage;
 
 
 /** Additional Add-Ons */
-//TODO: user should be able to have multiple roles (for example admin and manager)
+//TODO: OPTIONAL: user should be able to have multiple roles (for example admin and manager)

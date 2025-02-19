@@ -279,13 +279,12 @@ export default CreateProcess;
 
 
 
-
-//TODO: change error message if no project is assigned
-//TODO: change delete process => check if it shouldnt even be displayed for employees or if the should be able to request a deletion
+//TODO delete button should ask if user really wants to delete the process
 //TODO: include a css file, to make the site more appealing
 
 //** Additional */
-//TODO: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored
+//TODO: OPTIONAL: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored
+//TODO: OPTIONAL: load xml file to create new process
 
 
 /** Things to clear */
@@ -294,3 +293,7 @@ export default CreateProcess;
 
 //TODO: should the creating a new process be priveliged to some user?
 //TODO: make creating a process procecss dependable on role of the user: Employer: needs permission from supervisior to create new process; Manager: can simply create a new Process
+
+
+/** for report */
+// delete button isnt visible for employees, they can request the cancelation of active instances, but not the process att all

@@ -228,6 +228,6 @@ export default UserManagement;
 
 
 
-
+//TODO: use bootstrap checkbox and radio button groups for projects
 
 //TODO: Change password optional, only role change should be possible => is already the case, but maybe it would be clearer if the password box would be displayed with clicking an extra "change password" button

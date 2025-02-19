@@ -1,47 +1,48 @@
-// ExecuteProcess.js
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom'; // Ensure useLocation is imported
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer';
-import 'bpmn-js/dist/assets/diagram-js.css';
-import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
+import './executeProcess.css';
 
 function ExecuteProcess() {
   const location = useLocation();
   const instanceIdFromNotification = location.state?.instanceId;
 
-  // List of BPMN process templates (filtered by user's projects)
+  // State management
   const [processList, setProcessList] = useState([]);
-  // Instances that are still running
   const [activeInstances, setActiveInstances] = useState([]);
-  // Instances that have finished or canceled (archived)
   const [archivedInstances, setArchivedInstances] = useState([]);
-  // Currently selected instance (by _id)
   const [selectedInstanceId, setSelectedInstanceId] = useState(null);
-  // Currently selected process template (when starting a new instance)
   const [selectedProcess, setSelectedProcess] = useState(null);
-  // New instance name input value (when creating an instance)
   const [newInstanceName, setNewInstanceName] = useState("");
-  // User's assigned project names (array of strings)
   const [userProjects, setUserProjects] = useState([]);
+  const [selectedElementDetails, setSelectedElementDetails] = useState(null);
 
+  // BPMN viewer references
   const viewerRef = useRef(null);
   const bpmnContainerRef = useRef(null);
-
-  // Get current logged-in user from sessionStorage (may only include _id, username, role)
   const currentUser = JSON.parse(sessionStorage.getItem('user'));
 
-  // Fetch full user details to get assigned projects.
+  // Function to handle BPMN element clicks
+  const handleElementClick = (event) => {
+    const element = event.element;
+    const details = {
+      name: element.businessObject.name || 'Unnamed',
+      role: element.businessObject.get('role:role') || 'No role assigned',
+      description: element.businessObject.get('role:description') || 'No description'
+    };
+    setSelectedElementDetails(details);
+  };
+
+  // User and project initialization
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:5001/api/users/${currentUser._id}`);
         const userDetails = response.data;
         if (userDetails.projects && Array.isArray(userDetails.projects)) {
-          // Extract project names from populated projects.
           const names = userDetails.projects.map(proj => proj.name);
-          console.log("Fetched user project names:", names);
           setUserProjects(names);
         }
       } catch (err) {
@@ -51,35 +52,24 @@ function ExecuteProcess() {
     fetchUserDetails();
   }, [currentUser._id]);
 
-  // Once userProjects are loaded, fetch processes that match.
+  // Process and instance data fetching
   useEffect(() => {
-    if (userProjects.length > 0) {
-      fetchProcesses();
-    } else {
-      // If no projects assigned, clear processList.
-      setProcessList([]);
-    }
+    userProjects.length > 0 ? fetchProcesses() : setProcessList([]);
   }, [userProjects]);
 
-  // Once processList is updated, fetch instances that belong to those processes.
   useEffect(() => {
-    if (processList.length > 0) {
-      fetchInstances();
-    } else {
-      setActiveInstances([]);
-      setArchivedInstances([]);
-    }
+    processList.length > 0 ? fetchInstances() : setActiveInstances([]);
   }, [processList]);
 
-  // If an instance ID was passed from a notification, select it.
+  // BPMN viewer lifecycle management
   useEffect(() => {
     if (instanceIdFromNotification) {
       setSelectedInstanceId(instanceIdFromNotification);
       setSelectedProcess(null);
+      setSelectedElementDetails(null);
     }
   }, [instanceIdFromNotification]);
 
-  // Clean up the viewer on unmount.
   useEffect(() => {
     return () => {
       if (viewerRef.current) {
@@ -89,7 +79,7 @@ function ExecuteProcess() {
     };
   }, []);
 
-  // This effect both re‑creates the viewer (if needed) and loads the diagram.
+  // Diagram loading logic
   useEffect(() => {
     const loadDiagram = async () => {
       if ((selectedProcess || selectedInstanceId) && !viewerRef.current) {
@@ -99,7 +89,7 @@ function ExecuteProcess() {
           moveCanvas: false,
         });
       }
-      if (!viewerRef.current) return;
+
       try {
         if (selectedProcess) {
           await viewerRef.current.importXML(selectedProcess.xml);
@@ -120,31 +110,42 @@ function ExecuteProcess() {
     loadDiagram();
   }, [selectedProcess, selectedInstanceId, activeInstances, archivedInstances]);
 
-  // Fetch processes and filter by assigned user projects.
+  // Attach event listener for element clicks on the BPMN diagram
+  useEffect(() => {
+    if (viewerRef.current) {
+      const eventBus = viewerRef.current.get('eventBus');
+      eventBus.on('element.click', handleElementClick);
+      return () => {
+        eventBus.off('element.click', handleElementClick);
+      };
+    }
+  }, [selectedProcess, selectedInstanceId]);
+
+  // Data fetching functions
   const fetchProcesses = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/processes');
-      let processes = response.data;
-      // Filter processes: only include those whose populated project name is in userProjects.
-      processes = processes.filter(proc => 
+      const filtered = response.data.filter(proc => 
         proc.project && userProjects.includes(proc.project.name)
       );
-      console.log("Filtered process list:", processes);
-      setProcessList(processes);
+      setProcessList(filtered);
     } catch (err) {
       console.error('Error fetching processes:', err);
     }
   };
 
-  // Fetch instances and filter them by allowed process names.
   const fetchInstances = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/instances');
-      const instances = response.data;
-      // Allowed process names from the filtered processList.
-      const allowedProcessNames = new Set(processList.map(p => p.name));
-      const active = instances.filter(inst => inst.status === 'running' && allowedProcessNames.has(inst.processName));
-      const archived = instances.filter(inst => inst.status !== 'running' && allowedProcessNames.has(inst.processName));
+      const allowedNames = new Set(processList.map(p => p.name));
+      const active = response.data.filter(inst => 
+        inst.status === 'running' && allowedNames.has(inst.processName)
+      );
+      const archived = response.data
+        .filter(inst => 
+          inst.status !== 'running' && allowedNames.has(inst.processName)
+        )
+        .sort((a, b) => new Date(b.created) - new Date(a.created)); // Newest first
       setActiveInstances(active);
       setArchivedInstances(archived);
     } catch (err) {
@@ -152,99 +153,115 @@ function ExecuteProcess() {
     }
   };
 
-  // Helper to update an instance in the backend.
+  // Instance management
   const updateInstance = async (instanceId, updatedData) => {
     try {
-      const response = await axios.put(`http://localhost:5001/api/instances/${instanceId}`, updatedData);
+      const response = await axios.put(
+        `http://localhost:5001/api/instances/${instanceId}`,
+        updatedData
+      );
       const updatedInstance = response.data.instance;
-      if (updatedInstance.status !== 'running') {
-        setActiveInstances(prev => prev.filter(inst => inst._id !== instanceId));
-        setArchivedInstances(prev => [...prev, updatedInstance]);
-      } else {
-        setActiveInstances(prev =>
-          prev.map(inst => (inst._id === instanceId ? updatedInstance : inst))
-        );
-      }
+      updateInstanceState(updatedInstance);
     } catch (err) {
       console.error('Error updating instance:', err);
     }
   };
 
-  // Create a new instance for a given process.
+  const updateInstanceState = (updatedInstance) => {
+    if (updatedInstance.status !== 'running') {
+      setActiveInstances(prev => prev.filter(inst => inst._id !== updatedInstance._id));
+      setArchivedInstances(prev => [...prev, updatedInstance]);
+    } else {
+      setActiveInstances(prev => 
+        prev.map(inst => (inst._id === updatedInstance._id ? updatedInstance : inst))
+      );
+    }
+  };
+
+  // Process creation and navigation
   const createNewInstance = async (process, instanceName) => {
     if (!instanceName) {
       alert("Please enter an instance name.");
       return;
     }
+
     const parser = new XMLParser({
       ignoreAttributes: false,
       attributeNamePrefix: "@_",
       removeNSPrefix: true,
     });
-    const parsedXML = parser.parse(process.xml);
-    const flowMap = {};
-
-    // Ensure sequenceFlow is always an array.
-    const sequenceFlows = Array.isArray(parsedXML.definitions.process.sequenceFlow)
-      ? parsedXML.definitions.process.sequenceFlow
-      : [parsedXML.definitions.process.sequenceFlow];
-
-    sequenceFlows.forEach(flow => {
-      if (!flowMap[flow["@_sourceRef"]]) {
-        flowMap[flow["@_sourceRef"]] = [];
-      }
-      flowMap[flow["@_sourceRef"]].push({
-        target: flow["@_targetRef"],
-        name: flow["@_name"] || 'Unnamed Flow',
-      });
-    });
-
-    const newInstanceData = {
-      processId: process._id || process.id,
-      processName: process.name,
-      instanceName,
-      xml: process.xml,
-      currentElement: null,
-      sequenceMap: flowMap,
-      gatewayChoices: [],
-      position: 'StartEvent_1',
-      status: 'running',
-      created: new Date(),
-    };
-
+    
     try {
-      const response = await axios.post('http://localhost:5001/api/instances', newInstanceData);
-      const savedInstance = response.data.instance;
-      setActiveInstances(prev => [...prev, savedInstance]);
-      setSelectedInstanceId(savedInstance._id);
-      setSelectedProcess(null);
-      setNewInstanceName("");
-
-      // Load the new instance diagram.
-      await viewerRef.current.importXML(process.xml);
-      viewerRef.current.get('canvas').zoom('fit-viewport');
-
-      const currentElement = getElementState('StartEvent_1');
-      updateInstance(savedInstance._id, { currentElement });
+      const parsedXML = parser.parse(process.xml);
+      const flowMap = buildFlowMap(parsedXML);
+      const newInstanceData = buildInstanceData(process, instanceName, flowMap);
+      
+      const response = await axios.post(
+        'http://localhost:5001/api/instances',
+        newInstanceData
+      );
+      
+      handleNewInstanceResponse(response.data.instance, process);
     } catch (err) {
       console.error('Error creating new instance:', err);
     }
   };
 
-  // Retrieve an element's state from the viewer.
-  const getElementState = (elementId) => {
-    const element = viewerRef.current.get('elementRegistry').find(el => el.id === elementId);
-    return element
-      ? {
-          id: element.id,
-          name: element.businessObject.name || 'Unnamed',
-          role: element.businessObject.get('role:role') || 'No role assigned',
-          description: element.businessObject.get('role:description') || 'No description',
-        }
-      : null;
+  const buildFlowMap = (parsedXML) => {
+    const flowMap = {};
+    const sequenceFlows = Array.isArray(parsedXML.definitions.process.sequenceFlow)
+      ? parsedXML.definitions.process.sequenceFlow
+      : [parsedXML.definitions.process.sequenceFlow];
+
+    sequenceFlows.forEach(flow => {
+      const source = flow["@_sourceRef"];
+      flowMap[source] = flowMap[source] || [];
+      flowMap[source].push({
+        target: flow["@_targetRef"],
+        name: flow["@_name"] || 'Unnamed Flow',
+      });
+    });
+    return flowMap;
   };
 
-  // Advance the process one step.
+  const buildInstanceData = (process, instanceName, flowMap) => ({
+    processId: process._id,
+    processName: process.name,
+    instanceName,
+    xml: process.xml,
+    currentElement: null,
+    sequenceMap: flowMap,
+    gatewayChoices: [],
+    position: 'StartEvent_1',
+    status: 'running',
+    created: new Date(),
+  });
+
+  const handleNewInstanceResponse = async (savedInstance, process) => {
+    setActiveInstances(prev => [...prev, savedInstance]);
+    setSelectedInstanceId(savedInstance._id);
+    setSelectedProcess(null);
+    setNewInstanceName("");
+
+    await viewerRef.current.importXML(process.xml);
+    viewerRef.current.get('canvas').zoom('fit-viewport');
+    updateInstance(savedInstance._id, { 
+      currentElement: getElementState('StartEvent_1') 
+    });
+  };
+
+  // Element state management
+  const getElementState = (elementId) => {
+    const element = viewerRef.current.get('elementRegistry').find(el => el.id === elementId);
+    return element ? {
+      id: element.id,
+      name: element.businessObject.name || 'Unnamed',
+      role: element.businessObject.get('role:role') || 'No role assigned',
+      description: element.businessObject.get('role:description') || 'No description',
+    } : null;
+  };
+
+  // Process navigation handlers
   const handleNextStep = (instanceId) => {
     const instance = activeInstances.find(i => i._id === instanceId);
     if (!instance) return;
@@ -254,43 +271,111 @@ function ExecuteProcess() {
       updateInstance(instanceId, { gatewayChoices: nextElements });
     } else if (nextElements.length === 1) {
       const newPosition = nextElements[0]?.target;
-      const newElement = getElementState(newPosition);
-      updateInstance(instanceId, { position: newPosition, currentElement: newElement, gatewayChoices: [] });
+      updateInstance(instanceId, { 
+        position: newPosition, 
+        currentElement: getElementState(newPosition), 
+        gatewayChoices: [] 
+      });
     }
   };
 
-  // When multiple next paths exist, allow the user to choose.
   const handleGatewayChoice = (instanceId, target) => {
-    const newElement = getElementState(target);
-    updateInstance(instanceId, { position: target, currentElement: newElement, gatewayChoices: [] });
+    updateInstance(instanceId, { 
+      position: target, 
+      currentElement: getElementState(target), 
+      gatewayChoices: [] 
+    });
   };
 
-  // Finish the process.
+  // Process completion and cancellation
   const finishProcess = async (instanceId) => {
     await updateInstance(instanceId, { status: 'finished' });
-    if (selectedInstanceId === instanceId) {
-      setSelectedInstanceId(null);
-    }
-    clearViewer();
+    handleProcessCompletion(instanceId);
   };
 
-  // Cancel the process.
   const cancelProcess = async (instanceId) => {
     await updateInstance(instanceId, { status: 'canceled' });
+    handleProcessCompletion(instanceId);
+  };
+
+  const handleProcessCompletion = (instanceId) => {
     if (selectedInstanceId === instanceId) {
       setSelectedInstanceId(null);
     }
     clearViewer();
   };
 
-  // Close the viewer.
+  // Request handling
+  const requestApproval = async () => {
+    const requestedById = currentUser._id;
+    if (!requestedById) {
+      alert("No user id found, please login again.");
+      return;
+    }
+
+    const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
+    const projectId = processOfInstance?.project?._id || processOfInstance?.project;
+    if (!projectId) {
+      alert("No project assigned to the process.");
+      return;
+    }
+
+    try {
+      await axios.post('http://localhost:5001/api/notifications', {
+        message: `User ${currentUser.username} requested approval for instance "${selectedInstance.instanceName}"`,
+        instanceId: selectedInstance._id,
+        requestedBy: currentUser.username,
+        requestedById,
+        targetRole: 'Manager',
+        status: 'pending',
+        project: projectId
+      });
+      alert('Approval request sent to Manager.');
+    } catch (err) {
+      console.error('Error sending approval request:', err);
+      alert('Error sending approval request.');
+    }
+  };
+
+  const requestCancel = async (instanceId) => {
+    const requestedById = currentUser._id;
+    if (!requestedById) {
+      alert("No user id found, please login again.");
+      return;
+    }
+
+    const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
+    const projectId = processOfInstance?.project?._id || processOfInstance?.project;
+    if (!projectId) {
+      alert("No project assigned to the process.");
+      return;
+    }
+
+    try {
+      await axios.post('http://localhost:5001/api/notifications', {
+        message: `User ${currentUser.username} requested cancellation of instance "${selectedInstance.instanceName}"`,
+        instanceId,
+        requestedBy: currentUser.username,
+        requestedById,
+        targetRole: 'Manager',
+        status: 'pending',
+        project: projectId
+      });
+      alert('Cancellation request sent to Manager.');
+    } catch (err) {
+      console.error('Error sending cancellation request:', err);
+      alert('Error sending cancellation request.');
+    }
+  };
+
+  // UI helpers
   const handleClose = () => {
     clearViewer();
     setSelectedInstanceId(null);
     setSelectedProcess(null);
+    setSelectedElementDetails(null);
   };
 
-  // Helper to destroy the viewer.
   const clearViewer = () => {
     if (viewerRef.current) {
       viewerRef.current.destroy();
@@ -298,299 +383,267 @@ function ExecuteProcess() {
     }
   };
 
-  // Compute the selected instance.
-  const selectedInstance =
-    activeInstances.find(i => i._id === selectedInstanceId) ||
-    archivedInstances.find(i => i._id === selectedInstanceId);
-
-  // For active instances, get the next available flows.
-  const nextElements =
-    selectedInstance && selectedInstance.status === 'running'
-      ? selectedInstance.sequenceMap[selectedInstance.position] || []
-      : [];
-
-  // Helper: Retrieve the assigned project name for the selected instance.
+  // Derived data
+  const selectedInstance = [...activeInstances, ...archivedInstances]
+    .find(i => i._id === selectedInstanceId);
+  const nextElements = selectedInstance?.status === 'running' 
+    ? selectedInstance.sequenceMap[selectedInstance.position] || []
+    : [];
   const getAssignedProjectName = () => {
-    if (selectedInstance) {
-      const proc = processList.find(p => p.name === selectedInstance.processName);
-      return proc && proc.project && proc.project.name ? proc.project.name : "No Project Assigned";
-    }
-    return "";
-  };
-
-  // Notification request function.
-  const requestApproval = async () => {
-    const requestedById = currentUser._id;
-    if (!requestedById) {
-      console.error("No user id found in session.");
-      alert("No user id found, please login again.");
-      return;
-    }
-    // Determine the project of the instance by matching processName.
-    const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
-    const projectId = processOfInstance && processOfInstance.project 
-      ? (processOfInstance.project._id || processOfInstance.project)
-      : null;
-    if (!projectId) {
-      alert("No project assigned to the process.");
-      return;
-    }
-    if (currentUser.role === 'Employee' && selectedInstance.currentElement.role !== 'Employee') {
-      const newNotification = {
-        message: `User ${currentUser.username} attempted to proceed on instance "${selectedInstance.instanceName}" (step: ${selectedInstance.currentElement.name}) but doesn't have permission.`,
-        instanceId: selectedInstance._id,
-        requestedBy: currentUser.username,
-        requestedById,
-        targetRole: 'Manager',
-        status: 'pending',
-        project: projectId
-      };
-      try {
-        const response = await axios.post('http://localhost:5001/api/notifications', newNotification);
-        if (response.data.message) {
-          alert('Approval request sent to Manager.');
-        }
-      } catch (err) {
-        console.error('Error sending approval request:', err.response ? err.response.data : err);
-        alert('Error sending approval request.');
-      }
-    } else {
-      alert('You are not authorized to request approval for this step.');
-    }
+    const proc = processList.find(p => p.name === selectedInstance?.processName);
+    return proc?.project?.name || "No Project Assigned";
   };
 
   return (
-    <div
-      style={{
-        padding: '20px',
-        border: '1px solid green',
-        display: 'flex',
-        flexDirection: 'row',
-        width: '100%',
-        maxWidth: '1400px',
-        margin: '0 auto',
-      }}
-    >
-      {/* Left Sidebar */}
-      <div style={{ width: '250px', borderRight: '1px solid gray', paddingRight: '10px' }}>
-        <div>
-          <h3>Available Processes</h3>
-          <ul>
+    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh' }}>
+      <div className="row">
+        {/* Left Sidebar */}
+        <div className="col-md-3 border-end pe-3 left-sidebar">
+          <h5 className="mb-3">Available Processes</h5>
+          <ul className="list-group mb-4">
             {processList.map((process) => (
               <li
-                key={process._id || process.id}
-                style={{ cursor: 'pointer', padding: '5px', borderBottom: '1px solid lightgray' }}
+                key={process._id}
+                className={`list-group-item list-group-item-action ${selectedProcess?._id === process._id ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedProcess(process);
                   setSelectedInstanceId(null);
+                  setSelectedElementDetails(null);
                 }}
               >
-                {process.name}
+                <div className="fw-bold">{process.name}</div>
+                <small className="text-muted">{process.project?.name || 'No Project'}</small>
               </li>
             ))}
           </ul>
-        </div>
 
-        <div style={{ marginTop: '20px' }}>
-          <h3>Active Instances</h3>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
+          <h5 className="mb-3">Active Instances</h5>
+          <ul className="list-group mb-4">
             {activeInstances.map((instance) => (
               <li
                 key={instance._id}
-                style={{
-                  cursor: 'pointer',
-                  padding: '5px',
-                  backgroundColor: selectedInstanceId === instance._id ? '#e0f0ff' : 'white',
-                  borderBottom: '1px solid lightgray',
-                }}
+                className={`list-group-item list-group-item-action ${selectedInstanceId === instance._id ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedInstanceId(instance._id);
                   setSelectedProcess(null);
+                  setSelectedElementDetails(null);
                 }}
               >
-                <div>
-                  <strong>{instance.instanceName}</strong>
-                </div>
-                <div>
-                  <em>{instance.processName}</em>
-                </div>
-                <div>
-                  <small>{new Date(instance.created).toLocaleString()}</small>
-                </div>
+                <div className="fw-semibold">{instance.instanceName}</div>
+                <small className="text-muted">{instance.processName}</small>
+                <br />
+                <small className="text-muted">{new Date(instance.created).toLocaleDateString()}</small>
               </li>
             ))}
           </ul>
-        </div>
 
-        <div style={{ marginTop: '20px', borderTop: '1px solid gray', paddingTop: '10px' }}>
-          <h3>Archived Processes</h3>
-          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
+          <h5 className="mb-3">Archived Instances</h5>
+          <div className="overflow-auto" style={{ maxHeight: '400px' }}>
+            <ul className="list-group">
               {archivedInstances.map((instance) => (
                 <li
                   key={instance._id}
-                  style={{
-                    cursor: 'pointer',
-                    padding: '5px',
-                    borderBottom: '1px solid lightgray',
-                  }}
+                  className={`list-group-item list-group-item-action ${selectedInstanceId === instance._id ? 'active' : ''}`}
                   onClick={() => {
                     setSelectedInstanceId(instance._id);
                     setSelectedProcess(null);
+                    setSelectedElementDetails(null);
                   }}
                 >
-                  <div>
-                    <strong>{instance.instanceName}</strong>
-                  </div>
-                  <div>
-                    <em>{instance.processName}</em>
-                  </div>
-                  <div>
-                    <small>{new Date(instance.created).toLocaleString()}</small>
-                  </div>
+                  <div className="fw-medium">{instance.instanceName}</div>
+                  <small className="text-muted">{instance.processName} - {instance.status}</small>
                 </li>
               ))}
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingLeft: '10px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-          {selectedProcess ? (
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-              <input
-                type="text"
-                value={selectedProcess.name}
-                readOnly
-                style={{ marginRight: '10px', flex: 1 }}
-              />
-              <input
-                type="text"
-                placeholder="Enter instance name"
-                value={newInstanceName}
-                onChange={(e) => setNewInstanceName(e.target.value)}
-                style={{ marginRight: '10px', flex: 1 }}
-              />
-              <button onClick={() => createNewInstance(selectedProcess, newInstanceName)}>
-                Start New Instance
+        {/* Main Content Area */}
+        <div className="col-md-9">
+          {/* Process Mode Header */}
+          {selectedProcess && (
+            <div className="d-flex justify-content-between align-items-center bg-light rounded p-3 mb-3">
+              <div className="row g-2 align-items-center flex-grow-1">
+                <div className="col">
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={selectedProcess.name}
+                    readOnly
+                  />
+                </div>
+                <div className="col">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Instance Name"
+                    value={newInstanceName}
+                    onChange={(e) => setNewInstanceName(e.target.value)}
+                  />
+                </div>
+                <div className="col-auto">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => createNewInstance(selectedProcess, newInstanceName)}
+                  >
+                    Start Instance
+                  </button>
+                </div>
+              </div>
+              <button className="btn btn-danger ms-2" onClick={handleClose}>
+                Close
               </button>
             </div>
-          ) : (
-            <input
-              type="text"
-              value={
-                selectedInstance
-                  ? `${selectedInstance.instanceName} - ${selectedInstance.processName}`
-                  : 'Select a process'
-              }
-              readOnly
-              placeholder="Process Name"
-              style={{ flex: 1 }}
-            />
           )}
-          <div>
-            <button onClick={handleClose}>Close</button>
-          </div>
-        </div>
 
-        <div style={{ flex: 1, height: '500px', border: '1px solid black', overflow: 'hidden' }}>
-          <div ref={bpmnContainerRef} style={{ width: '100%', height: '100%' }}></div>
-        </div>
-
-        {/* Navigation Window: Display selected instance details with assigned project */}
-        {selectedInstanceId && selectedInstance && (
-          <div
-            style={{
-              marginTop: '10px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '400px',
-              border: '1px solid black',
-            }}
-          >
-            <div
-              style={{
-                borderBottom: '1px solid gray',
-                padding: '5px',
-                alignSelf: 'stretch',
-                textAlign: 'center',
-              }}
-            >
-              <strong>{selectedInstance.instanceName}</strong> -{' '}
-              <em>{selectedInstance.processName}</em> -{' '}
-              <small>{new Date(selectedInstance.created).toLocaleString()}</small>
-              <br />
-              <small>Project: {getAssignedProjectName()}</small>
+          {/* No Selection Header */}
+          {(!selectedProcess && !selectedInstance) && (
+            <div className="d-flex justify-content-between align-items-center bg-light rounded p-3 mb-3">
+              <input
+                type="text"
+                className="form-control flex-grow-1"
+                value="Select a process or instance"
+                readOnly
+              />
+              <button className="btn btn-danger ms-2" onClick={handleClose}>
+                Close
+              </button>
             </div>
-            {selectedInstance && selectedInstance.status !== 'running' ? (
-              <div style={{ padding: '20px', textAlign: 'center' }}>
-                <h3>Process Status: {selectedInstance.status}</h3>
-              </div>
-            ) : (
-              <>
-                {selectedInstance?.currentElement ? (
-                  <div style={{ padding: '20px', textAlign: 'center' }}>
-                    <h3>{selectedInstance.currentElement.name}</h3>
-                    <p>Role: {selectedInstance.currentElement.role}</p>
-                    <p>Description: {selectedInstance.currentElement.description}</p>
-                  </div>
-                ) : (
-                  <p>No active element</p>
-                )}
-                {selectedInstance?.currentElement &&
-                currentUser.role === 'Employee' &&
-                selectedInstance.currentElement.role !== 'Employee' ? (
-                  <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                    <p>You do not have permission to complete this step.</p>
-                    <button onClick={requestApproval}>Request Manager Approval</button>
-                  </div>
-                ) : (
-                  <>
-                    {selectedInstance?.gatewayChoices && selectedInstance.gatewayChoices.length > 0 ? (
-                      <div>
-                        <h4>Choose Path:</h4>
-                        {selectedInstance.gatewayChoices.map((choice) => (
-                          <button
-                            key={choice.target}
-                            onClick={() => handleGatewayChoice(selectedInstanceId, choice.target)}
-                            style={{ margin: '5px' }}
-                          >
-                            {choice.name}
-                          </button>
-                        ))}
+          )}
+
+          {/* Instance Mode Navigation Window */}
+          {selectedInstance && (
+            <>
+              <div className="card mb-3">
+                <div className="card-header">
+                  <div className="row">
+                    <div className="col">
+                      <h5 className="mb-0">
+                        {selectedInstance.instanceName} <small>({selectedInstance.processName})</small>
+                      </h5>
+                      <div className="d-flex justify-content-between mt-2">
+                        <div>
+                          <strong>Status:</strong>{" "}
+                          <span className={selectedInstance.status === 'running' ? 'text-success' : 'text-secondary'}>
+                            {selectedInstance.status.toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <strong>Project:</strong> {getAssignedProjectName()}
+                        </div>
+                        <div>
+                          <strong>Created:</strong> {new Date(selectedInstance.created).toLocaleString()}
+                        </div>
                       </div>
-                    ) : (
-                      <div>
-                        {nextElements.length === 0 ? (
-                          <button onClick={() => finishProcess(selectedInstanceId)} style={{ marginTop: '10px' }}>
-                            Finish Process
-                          </button>
+                    </div>
+                    <div className="col-auto">
+                      <button type="button" className="btn-close" aria-label="Close" onClick={handleClose}></button>
+                    </div>
+                  </div>
+                </div>
+                <div className="card-body">
+                  {selectedInstance.status !== 'running' ? (
+                    <div className="text-center text-muted">
+                      <h4>This instance has been {selectedInstance.status}</h4>
+                    </div>
+                  ) : (
+                    <>
+                      {selectedInstance.currentElement && (
+                        <div className="mb-4 p-3 border rounded">
+                          <h5>Current Step: {selectedInstance.currentElement.name}</h5>
+                          <div className="row">
+                            <div className="col-md-6">
+                              <label className="fw-semibold">Assigned Role:</label>
+                              <div>{selectedInstance.currentElement.role}</div>
+                            </div>
+                            <div className="col-md-6">
+                              <label className="fw-semibold">Description:</label>
+                              <div className="text-muted">{selectedInstance.currentElement.description}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="d-flex flex-column gap-3">
+                        {currentUser.role === 'Employee' && selectedInstance.currentElement?.role !== 'Employee' ? (
+                          <div className="alert alert-warning text-center" role="alert">
+                            <p className="mb-2">You need manager approval to proceed with this step</p>
+                            <button onClick={requestApproval} className="btn btn-primary">
+                              Request Manager Approval
+                            </button>
+                          </div>
                         ) : (
-                          <button
-                            onClick={() => handleNextStep(selectedInstanceId)}
-                            style={{ marginTop: '10px' }}
-                            disabled={!selectedInstance?.position}
-                          >
-                            Next →
-                          </button>
+                          <>
+                            {selectedInstance.gatewayChoices?.length > 0 ? (
+                              <div className="p-3 border rounded">
+                                <h5>Select Path:</h5>
+                                <div className="d-flex flex-wrap gap-2 justify-content-center">
+                                  {selectedInstance.gatewayChoices.map((choice) => (
+                                    <button
+                                      key={choice.target}
+                                      onClick={() => handleGatewayChoice(selectedInstanceId, choice.target)}
+                                      className="btn btn-primary"
+                                    >
+                                      {choice.name}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="d-flex justify-content-center gap-2">
+                                {nextElements.length === 0 ? (
+                                  <button onClick={() => finishProcess(selectedInstanceId)} className="btn btn-success">
+                                    Complete Process
+                                  </button>
+                                ) : (
+                                  <button onClick={() => handleNextStep(selectedInstanceId)} className="btn btn-primary">
+                                    Continue to Next Step &rarr;
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </>
                         )}
+                        <div className="d-flex justify-content-center gap-2">
+                          {currentUser.role === 'Employee' ? (
+                            <button onClick={() => requestCancel(selectedInstanceId)} className="btn btn-outline-danger">
+                              Request Cancellation
+                            </button>
+                          ) : (
+                            <button onClick={() => cancelProcess(selectedInstanceId)} className="btn btn-outline-danger">
+                              Cancel Process
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    )}
-                    {nextElements.length > 0 && (
-                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                        <button onClick={() => cancelProcess(selectedInstanceId)}>Cancel Process</button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        )}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Element Details (if any) */}
+              {selectedElementDetails && (
+                <div className="element-details mt-3 p-3 position-relative">
+                  <button 
+                    type="button" 
+                    className="btn-close position-absolute top-0 end-0 m-2" 
+                    aria-label="Close"
+                    onClick={() => setSelectedElementDetails(null)}
+                  ></button>
+                  <h5>{selectedElementDetails.name}</h5>
+                  <p><strong>Role:</strong> {selectedElementDetails.role}</p>
+                  <p><strong>Description:</strong> {selectedElementDetails.description}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* BPMN Viewer Container (only rendered when a process or instance is selected) */}
+          {(selectedProcess || selectedInstance) && (
+            <div className="bpmn-viewer-container mb-3">
+              <div ref={bpmnContainerRef} className="w-100 h-100"></div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -605,22 +658,8 @@ export default ExecuteProcess;
 
 
 
-
-
-
-
-
-
-
-/** Requiered Improvments */
-//TODO: include a css file, to make the site more appealing
-//TODO: employees can only send request to cancel instance
-
-
-
 /** Additional Improvments */
-//TODO: sort activeProcesses, so the newest process is on top
-//TODO: Search Bar for available Processes
+//TODO: OPTIONAL: Search Bar for available Processes
 
 
 /** Notes for report */
