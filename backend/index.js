@@ -412,9 +412,3 @@ app.put('/api/instances/:id', async (req, res) => {
 // Start the server
 const PORT = 5001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-
-
-
-
-//TODO: make sure that the backend is able to not only filter by role (manager), but also by projects
-//TODO: notifiactions need a project information saved in the schema

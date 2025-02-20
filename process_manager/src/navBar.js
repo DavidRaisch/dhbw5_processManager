@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiLogOut } from 'react-icons/fi';
-import { Person, House, Gear, PlayCircle, Bell } from 'react-bootstrap-icons';
+import { Person, House, Gear, PlayCircle, Bell, PersonFillGear} from 'react-bootstrap-icons';
 import axios from 'axios';
 import './navBar.css';
 
@@ -19,10 +19,7 @@ function TopNavBar({ currentPage }) {
         const userDetails = response.data;
         if (userDetails.projects && Array.isArray(userDetails.projects)) {
           const names = userDetails.projects.map(proj => proj.name);
-          console.log("Fetched user project names:", names);
           setUserProjects(names);
-        } else {
-          console.log("No projects found in user record");
         }
       } catch (err) {
         console.error("Error fetching user details:", err);
@@ -35,16 +32,10 @@ function TopNavBar({ currentPage }) {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // Build a comma-separated string of project names.
         const projectQuery = userProjects.length > 0 ? userProjects.join(',') : '';
-        console.log("Fetching notifications with parameters:", {
-          targetRole: user.role,
-          projectNames: projectQuery
-        });
         const notifResponse = await axios.get('http://localhost:5001/api/notifications', {
           params: { targetRole: user.role, projectNames: projectQuery },
         });
-        console.log("Fetched notifications:", notifResponse.data);
         setNotifications(notifResponse.data);
       } catch (err) {
         console.error("Error fetching notifications:", err);
@@ -58,46 +49,82 @@ function TopNavBar({ currentPage }) {
     navigate('/');
   };
 
-  // Helper function to determine if a given page is active.
+  // Helper to determine active nav item styling
   const isActive = (page) => currentPage === page ? 'active' : '';
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark top-nav-red mb-3">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">ZenithFlow</a>
+        <a className="navbar-brand" href="#">{'ZenithFlow'}</a>
         <div className="collapse navbar-collapse">
-          {/* Navigation links rendered as Bootstrap nav-pills */}
           <ul className="nav nav-pills ms-auto">
-            <li className="nav-item">
-              <button
-                onClick={() => navigate('/start')}
-                type="button"
-                className={`nav-link text-light ${isActive('Home')}`}
-              >
-                <House size={20} className="me-1" />
-                Home
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                onClick={() => navigate('/manage-process')}
-                type="button"
-                className={`nav-link text-light ${isActive('Manage Process')}`}
-              >
-                <Gear size={20} className="me-1" />
-                Manage Process
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                onClick={() => navigate('/execute-process')}
-                type="button"
-                className={`nav-link text-light ${isActive('Execute Process')}`}
-              >
-                <PlayCircle size={20} className="me-1" />
-                Execute Process
-              </button>
-            </li>
+            {user.role === 'Admin' ? (
+              <>
+              <li className="nav-item">
+                  <button
+                    onClick={() => navigate('/start')}
+                    type="button"
+                    className={`nav-link text-light ${isActive('Home')}`}
+                  >
+                    <House size={20} className="me-1" />
+                    Home
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    onClick={() => navigate('/manage-users')}
+                    type="button"
+                    className={`nav-link text-light ${isActive('Manage Users')}`}
+                  >
+                    <PersonFillGear size={20} className="me-1" />
+                    Manage Users
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    onClick={() => navigate('/manage-projects')}
+                    type="button"
+                    className={`nav-link text-light ${isActive('Manage Projects')}`}
+                  >
+                    <Gear size={20} className="me-1" />
+                    Manage Projects
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <button
+                    onClick={() => navigate('/start')}
+                    type="button"
+                    className={`nav-link text-light ${isActive('Home')}`}
+                  >
+                    <House size={20} className="me-1" />
+                    Home
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    onClick={() => navigate('/manage-process')}
+                    type="button"
+                    className={`nav-link text-light ${isActive('Manage Process')}`}
+                  >
+                    <Gear size={20} className="me-1" />
+                    Manage Process
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    onClick={() => navigate('/execute-process')}
+                    type="button"
+                    className={`nav-link text-light ${isActive('Execute Process')}`}
+                  >
+                    <PlayCircle size={20} className="me-1" />
+                    Execute Process
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
         <div className="d-flex align-items-center">
@@ -152,5 +179,5 @@ export default TopNavBar;
 
 
 
+
 //TODO: navBar should always be visible, main page should scroll with navBar static at the top
-//TODO: on the left side, the name of the project should be displayed, to identify which side the user is currently on it should label the button of the current page.

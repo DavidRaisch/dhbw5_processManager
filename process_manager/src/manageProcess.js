@@ -164,10 +164,10 @@ function ManageProcess() {
   };
 
   return (
-    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh', padding: '20px' }}>
-      {/* Universal Top Navigation Bar */}
-      <TopNavBar currentPage="Manage Process" />
-
+    <>
+    {/* Universal Top Navigation Bar */}
+    <TopNavBar currentPage="Manage Process" />
+    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh'}}>
       <div className="row">
         {/* Left Sidebar: Saved Processes */}
         <div className="col-md-3 border-end pe-3 left-sidebar">
@@ -284,6 +284,7 @@ function ManageProcess() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -300,7 +301,6 @@ export default ManageProcess;
 
 
 //TODO delete button should ask if user really wants to delete the process
-//TODO: include a css file, to make the site more appealing
 
 //** Additional */
 //TODO: OPTIONAL: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft } from 'react-icons/fi';
+import { ArrowLeft } from 'react-bootstrap-icons';
 import axios from 'axios';
 import './notificationPage.css';
 
@@ -94,7 +94,7 @@ function Notifications() {
   return (
     <div className="notifications-page" style={{ padding: '20px' }}>
       <button onClick={() => navigate(-1)} style={{ marginBottom: '10px' }}>
-        <FiArrowLeft size={16} /> Back
+        <ArrowLeft size={16} /> Back
       </button>
       <h2>Notifications</h2>
       {notifications.length === 0 ? (

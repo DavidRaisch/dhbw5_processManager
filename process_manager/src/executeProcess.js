@@ -386,8 +386,10 @@ function ExecuteProcess() {
   };
 
   return (
-    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh', padding: '20px' }}>
-      <TopNavBar currentPage="Execute Process" />
+    <>
+    {/* Universal Top Navigation Bar */}
+    <TopNavBar currentPage="Execute Process" />
+    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh'}}>
       <div className="row">
         {/* Left Sidebar */}
         <div className="col-md-3 border-end pe-3 left-sidebar">
@@ -638,18 +640,13 @@ function ExecuteProcess() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
 export default ExecuteProcess;
 
 
-
-
-
-//TODO: if navigated from the notifications the seleceted instance should be displayed in the bpmn viewer => bpmn viewer wird vermutlich nur dann angezeigt, wenn aktiv auf eine instanz geklickt wird, sollte diesen aber öffnen sobald eine instanz
-//funktioniert nciht idk why
-//vlt in feld einfach schreiben no process seleceted und gut ist
 //TODO: reload page should to the same as close button
 //TODO: put header over the bpmn container like in managerProcess
 
