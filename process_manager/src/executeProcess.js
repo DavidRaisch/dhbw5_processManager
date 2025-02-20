@@ -387,54 +387,33 @@ function ExecuteProcess() {
 
   return (
     <>
-    {/* Universal Top Navigation Bar */}
-    <TopNavBar currentPage="Execute Process" />
-    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh'}}>
-      <div className="row">
-        {/* Left Sidebar */}
-        <div className="col-md-3 border-end pe-3 left-sidebar">
-          <h5 className="mb-3">Available Processes</h5>
-          <ul className="list-group mb-4">
-            {processList.map((process) => (
-              <li
-                key={process._id}
-                className={`list-group-item list-group-item-action ${selectedProcess?._id === process._id ? 'active' : ''}`}
-                onClick={() => {
-                  setSelectedProcess(process);
-                  setSelectedInstanceId(null);
-                  setSelectedElementDetails(null);
-                }}
-              >
-                <div className="fw-bold">{process.name}</div>
-                <small className="text-muted">{process.project?.name || 'No Project'}</small>
-              </li>
-            ))}
-          </ul>
+      {/* Universal Top Navigation Bar */}
+      <TopNavBar currentPage="Execute Process" />
+      <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh'}}>
+        <div className="row">
+          {/* Left Sidebar */}
+          <div className="col-md-3 border-end pe-3 left-sidebar">
+            <h5 className="mb-3">Available Processes</h5>
+            <ul className="list-group mb-4">
+              {processList.map((process) => (
+                <li
+                  key={process._id}
+                  className={`list-group-item list-group-item-action ${selectedProcess?._id === process._id ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedProcess(process);
+                    setSelectedInstanceId(null);
+                    setSelectedElementDetails(null);
+                  }}
+                >
+                  <div className="fw-bold">{process.name}</div>
+                  <small className="text-muted">{process.project?.name || 'No Project'}</small>
+                </li>
+              ))}
+            </ul>
 
-          <h5 className="mb-3">Active Instances</h5>
-          <ul className="list-group mb-4">
-            {activeInstances.map((instance) => (
-              <li
-                key={instance._id}
-                className={`list-group-item list-group-item-action ${selectedInstanceId === instance._id ? 'active' : ''}`}
-                onClick={() => {
-                  setSelectedInstanceId(instance._id);
-                  setSelectedProcess(null);
-                  setSelectedElementDetails(null);
-                }}
-              >
-                <div className="fw-semibold">{instance.instanceName}</div>
-                <small className="text-muted">{instance.processName}</small>
-                <br />
-                <small className="text-muted">{new Date(instance.created).toLocaleDateString()}</small>
-              </li>
-            ))}
-          </ul>
-
-          <h5 className="mb-3">Archived Instances</h5>
-          <div className="overflow-auto" style={{ maxHeight: '400px' }}>
-            <ul className="list-group">
-              {archivedInstances.map((instance) => (
+            <h5 className="mb-3">Active Instances</h5>
+            <ul className="list-group mb-4">
+              {activeInstances.map((instance) => (
                 <li
                   key={instance._id}
                   className={`list-group-item list-group-item-action ${selectedInstanceId === instance._id ? 'active' : ''}`}
@@ -444,202 +423,233 @@ function ExecuteProcess() {
                     setSelectedElementDetails(null);
                   }}
                 >
-                  <div className="fw-medium">{instance.instanceName}</div>
-                  <small className="text-muted">{instance.processName} - {instance.status}</small>
+                  <div className="fw-semibold">{instance.instanceName}</div>
+                  <small className="text-muted">{instance.processName}</small>
+                  <br />
+                  <small className="text-muted">{new Date(instance.created).toLocaleDateString()}</small>
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
 
-        {/* Main Content Area */}
-        <div className="col-md-9">
-          {/* Process Mode Header */}
-          {selectedProcess && (
-            <div className="d-flex justify-content-between align-items-center bg-light rounded p-3 mb-3">
-              <div className="row g-2 align-items-center flex-grow-1">
-                <div className="col">
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={selectedProcess.name}
-                    readOnly
-                  />
-                </div>
-                <div className="col">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Instance Name"
-                    value={newInstanceName}
-                    onChange={(e) => setNewInstanceName(e.target.value)}
-                  />
-                </div>
-                <div className="col-auto">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => createNewInstance(selectedProcess, newInstanceName)}
+            <h5 className="mb-3">Archived Instances</h5>
+            <div className="overflow-auto" style={{ maxHeight: '400px' }}>
+              <ul className="list-group">
+                {archivedInstances.map((instance) => (
+                  <li
+                    key={instance._id}
+                    className={`list-group-item list-group-item-action ${selectedInstanceId === instance._id ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedInstanceId(instance._id);
+                      setSelectedProcess(null);
+                      setSelectedElementDetails(null);
+                    }}
                   >
-                    Start Instance
-                  </button>
-                </div>
-              </div>
-              <button className="btn btn-danger ms-2" onClick={handleClose}>
-                Close
-              </button>
+                    <div className="fw-medium">{instance.instanceName}</div>
+                    <small className="text-muted">{instance.processName} - {instance.status}</small>
+                  </li>
+                ))}
+              </ul>
             </div>
-          )}
+          </div>
 
-          {/* No Selection Header */}
-          {(!selectedProcess && !selectedInstance) && (
-            <div className="d-flex justify-content-between align-items-center bg-light rounded p-3 mb-3">
-              <input
-                type="text"
-                className="form-control flex-grow-1"
-                value="Select a process or instance"
-                readOnly
-              />
-              <button className="btn btn-danger ms-2" onClick={handleClose}>
-                Close
-              </button>
-            </div>
-          )}
-
-          {/* Instance Mode Navigation Window */}
-          {selectedInstance && (
-            <>
-              <div className="card mb-3">
-                <div className="card-header">
-                  <div className="row">
-                    <div className="col">
-                      <h5 className="mb-0">
-                        {selectedInstance.instanceName} <small>({selectedInstance.processName})</small>
-                      </h5>
-                      <div className="d-flex justify-content-between mt-2">
-                        <div>
-                          <strong>Status:</strong>{" "}
-                          <span className={selectedInstance.status === 'running' ? 'text-success' : 'text-secondary'}>
-                            {selectedInstance.status.toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <strong>Project:</strong> {getAssignedProjectName()}
-                        </div>
-                        <div>
-                          <strong>Created:</strong> {new Date(selectedInstance.created).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-auto">
-                      <button type="button" className="btn-close" aria-label="Close" onClick={handleClose}></button>
-                    </div>
+          {/* Main Content Area */}
+          <div className="col-md-9">
+            {/* Process Mode Header */}
+            {selectedProcess && (
+              <div className="d-flex justify-content-between align-items-center bg-light rounded p-3 mb-3">
+                <div className="row g-2 align-items-center flex-grow-1">
+                  <div className="col">
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={selectedProcess.name}
+                      readOnly
+                    />
+                  </div>
+                  <div className="col">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Instance Name"
+                      value={newInstanceName}
+                      onChange={(e) => setNewInstanceName(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-auto">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => createNewInstance(selectedProcess, newInstanceName)}
+                    >
+                      Start Instance
+                    </button>
                   </div>
                 </div>
-                <div className="card-body">
-                  {selectedInstance.status !== 'running' ? (
-                    <div className="text-center text-muted">
-                      <h4>This instance has been {selectedInstance.status}</h4>
-                    </div>
-                  ) : (
-                    <>
-                      {selectedInstance.currentElement && (
-                        <div className="mb-4 p-3 border rounded">
-                          <h5>Current Step: {selectedInstance.currentElement.name}</h5>
-                          <div className="row">
-                            <div className="col-md-6">
-                              <label className="fw-semibold">Assigned Role:</label>
-                              <div>{selectedInstance.currentElement.role}</div>
-                            </div>
-                            <div className="col-md-6">
-                              <label className="fw-semibold">Description:</label>
-                              <div className="text-muted">{selectedInstance.currentElement.description}</div>
-                            </div>
+                <button className="btn btn-danger ms-2" onClick={handleClose}>
+                  Close
+                </button>
+              </div>
+            )}
+
+            {/* No Selection Header */}
+            {(!selectedProcess && !selectedInstance) && (
+              <div className="d-flex justify-content-between align-items-center bg-light rounded p-3 mb-3">
+                <input
+                  type="text"
+                  className="form-control flex-grow-1"
+                  value="Select a process or instance"
+                  readOnly
+                />
+                <button className="btn btn-danger ms-2" onClick={handleClose}>
+                  Close
+                </button>
+              </div>
+            )}
+
+            {/* Instance Mode Navigation Window */}
+            {selectedInstance && (
+              <>
+                <div className="card mb-3">
+                  <div className="card-header bg-light">
+                    <div className="row">
+                      <div className="col">
+                        <h5 className="mb-0">
+                          {selectedInstance.instanceName} <small>({selectedInstance.processName})</small>
+                        </h5>
+                        <div className="d-flex justify-content-between mt-2">
+                          <div>
+                            <strong>Status:</strong>{" "}
+                            <span className={selectedInstance.status === 'running' ? 'text-success' : 'text-secondary'}>
+                              {selectedInstance.status.toUpperCase()}
+                            </span>
                           </div>
-                        </div>
-                      )}
-                      <div className="d-flex flex-column gap-3">
-                        {currentUser.role === 'Employee' && selectedInstance.currentElement?.role !== 'Employee' ? (
-                          <div className="alert alert-warning text-center" role="alert">
-                            <p className="mb-2">You need manager approval to proceed with this step</p>
-                            <button onClick={requestApproval} className="btn btn-primary">
-                              Request Manager Approval
-                            </button>
+                          <div>
+                            <strong>Project:</strong> {getAssignedProjectName()}
                           </div>
-                        ) : (
-                          <>
-                            {selectedInstance.gatewayChoices?.length > 0 ? (
-                              <div className="p-3 border rounded">
-                                <h5>Select Path:</h5>
-                                <div className="d-flex flex-wrap gap-2 justify-content-center">
-                                  {selectedInstance.gatewayChoices.map((choice) => (
-                                    <button
-                                      key={choice.target}
-                                      onClick={() => handleGatewayChoice(selectedInstanceId, choice.target)}
-                                      className="btn btn-primary"
-                                    >
-                                      {choice.name}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="d-flex justify-content-center gap-2">
-                                {nextElements.length === 0 ? (
-                                  <button onClick={() => finishProcess(selectedInstanceId)} className="btn btn-success">
-                                    Complete Process
-                                  </button>
-                                ) : (
-                                  <button onClick={() => handleNextStep(selectedInstanceId)} className="btn btn-primary">
-                                    Continue to Next Step &rarr;
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        )}
-                        <div className="d-flex justify-content-center gap-2">
-                          {currentUser.role === 'Employee' ? (
-                            <button onClick={() => requestCancel(selectedInstanceId)} className="btn btn-outline-danger">
-                              Request Cancellation
-                            </button>
-                          ) : (
-                            <button onClick={() => cancelProcess(selectedInstanceId)} className="btn btn-outline-danger">
-                              Cancel Process
-                            </button>
-                          )}
+                          <div>
+                            <strong>Created:</strong> {new Date(selectedInstance.created).toLocaleString()}
+                          </div>
                         </div>
                       </div>
-                    </>
-                  )}
+                      <div className="col-auto">
+                        <button type="button" className="btn-close" aria-label="Close" onClick={handleClose}></button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-body">
+                    {selectedInstance.status !== 'running' ? (
+                      <div className="text-center text-muted">
+                        <h4>This instance has been {selectedInstance.status}</h4>
+                      </div>
+                    ) : (
+                      <>
+                        {selectedInstance.currentElement && (
+                          <div className="mb-4 p-3 border rounded">
+                            <h5>Current Step: {selectedInstance.currentElement.name}</h5>
+                            <div className="row">
+                              <div className="col-md-6">
+                                <label className="fw-semibold">Assigned Role:</label>
+                                <div>{selectedInstance.currentElement.role}</div>
+                              </div>
+                              <div className="col-md-6">
+                                <label className="fw-semibold">Description:</label>
+                                <div className="text-muted">{selectedInstance.currentElement.description}</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        <div className="d-flex flex-column gap-3">
+                          {currentUser.role === 'Employee' && selectedInstance.currentElement?.role !== 'Employee' ? (
+                            <div className="alert alert-warning text-center" role="alert">
+                              <p className="mb-2">You need manager approval to proceed with this step</p>
+                              <button onClick={requestApproval} className="btn btn-primary">
+                                Request Manager Approval
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              {selectedInstance.gatewayChoices?.length > 0 ? (
+                                <div className="p-3 border rounded">
+                                  <h5>Select Path:</h5>
+                                  <div className="d-flex flex-wrap gap-2 justify-content-center">
+                                    {selectedInstance.gatewayChoices.map((choice) => (
+                                      <button
+                                        key={choice.target}
+                                        onClick={() => handleGatewayChoice(selectedInstanceId, choice.target)}
+                                        className="btn btn-primary"
+                                      >
+                                        {choice.name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="d-flex justify-content-center gap-2">
+                                  {nextElements.length === 0 ? (
+                                    <button onClick={() => finishProcess(selectedInstanceId)} className="btn btn-success">
+                                      Complete Process
+                                    </button>
+                                  ) : (
+                                    <button onClick={() => handleNextStep(selectedInstanceId)} className="btn btn-primary">
+                                      Continue to Next Step &rarr;
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </>
+                          )}
+                          <div className="d-flex justify-content-center gap-2">
+                            {currentUser.role === 'Employee' ? (
+                              <button onClick={() => requestCancel(selectedInstanceId)} className="btn btn-outline-danger">
+                                Request Cancellation
+                              </button>
+                            ) : (
+                              <button onClick={() => cancelProcess(selectedInstanceId)} className="btn btn-outline-danger">
+                                Cancel Process
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Header for Element Details */}
+                {selectedElementDetails && (
+                  <div className="card mb-3">
+                    <div className="card-header bg-light">
+                      <h5 className="mb-0">Element Details</h5>
+                    </div>
+                    <div className="card-body position-relative">
+                      <button 
+                        type="button" 
+                        className="btn-close position-absolute top-0 end-0 m-2" 
+                        aria-label="Close"
+                        onClick={() => setSelectedElementDetails(null)}
+                      ></button>
+                      <h5>{selectedElementDetails.name}</h5>
+                      <p><strong>Role:</strong> {selectedElementDetails.role}</p>
+                      <p><strong>Description:</strong> {selectedElementDetails.description}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Header for BPMN Viewer Container */}
+            {(selectedProcess || selectedInstanceId) && (
+              <div className="card mb-3">
+                <div className="card-header bg-light">
+                  <h5 className="mb-0">Diagram Viewer</h5>
+                </div>
+                <div className="card-body p-0 bpmn-viewer-container">
+                  <div ref={bpmnContainerRef} className="w-100 h-100"></div>
                 </div>
               </div>
-
-              {/* Element Details (if any) */}
-              {selectedElementDetails && (
-                <div className="element-details mt-3 p-3 position-relative">
-                  <button 
-                    type="button" 
-                    className="btn-close position-absolute top-0 end-0 m-2" 
-                    aria-label="Close"
-                    onClick={() => setSelectedElementDetails(null)}
-                  ></button>
-                  <h5>{selectedElementDetails.name}</h5>
-                  <p><strong>Role:</strong> {selectedElementDetails.role}</p>
-                  <p><strong>Description:</strong> {selectedElementDetails.description}</p>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* BPMN Viewer Container - Rendered only when a process or instance is selected */}
-          {(selectedProcess || selectedInstanceId) && (
-            <div className="bpmn-viewer-container mb-3">
-              <div ref={bpmnContainerRef} className="w-100 h-100"></div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }
@@ -647,8 +657,8 @@ function ExecuteProcess() {
 export default ExecuteProcess;
 
 
+
 //TODO: reload page should to the same as close button
-//TODO: put header over the bpmn container like in managerProcess
 
 
 

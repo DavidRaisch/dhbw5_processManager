@@ -61,7 +61,8 @@ function LoginPage() {
 export default LoginPage;
 
 
-
+//TODO: include navbar but without any buttons only the project-name on the left.
+//TODO: use css additionally in loginPage
 
 /** Additional Add-Ons */
 //TODO: OPTIONAL: user should be able to have multiple roles (for example admin and manager)

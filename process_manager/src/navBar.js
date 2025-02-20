@@ -178,6 +178,6 @@ function TopNavBar({ currentPage }) {
 export default TopNavBar;
 
 
-
+//TODO: make logout button red again
 
 //TODO: navBar should always be visible, main page should scroll with navBar static at the top
