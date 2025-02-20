@@ -4,6 +4,7 @@ import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer';
 import './executeProcess.css';
+import TopNavBar from './navBar';
 
 function ExecuteProcess() {
   const location = useLocation();
@@ -82,6 +83,7 @@ function ExecuteProcess() {
   // Diagram loading logic
   useEffect(() => {
     const loadDiagram = async () => {
+      // Only create a new viewer if there is a selection and no viewer exists.
       if ((selectedProcess || selectedInstanceId) && !viewerRef.current) {
         viewerRef.current = new NavigatedViewer({
           container: bpmnContainerRef.current,
@@ -89,7 +91,6 @@ function ExecuteProcess() {
           moveCanvas: false,
         });
       }
-
       try {
         if (selectedProcess) {
           await viewerRef.current.importXML(selectedProcess.xml);
@@ -145,7 +146,7 @@ function ExecuteProcess() {
         .filter(inst => 
           inst.status !== 'running' && allowedNames.has(inst.processName)
         )
-        .sort((a, b) => new Date(b.created) - new Date(a.created)); // Newest first
+        .sort((a, b) => new Date(b.created) - new Date(a.created));
       setActiveInstances(active);
       setArchivedInstances(archived);
     } catch (err) {
@@ -184,23 +185,19 @@ function ExecuteProcess() {
       alert("Please enter an instance name.");
       return;
     }
-
     const parser = new XMLParser({
       ignoreAttributes: false,
       attributeNamePrefix: "@_",
       removeNSPrefix: true,
     });
-    
     try {
       const parsedXML = parser.parse(process.xml);
       const flowMap = buildFlowMap(parsedXML);
       const newInstanceData = buildInstanceData(process, instanceName, flowMap);
-      
       const response = await axios.post(
         'http://localhost:5001/api/instances',
         newInstanceData
       );
-      
       handleNewInstanceResponse(response.data.instance, process);
     } catch (err) {
       console.error('Error creating new instance:', err);
@@ -212,7 +209,6 @@ function ExecuteProcess() {
     const sequenceFlows = Array.isArray(parsedXML.definitions.process.sequenceFlow)
       ? parsedXML.definitions.process.sequenceFlow
       : [parsedXML.definitions.process.sequenceFlow];
-
     sequenceFlows.forEach(flow => {
       const source = flow["@_sourceRef"];
       flowMap[source] = flowMap[source] || [];
@@ -242,7 +238,7 @@ function ExecuteProcess() {
     setSelectedInstanceId(savedInstance._id);
     setSelectedProcess(null);
     setNewInstanceName("");
-
+    // The viewer container will be re-rendered because selectedInstanceId is set
     await viewerRef.current.importXML(process.xml);
     viewerRef.current.get('canvas').zoom('fit-viewport');
     updateInstance(savedInstance._id, { 
@@ -265,7 +261,6 @@ function ExecuteProcess() {
   const handleNextStep = (instanceId) => {
     const instance = activeInstances.find(i => i._id === instanceId);
     if (!instance) return;
-
     const nextElements = instance.sequenceMap[instance.position] || [];
     if (nextElements.length > 1) {
       updateInstance(instanceId, { gatewayChoices: nextElements });
@@ -312,14 +307,12 @@ function ExecuteProcess() {
       alert("No user id found, please login again.");
       return;
     }
-
     const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
     const projectId = processOfInstance?.project?._id || processOfInstance?.project;
     if (!projectId) {
       alert("No project assigned to the process.");
       return;
     }
-
     try {
       await axios.post('http://localhost:5001/api/notifications', {
         message: `User ${currentUser.username} requested approval for instance "${selectedInstance.instanceName}"`,
@@ -343,14 +336,12 @@ function ExecuteProcess() {
       alert("No user id found, please login again.");
       return;
     }
-
     const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
     const projectId = processOfInstance?.project?._id || processOfInstance?.project;
     if (!projectId) {
       alert("No project assigned to the process.");
       return;
     }
-
     try {
       await axios.post('http://localhost:5001/api/notifications', {
         message: `User ${currentUser.username} requested cancellation of instance "${selectedInstance.instanceName}"`,
@@ -395,7 +386,8 @@ function ExecuteProcess() {
   };
 
   return (
-    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh' }}>
+    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh', padding: '20px' }}>
+      <TopNavBar currentPage="Execute Process" />
       <div className="row">
         {/* Left Sidebar */}
         <div className="col-md-3 border-end pe-3 left-sidebar">
@@ -637,8 +629,8 @@ function ExecuteProcess() {
             </>
           )}
 
-          {/* BPMN Viewer Container (only rendered when a process or instance is selected) */}
-          {(selectedProcess || selectedInstance) && (
+          {/* BPMN Viewer Container - Rendered only when a process or instance is selected */}
+          {(selectedProcess || selectedInstanceId) && (
             <div className="bpmn-viewer-container mb-3">
               <div ref={bpmnContainerRef} className="w-100 h-100"></div>
             </div>
@@ -655,10 +647,16 @@ export default ExecuteProcess;
 
 
 
+//TODO: if navigated from the notifications the seleceted instance should be displayed in the bpmn viewer => bpmn viewer wird vermutlich nur dann angezeigt, wenn aktiv auf eine instanz geklickt wird, sollte diesen aber öffnen sobald eine instanz
+//funktioniert nciht idk why
+//vlt in feld einfach schreiben no process seleceted und gut ist
+//TODO: reload page should to the same as close button
+//TODO: put header over the bpmn container like in managerProcess
 
 
 
 /** Additional Improvments */
+//TODO: if reloaded the page goes always to the first entry point, means the empty execute process page or the process from the notifications
 //TODO: OPTIONAL: Search Bar for available Processes
 
 

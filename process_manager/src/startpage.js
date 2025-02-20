@@ -174,7 +174,7 @@ export default StartPage;
 
 
 
-
+//TODO: include navbar and add an description or a welcome page instead of the buttons, that are no longer needed
 
 
 //TODO: make user details always in the next line

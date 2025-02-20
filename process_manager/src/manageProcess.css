@@ -1,0 +1,19 @@
+/* manageProcess.css */
+
+/* BPMN Editor container styling */
+.bpmn-editor-container {
+  height: 400px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Left Sidebar Styling */
+.left-sidebar {
+  background-color: #f3f4f684; /* light gray background */
+  padding: 1rem;
+}
+
+/* Full-screen container background */
+.bg-sidebar-grey {
+  background-color: rgba(243, 244, 246, 0.8) !important;
+}
