@@ -24,6 +24,7 @@
   
   /* Container Background matching the sidebar (using rgba with !important to override defaults) */
   .bg-sidebar-grey {
+    padding-top: 80px;
     background-color: rgba(243, 244, 246, 0.8) !important;
   }
   

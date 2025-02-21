@@ -13,6 +13,19 @@
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
+  .dropdown-item.text-danger {
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  
+  /*
+  .dropdown-item.text-danger:hover {
+    border-color: #BD2130;
+    background-color: #BD2130;
+    color: #fff !important;
+  }*/
+  
+
   
   
   

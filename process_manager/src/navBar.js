@@ -52,7 +52,7 @@ function TopNavBar({ currentPage, minimal }) {
     const isActive = (page) => currentPage === page ? 'active' : '';
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark top-nav-red mb-3">
+    <nav className="navbar navbar-expand-lg navbar-dark top-nav-red fixed-top mb-3">
       <div className="container-fluid">
         <a className="navbar-brand" href="#">{'ZenithFlow'}</a>
         {!isMinimal && (
@@ -171,7 +171,7 @@ function TopNavBar({ currentPage, minimal }) {
                     <hr className="dropdown-divider" />
                   </li>
                   <li>
-                    <button className="dropdown-item" onClick={handleLogout}>
+                    <button className="dropdown-item text-danger" onClick={handleLogout}>
                       <FiLogOut size={16} className="me-2" />
                       Logout
                     </button>
@@ -187,9 +187,6 @@ function TopNavBar({ currentPage, minimal }) {
 }
 
 export default TopNavBar;
-
-
-//TODO: highlight currently visited page
 
 
 //TODO: make logout button red again
