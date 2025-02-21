@@ -1,7 +1,8 @@
-// LoginPage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PersonFillGear, BoxArrowInRight } from 'react-bootstrap-icons';
 import axios from 'axios';
+import TopNavBar from './navBar';
 import './loginPage.css';
 
 function LoginPage() {
@@ -12,16 +13,13 @@ function LoginPage() {
 
   // On mount, clear any stored session data
   useEffect(() => {
-    if (sessionStorage.getItem('user')) {
-      sessionStorage.removeItem('user');
-    }
+    sessionStorage.removeItem('user');
   }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5001/api/login', { username, password });
-      // On successful login, store the user data (without password) in sessionStorage
       sessionStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/start');
     } catch (err) {
@@ -30,35 +28,42 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-page">
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div className="form-field">
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
+    <>
+      <TopNavBar minimal={true} currentPage="Process Manager" />
+      <div className="login-page">
+        <div className="login-card">
+          <h2 className="text-center mb-4">Login</h2>
+          <form onSubmit={handleLogin}>
+            <div className="form-field">
+              <label>Username:</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-field">
+              <label>Password:</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            {error && <p className="error">{error}</p>}
+            
+            <button type="submit" className="btn btn-primary w-100"> <BoxArrowInRight size={20} className="me-1" />Login</button>
+          </form>
         </div>
-        <div className="form-field">
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p className="error">{error}</p>}
-        <button type="submit">Login</button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 }
 
 export default LoginPage;
+
 
 
 //TODO: include navbar but without any buttons only the project-name on the left.

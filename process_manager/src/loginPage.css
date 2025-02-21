@@ -1,14 +1,35 @@
 .login-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  .form-field {
-    margin-bottom: 15px;
-  }
-  .error {
-    color: red;
-  }
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 15px;
+}
+
+.login-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-field {
+  margin-bottom: 15px;
+}
+
+.error {
+  color: red;
+}
+.navbar {
+  min-height: 70px; /* or your desired height */
+  /* Optionally ensure the container is flexed to center items */
+  display: flex;
+  align-items: center;
+}
+
+
   

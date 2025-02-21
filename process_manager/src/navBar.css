@@ -1,7 +1,7 @@
 .top-nav-red {
     background-color: #2d5bc8; /* Bootstrap danger red */
   }
-  .nav-pills .nav-link:hover {
+    .nav-pills .nav-link:hover {
     background-color: rgb(255, 255, 255);
     color: #020202 !important;
   }
@@ -13,22 +13,6 @@
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  /* Logout Button inside the Dropdown */
-  .dropdown-item.logout-btn {
-    color: #ff4444;
-    transition: color 0.3s ease;
-    width: 100%;
-    text-align: left;
-    background: transparent;
-    border: none;
-    padding: 0.25rem 1.5rem;
-  }
-  
-  /* On hover, change the logout button text to red */
-  .dropdown-item.logout-btn:hover {
-    color: red;
-    background-color: transparent;
-  }
   
   
   
