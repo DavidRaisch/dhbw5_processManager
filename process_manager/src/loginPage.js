@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PersonFillGear, BoxArrowInRight } from 'react-bootstrap-icons';
+import { BoxArrowInRight } from 'react-bootstrap-icons';
 import axios from 'axios';
 import TopNavBar from './navBar';
 import './loginPage.css';

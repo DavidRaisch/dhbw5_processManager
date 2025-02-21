@@ -20,10 +20,22 @@ function ExecuteProcess() {
   const [userProjects, setUserProjects] = useState([]);
   const [selectedElementDetails, setSelectedElementDetails] = useState(null);
 
+  // State for generic alert modal
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+
   // BPMN viewer references
   const viewerRef = useRef(null);
   const bpmnContainerRef = useRef(null);
   const currentUser = JSON.parse(sessionStorage.getItem('user'));
+
+  // Helper function to trigger an alert modal.
+  const triggerAlert = (title, message) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setShowAlertModal(true);
+  };
 
   // Function to handle BPMN element clicks
   const handleElementClick = (event) => {
@@ -182,7 +194,7 @@ function ExecuteProcess() {
   // Process creation and navigation
   const createNewInstance = async (process, instanceName) => {
     if (!instanceName) {
-      alert("Please enter an instance name.");
+      triggerAlert("Missing Instance Name", "Please enter an instance name.");
       return;
     }
     const parser = new XMLParser({
@@ -304,13 +316,13 @@ function ExecuteProcess() {
   const requestApproval = async () => {
     const requestedById = currentUser._id;
     if (!requestedById) {
-      alert("No user id found, please login again.");
+      triggerAlert("Missing User ID", "No user id found, please login again.");
       return;
     }
     const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
     const projectId = processOfInstance?.project?._id || processOfInstance?.project;
     if (!projectId) {
-      alert("No project assigned to the process.");
+      triggerAlert("Missing Project", "No project assigned to the process.");
       return;
     }
     try {
@@ -323,23 +335,23 @@ function ExecuteProcess() {
         status: 'pending',
         project: projectId
       });
-      alert('Approval request sent to Manager.');
+      triggerAlert("Success", "Approval request sent to Manager.");
     } catch (err) {
       console.error('Error sending approval request:', err);
-      alert('Error sending approval request.');
+      triggerAlert("Error", "Error sending approval request.");
     }
   };
 
   const requestCancel = async (instanceId) => {
     const requestedById = currentUser._id;
     if (!requestedById) {
-      alert("No user id found, please login again.");
+      triggerAlert("Missing User ID", "No user id found, please login again.");
       return;
     }
     const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
     const projectId = processOfInstance?.project?._id || processOfInstance?.project;
     if (!projectId) {
-      alert("No project assigned to the process.");
+      triggerAlert("Missing Project", "No project assigned to the process.");
       return;
     }
     try {
@@ -352,10 +364,10 @@ function ExecuteProcess() {
         status: 'pending',
         project: projectId
       });
-      alert('Cancellation request sent to Manager.');
+      triggerAlert("Success", "Cancellation request sent to Manager.");
     } catch (err) {
       console.error('Error sending cancellation request:', err);
-      alert('Error sending cancellation request.');
+      triggerAlert("Error", "Error sending cancellation request.");
     }
   };
 
@@ -650,11 +662,38 @@ function ExecuteProcess() {
           </div>
         </div>
       </div>
+
+      {/* Generic Alert Modal */}
+      <div className={`modal fade ${showAlertModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">{alertTitle}</h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowAlertModal(false)}
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <p style={{ whiteSpace: 'pre-wrap' }}>{alertMessage}</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" onClick={() => setShowAlertModal(false)}>
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showAlertModal && <div className="modal-backdrop fade show"></div>}
     </>
   );
 }
 
 export default ExecuteProcess;
+
 
 
 

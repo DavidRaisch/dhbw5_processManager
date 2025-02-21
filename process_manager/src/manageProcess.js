@@ -18,12 +18,29 @@ function ManageProcess() {
   const [description, setDescription] = useState('');
   const [availableProjects, setAvailableProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
+  
+  // State for delete confirmation modal.
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [processToDelete, setProcessToDelete] = useState(null);
+
+  // State for generic alert modal.
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
 
   // Get logged in user from sessionStorage.
   const user = JSON.parse(sessionStorage.getItem('user'));
   const roleOptions = ['Admin', 'Manager', 'Employee'];
+
+  // Helper function to trigger an alert modal.
+  const triggerAlert = (title, message) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setShowAlertModal(true);
+  };
 
   useEffect(() => {
     bpmnModeler.current = new BpmnModeler({
@@ -99,28 +116,28 @@ function ManageProcess() {
 
   const handleSaveToDatabase = () => {
     if (!processName) {
-      alert('Please enter a process name.');
+      triggerAlert('Missing Process Name', 'Please enter a process name.');
       return;
     }
     if (!selectedProject) {
-      alert('Please select a project.');
+      triggerAlert('Missing Project', 'Please select a project.');
       return;
     }
     const errors = validateDiagram();
     if (errors.length > 0) {
-      alert('Error: Not every element has a role and a description:\n' + errors.join('\n'));
+      triggerAlert('Validation Error', 'The following errors occurred:\n' + errors.join('\n'));
       return;
     }
     bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
       axios
         .post('http://localhost:5001/api/processes', { name: processName, xml, project: selectedProject })
         .then((response) => {
-          alert(response.data.message);
+          triggerAlert('Success', response.data.message);
           fetchProcesses();
         })
         .catch((err) => {
           console.error('Error saving process:', err);
-          alert('An error occurred while saving the process.');
+          triggerAlert('Error', 'An error occurred while saving the process.');
         });
     });
   };
@@ -137,6 +154,7 @@ function ManageProcess() {
       })
       .catch((err) => {
         console.error('Error creating new diagram:', err);
+        triggerAlert('Error', 'An error occurred while creating a new process.');
       });
   };
 
@@ -150,140 +168,208 @@ function ManageProcess() {
         setDescription('');
         setSelectedProject(process.project ? process.project._id || process.project : '');
       })
-      .catch((err) => console.error('Error loading process:', err));
+      .catch((err) => {
+        console.error('Error loading process:', err);
+        triggerAlert('Error', 'An error occurred while loading the process.');
+      });
   };
 
   const handleDeleteProcess = (id) => {
     axios
       .delete(`http://localhost:5001/api/processes/${id}`)
       .then(() => {
-        alert('Process deleted');
+        triggerAlert('Success', 'Process deleted');
         fetchProcesses();
       })
-      .catch((err) => console.error('Error deleting process:', err));
+      .catch((err) => {
+        console.error('Error deleting process:', err);
+        triggerAlert('Error', 'An error occurred while deleting the process.');
+      });
+  };
+
+  const confirmDelete = () => {
+    if (processToDelete) {
+      handleDeleteProcess(processToDelete);
+      setProcessToDelete(null);
+    }
+    setShowDeleteModal(false);
   };
 
   return (
     <>
-    {/* Universal Top Navigation Bar */}
-    <TopNavBar currentPage="Manage Process" />
-    <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh'}}>
-      <div className="row">
-        {/* Left Sidebar: Saved Processes */}
-        <div className="col-md-3 border-end pe-3 left-sidebar">
-          <h5 className="mb-3">Saved Processes</h5>
-          <div className="list-group">
-            {processList.map((process) => (
-              <div key={process._id} className="list-group-item mb-2">
-                <div className="fw-bold">{process.name}</div>
-                <div>
-                  <em>{process.project ? process.project.name : 'No Project'}</em>
-                </div>
-                <div className="mt-2">
-                  <button onClick={() => handleLoadProcess(process)} className="btn btn-sm btn-primary me-2">
-                    Load
-                  </button>
-                  {user?.role === 'Manager' && (
-                    <button onClick={() => handleDeleteProcess(process._id)} className="btn btn-sm btn-danger">
-                      Delete
+      {/* Universal Top Navigation Bar */}
+      <TopNavBar currentPage="Manage Process" />
+      <div className="container-fluid bg-sidebar-grey" style={{ minHeight: '100vh' }}>
+        <div className="row">
+          {/* Left Sidebar: Saved Processes */}
+          <div className="col-md-3 border-end pe-3 left-sidebar">
+            <h5 className="mb-3">Saved Processes</h5>
+            <div className="list-group">
+              {processList.map((process) => (
+                <div key={process._id} className="list-group-item mb-2">
+                  <div className="fw-bold">{process.name}</div>
+                  <div>
+                    <em>{process.project ? process.project.name : 'No Project'}</em>
+                  </div>
+                  <div className="mt-2">
+                    <button onClick={() => handleLoadProcess(process)} className="btn btn-sm btn-primary me-2">
+                      Load
                     </button>
-                  )}
+                    {user?.role === 'Manager' && (
+                      <button
+                        onClick={() => { setProcessToDelete(process._id); setShowDeleteModal(true); }}
+                        className="btn btn-sm btn-danger"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="col-md-9">
+            {/* BPMN Editor */}
+            <div className="card mb-3">
+              <div className="card-header">
+                <h5 className="mb-0">BPMN Editor</h5>
+              </div>
+              <div className="card-body p-0">
+                <div ref={bpmnEditorRef} className="bpmn-editor-container"></div>
+              </div>
+            </div>
+
+            {/* Process Information */}
+            <div className="card mb-3">
+              <div className="card-header">
+                <h5 className="mb-0">Process Information</h5>
+              </div>
+              <div className="card-body">
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Process Name"
+                    value={processName}
+                    onChange={(e) => setProcessName(e.target.value)}
+                  />
+                </div>
+                <div className="mb-3">
+                  <select
+                    className="form-select"
+                    value={selectedProject}
+                    onChange={(e) => setSelectedProject(e.target.value)}
+                  >
+                    <option value="">Select Project</option>
+                    {availableProjects.map((project) => (
+                      <option key={project._id} value={project._id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <button onClick={handleSaveToDatabase} className="btn btn-primary me-2">
+                    Save to Database
+                  </button>
+                  <button onClick={handleCreateNewProcess} className="btn btn-secondary">
+                    Create New Process
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Main Content Area */}
-        <div className="col-md-9">
-          {/* BPMN Editor */}
-          <div className="card mb-3">
-            <div className="card-header">
-              <h5 className="mb-0">BPMN Editor</h5>
-            </div>
-            <div className="card-body p-0">
-              <div ref={bpmnEditorRef} className="bpmn-editor-container"></div>
-            </div>
-          </div>
-
-          {/* Process Information */}
-          <div className="card mb-3">
-            <div className="card-header">
-              <h5 className="mb-0">Process Information</h5>
-            </div>
-            <div className="card-body">
-              <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Process Name"
-                  value={processName}
-                  onChange={(e) => setProcessName(e.target.value)}
-                />
+            {/* Role & Description Assignment */}
+            <div className="card">
+              <div className="card-header">
+                <h5 className="mb-0">Assign Role and Description</h5>
               </div>
-              <div className="mb-3">
-                <select
-                  className="form-select"
-                  value={selectedProject}
-                  onChange={(e) => setSelectedProject(e.target.value)}
-                >
-                  <option value="">Select Project</option>
-                  {availableProjects.map((project) => (
-                    <option key={project._id} value={project._id}>
-                      {project.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-3">
-                <button onClick={handleSaveToDatabase} className="btn btn-primary me-2">
-                  Save to Database
-                </button>
-                <button onClick={handleCreateNewProcess} className="btn btn-secondary">
-                  Create New Process
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Role & Description Assignment */}
-          <div className="card">
-            <div className="card-header">
-              <h5 className="mb-0">Assign Role and Description</h5>
-            </div>
-            <div className="card-body">
-              <div className="mb-3">
-                <select
-                  className="form-select"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <option value="">Select Role</option>
-                  {roleOptions.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-              <div>
-                <strong>Selected Element:</strong>{' '}
-                {selectedElement ? (selectedElement.businessObject.name || selectedElement.id) : 'None'}
+              <div className="card-body">
+                <div className="mb-3">
+                  <select className="form-select" value={role} onChange={(e) => setRole(e.target.value)}>
+                    <option value="">Select Role</option>
+                    {roleOptions.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <strong>Selected Element:</strong>{' '}
+                  {selectedElement ? (selectedElement.businessObject.name || selectedElement.id) : 'None'}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Delete Confirmation Modal */}
+      <div className={`modal fade ${showDeleteModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Confirm Delete</h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowDeleteModal(false)}
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to delete this process?</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn btn-danger" onClick={confirmDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showDeleteModal && <div className="modal-backdrop fade show"></div>}
+
+      {/* Generic Alert Modal */}
+      <div className={`modal fade ${showAlertModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">{alertTitle}</h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowAlertModal(false)}
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <p style={{ whiteSpace: 'pre-wrap' }}>{alertMessage}</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" onClick={() => setShowAlertModal(false)}>
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showAlertModal && <div className="modal-backdrop fade show"></div>}
     </>
   );
 }
@@ -292,15 +378,6 @@ export default ManageProcess;
 
 
 
-
-
-
-
-
-
-
-
-//TODO delete button should ask if user really wants to delete the process
 
 //** Additional */
 //TODO: OPTIONAL: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored
@@ -318,3 +395,4 @@ export default ManageProcess;
 
 /** for report */
 // delete button isnt visible for employees, they can request the cancelation of active instances, but not the process att all
+// delete button asks if manager is sure, he wants to delete the process
