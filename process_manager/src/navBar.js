@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiLogOut } from 'react-icons/fi';
-import { Person, House, Gear, PlayCircle, Bell, Users, PersonFillGear } from 'react-bootstrap-icons';
+import { Person, House, Gear, PlayCircle, Bell, PersonFillGear } from 'react-bootstrap-icons';
 import axios from 'axios';
 import './navBar.css';
 

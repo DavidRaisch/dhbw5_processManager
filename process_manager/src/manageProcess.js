@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 import 'bpmn-js/dist/assets/diagram-js.css';
@@ -10,7 +9,6 @@ import TopNavBar from './navBar';
 import './manageProcess.css';
 
 function ManageProcess() {
-  const navigate = useNavigate();
   const [processName, setProcessName] = useState('');
   const [processList, setProcessList] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);

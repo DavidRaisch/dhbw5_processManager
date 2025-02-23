@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer';
@@ -8,6 +8,7 @@ import TopNavBar from './navBar';
 
 function ExecuteProcess() {
   const location = useLocation();
+  const navigate = useNavigate();
   const instanceIdFromNotification = location.state?.instanceId;
 
   // State management
@@ -37,16 +38,17 @@ function ExecuteProcess() {
     setShowAlertModal(true);
   };
 
-  // Function to handle BPMN element clicks
-  const handleElementClick = (event) => {
-    const element = event.element;
-    const details = {
-      name: element.businessObject.name || 'Unnamed',
-      role: element.businessObject.get('role:role') || 'No role assigned',
-      description: element.businessObject.get('role:description') || 'No description'
-    };
-    setSelectedElementDetails(details);
-  };
+  // Clear location state after processing it.
+  useEffect(() => {
+    if (instanceIdFromNotification) {
+      // Use navigate with replace to clear state.
+      navigate(location.pathname, { replace: true });
+      // And set the instance id from notification into our state
+      setSelectedInstanceId(instanceIdFromNotification);
+      setSelectedProcess(null);
+      setSelectedElementDetails(null);
+    }
+  }, [instanceIdFromNotification, location.pathname, navigate]);
 
   // User and project initialization
   useEffect(() => {
@@ -76,14 +78,6 @@ function ExecuteProcess() {
 
   // BPMN viewer lifecycle management
   useEffect(() => {
-    if (instanceIdFromNotification) {
-      setSelectedInstanceId(instanceIdFromNotification);
-      setSelectedProcess(null);
-      setSelectedElementDetails(null);
-    }
-  }, [instanceIdFromNotification]);
-
-  useEffect(() => {
     return () => {
       if (viewerRef.current) {
         viewerRef.current.destroy();
@@ -95,7 +89,6 @@ function ExecuteProcess() {
   // Diagram loading logic
   useEffect(() => {
     const loadDiagram = async () => {
-      // Only create a new viewer if there is a selection and no viewer exists.
       if ((selectedProcess || selectedInstanceId) && !viewerRef.current) {
         viewerRef.current = new NavigatedViewer({
           container: bpmnContainerRef.current,
@@ -134,7 +127,16 @@ function ExecuteProcess() {
     }
   }, [selectedProcess, selectedInstanceId]);
 
-  // Data fetching functions
+  const handleElementClick = (event) => {
+    const element = event.element;
+    const details = {
+      name: element.businessObject.name || 'Unnamed',
+      role: element.businessObject.get('role:role') || 'No role assigned',
+      description: element.businessObject.get('role:description') || 'No description'
+    };
+    setSelectedElementDetails(details);
+  };
+
   const fetchProcesses = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/processes');
@@ -166,7 +168,6 @@ function ExecuteProcess() {
     }
   };
 
-  // Instance management
   const updateInstance = async (instanceId, updatedData) => {
     try {
       const response = await axios.put(
@@ -191,7 +192,6 @@ function ExecuteProcess() {
     }
   };
 
-  // Process creation and navigation
   const createNewInstance = async (process, instanceName) => {
     if (!instanceName) {
       triggerAlert("Missing Instance Name", "Please enter an instance name.");
@@ -250,7 +250,6 @@ function ExecuteProcess() {
     setSelectedInstanceId(savedInstance._id);
     setSelectedProcess(null);
     setNewInstanceName("");
-    // The viewer container will be re-rendered because selectedInstanceId is set
     await viewerRef.current.importXML(process.xml);
     viewerRef.current.get('canvas').zoom('fit-viewport');
     updateInstance(savedInstance._id, { 
@@ -258,7 +257,6 @@ function ExecuteProcess() {
     });
   };
 
-  // Element state management
   const getElementState = (elementId) => {
     const element = viewerRef.current.get('elementRegistry').find(el => el.id === elementId);
     return element ? {
@@ -269,7 +267,6 @@ function ExecuteProcess() {
     } : null;
   };
 
-  // Process navigation handlers
   const handleNextStep = (instanceId) => {
     const instance = activeInstances.find(i => i._id === instanceId);
     if (!instance) return;
@@ -294,7 +291,6 @@ function ExecuteProcess() {
     });
   };
 
-  // Process completion and cancellation
   const finishProcess = async (instanceId) => {
     await updateInstance(instanceId, { status: 'finished' });
     handleProcessCompletion(instanceId);
@@ -312,7 +308,6 @@ function ExecuteProcess() {
     clearViewer();
   };
 
-  // Request handling
   const requestApproval = async () => {
     const requestedById = currentUser._id;
     if (!requestedById) {
@@ -371,7 +366,6 @@ function ExecuteProcess() {
     }
   };
 
-  // UI helpers
   const handleClose = () => {
     clearViewer();
     setSelectedInstanceId(null);
@@ -386,7 +380,6 @@ function ExecuteProcess() {
     }
   };
 
-  // Derived data
   const selectedInstance = [...activeInstances, ...archivedInstances]
     .find(i => i._id === selectedInstanceId);
   const nextElements = selectedInstance?.status === 'running' 
@@ -688,6 +681,7 @@ function ExecuteProcess() {
         </div>
       </div>
       {showAlertModal && <div className="modal-backdrop fade show"></div>}
+    
     </>
   );
 }
@@ -697,12 +691,8 @@ export default ExecuteProcess;
 
 
 
-//TODO: reload page should to the same as close button
-
-
 
 /** Additional Improvments */
-//TODO: if reloaded the page goes always to the first entry point, means the empty execute process page or the process from the notifications
 //TODO: OPTIONAL: Search Bar for available Processes
 
 
