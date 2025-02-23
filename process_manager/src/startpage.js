@@ -21,19 +21,3 @@ function StartPage() {
 export default StartPage;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/** Additional Add-Ons */
-//TODO: make user details always in the next line
-//TODO: get a custom password change site for only the individual user also in the dropdown menu
-

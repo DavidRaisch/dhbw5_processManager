@@ -9,6 +9,7 @@ import UserManagement from './userManagement';
 import ProjectManagement from './projectManagement'; // New separate project management page
 import PrivateRoute from './privateRoute';
 import Notifications from './notificationPage';
+import ChangePassword from './changePassword';
 
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
           element={
             <PrivateRoute>
               <ProjectManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <PrivateRoute>
+              <ChangePassword />
             </PrivateRoute>
           }
         />

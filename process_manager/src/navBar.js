@@ -171,6 +171,17 @@ function TopNavBar({ currentPage, minimal }) {
                     <hr className="dropdown-divider" />
                   </li>
                   <li>
+                    <button 
+                      className="dropdown-item" 
+                      onClick={() => navigate('/change-password')}
+                    >
+                      Change Password
+                    </button>
+                  </li>
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                  <li>
                     <button className="dropdown-item text-danger" onClick={handleLogout}>
                       <FiLogOut size={16} className="me-2" />
                       Logout

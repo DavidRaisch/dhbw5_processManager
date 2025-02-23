@@ -1,6 +1,6 @@
-// userManagement.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import TopNavBar from './navBar';
 import './userManagement.css';
 
 function UserManagement() {
@@ -9,6 +9,27 @@ function UserManagement() {
   const [editingUser, setEditingUser] = useState(null);
   const [availableProjects, setAvailableProjects] = useState([]);
   const roleOptions = ['Admin', 'Manager', 'Employee'];
+
+  // State for generic alert modal.
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+
+  // State for delete confirmation modal.
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  // New state for change password modal.
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [changePasswordUser, setChangePasswordUser] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+
+  // Helper function to trigger an alert modal.
+  const triggerAlert = (title, message) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setShowAlertModal(true);
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -35,17 +56,18 @@ function UserManagement() {
 
   const handleCreateUser = async () => {
     if (!newUser.username || !newUser.password) {
-      alert('Username and Password are required');
+      triggerAlert('Missing Fields', 'Username and Password are required');
       return;
     }
-    // Ensure uniqueness in newUser.projects
     const uniqueProjects = [...new Set(newUser.projects)];
     try {
       await axios.post('http://localhost:5001/api/users', { ...newUser, projects: uniqueProjects });
       fetchUsers();
       setNewUser({ username: '', role: 'Employee', password: '', projects: [] });
+      triggerAlert('Success', 'User created successfully');
     } catch (error) {
       console.error('Error creating user:', error);
+      triggerAlert('Error', 'Error creating user');
     }
   };
 
@@ -60,7 +82,7 @@ function UserManagement() {
 
   const handleUpdateUser = async () => {
     if (!editingUser.username) {
-      alert('Username is required');
+      triggerAlert('Missing Username', 'Username is required');
       return;
     }
     const uniqueProjects = [...new Set(editingUser.projects)];
@@ -68,22 +90,33 @@ function UserManagement() {
       await axios.put(`http://localhost:5001/api/users/${editingUser._id}`, { ...editingUser, projects: uniqueProjects });
       setEditingUser(null);
       fetchUsers();
+      triggerAlert('Success', 'User updated successfully');
     } catch (error) {
       console.error('Error updating user:', error);
+      triggerAlert('Error', 'Error updating user');
     }
   };
 
   const handleDeleteUser = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
       await axios.delete(`http://localhost:5001/api/users/${id}`);
       fetchUsers();
+      triggerAlert('Success', 'User deleted successfully');
     } catch (error) {
       console.error('Error deleting user:', error);
+      triggerAlert('Error', 'Error deleting user');
     }
   };
 
-  // Toggle project selection for new user
+  const confirmDelete = () => {
+    if (userToDelete) {
+      handleDeleteUser(userToDelete);
+      setUserToDelete(null);
+    }
+    setShowDeleteModal(false);
+  };
+
+  // Toggle project selection for new user.
   const handleNewUserProjectToggle = (projectId) => {
     setNewUser(prevState => {
       let projects;
@@ -92,12 +125,11 @@ function UserManagement() {
       } else {
         projects = [...prevState.projects, projectId];
       }
-      projects = [...new Set(projects)]; // ensure uniqueness
-      return { ...prevState, projects };
+      return { ...prevState, projects: [...new Set(projects)] };
     });
   };
 
-  // Toggle project selection for editing user
+  // Toggle project selection for editing user.
   const handleEditUserProjectToggle = (projectId) => {
     setEditingUser(prevState => {
       let projects;
@@ -106,130 +138,284 @@ function UserManagement() {
       } else {
         projects = [...prevState.projects, projectId];
       }
-      projects = [...new Set(projects)];
-      return { ...prevState, projects };
+      return { ...prevState, projects: [...new Set(projects)] };
     });
   };
 
-  return (
-    <div className="user-management">
-      <h2>User Management</h2>
+  // Handle Change Password modal submission.
+  const handleChangePassword = async () => {
+    if (!newPassword) {
+      triggerAlert('Missing Password', 'Please enter a new password');
+      return;
+    }
+    try {
+      await axios.put(`http://localhost:5001/api/users/${changePasswordUser._id}`, { password: newPassword });
+      triggerAlert('Success', 'Password updated successfully');
+      setShowChangePasswordModal(false);
+      setChangePasswordUser(null);
+      setNewPassword('');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating password:', error);
+      triggerAlert('Error', 'Error updating password');
+    }
+  };
 
-      {/* New User Form */}
-      <div className="user-form">
-        <h3>Create New User</h3>
-        <input
-          type="text"
-          placeholder="Username"
-          value={newUser.username}
-          onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={newUser.password}
-          onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-        />
-        <select
-          value={newUser.role}
-          onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-        >
-          {roleOptions.map((role) => (
-            <option key={role} value={role}>{role}</option>
-          ))}
-        </select>
-        <div className="project-assignment-box">
-          <h4>Assign Projects</h4>
-          {availableProjects.map((project) => (
-            <label key={project._id}>
-              <input
-                type="checkbox"
-                checked={newUser.projects.includes(project._id)}
-                onChange={() => handleNewUserProjectToggle(project._id)}
+  return (
+    <>
+      {/* Top Navigation Bar */}
+      <TopNavBar currentPage="Manage Users" />
+
+      <div className="container-fluid my-4">
+        <h2 className="mb-4">User Management</h2>
+        
+        {/* New User Form */}
+        <div className="card mb-4">
+          <div className="card-header">
+            <h5>Create New User</h5>
+          </div>
+          <div className="card-body">
+            <div className="mb-3">
+              <input 
+                type="text"
+                className="form-control"
+                placeholder="Username"
+                value={newUser.username}
+                onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
               />
-              {project.name}
-            </label>
-          ))}
+            </div>
+            <div className="mb-3">
+              <input 
+                type="password"
+                className="form-control"
+                placeholder="Password"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              />
+            </div>
+            {/* Custom Bootstrap Role Dropdown */}
+            <div className="dropdown mb-3">
+              <button 
+                className="form-control dropdown-toggle custom-dropdown" 
+                type="button" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+              >
+                {newUser.role || 'Select Role'}
+              </button>
+              <ul className="dropdown-menu w-100">
+                {roleOptions.map((role) => (
+                  <li key={role}>
+                    <button className="dropdown-item" onClick={() => setNewUser({ ...newUser, role })}>
+                      {role}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="project-assignment-box mb-3">
+              <h5>Assign Projects</h5>
+              {availableProjects.map((project) => (
+                <label key={project._id} className="form-check-label me-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input me-1"
+                    checked={newUser.projects.includes(project._id)}
+                    onChange={() => handleNewUserProjectToggle(project._id)}
+                  />
+                  {project.name}
+                </label>
+              ))}
+            </div>
+            <button className="btn btn-primary" onClick={handleCreateUser}>
+              Create User
+            </button>
+          </div>
         </div>
-        <button onClick={handleCreateUser}>Create User</button>
+
+        {/* Edit User Form */}
+        {editingUser && (
+          <div className="card mb-4">
+            <div className="card-header">
+              <h5>Edit User</h5>
+            </div>
+            <div className="card-body">
+              <div className="mb-3">
+                <input 
+                  type="text"
+                  className="form-control"
+                  value={editingUser.username}
+                  readOnly
+                />
+              </div>
+              {/* No password input here; change password is handled separately */}
+              {/* Custom Bootstrap Dropdown for Role in Edit */}
+              <div className="dropdown mb-3">
+                <button 
+                  className="form-control dropdown-toggle custom-dropdown" 
+                  type="button" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false"
+                >
+                  {editingUser.role || 'Select Role'}
+                </button>
+                <ul className="dropdown-menu w-100">
+                  {roleOptions.map((role) => (
+                    <li key={role}>
+                      <button className="dropdown-item" onClick={() => setEditingUser({ ...editingUser, role })}>
+                        {role}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="project-assignment-box mb-3">
+                <h5>Assign Projects</h5>
+                {availableProjects.map((project) => (
+                  <label key={project._id} className="form-check-label me-2">
+                    <input
+                      type="checkbox"
+                      className="form-check-input me-1"
+                      checked={editingUser.projects.includes(project._id)}
+                      onChange={() => handleEditUserProjectToggle(project._id)}
+                    />
+                    {project.name}
+                  </label>
+                ))}
+              </div>
+              <button className="btn btn-primary me-2" onClick={handleUpdateUser}>
+                Update User
+              </button>
+              <button className="btn btn-secondary" onClick={() => setEditingUser(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Users List */}
+        <div className="card">
+          <div className="card-header">
+            <h5>Existing Users</h5>
+          </div>
+          <div className="card-body p-0">
+            <table className="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Projects</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.username}</td>
+                    <td>{user.role}</td>
+                    <td>
+                      {user.projects && user.projects.length > 0
+                        ? user.projects.map(project => project.name).join(', ')
+                        : 'None'}
+                    </td>
+                    <td>
+                      <button className="btn btn-primary btn-sm me-2" onClick={() => handleEditUser(user)}>
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => {
+                          setChangePasswordUser(user);
+                          setShowChangePasswordModal(true);
+                        }}
+                      >
+                        Change Password
+                      </button>
+                      <button className="btn btn-danger btn-sm" onClick={() => {
+                        setUserToDelete(user._id);
+                        setShowDeleteModal(true);
+                      }}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      {/* Edit User Form */}
-      {editingUser && (
-        <div className="user-form">
-          <h3>Edit User</h3>
-          <input type="text" value={editingUser.username} readOnly />
-          <input
-            type="password"
-            placeholder="New Password"
-            onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })}
-          />
-          <select
-            value={editingUser.role}
-            onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
-          >
-            {roleOptions.map((role) => (
-              <option key={role} value={role}>{role}</option>
-            ))}
-          </select>
-          <div className="project-assignment-box">
-            <h4>Assign Projects</h4>
-            {availableProjects.map((project) => (
-              <label key={project._id}>
-                <input
-                  type="checkbox"
-                  checked={editingUser.projects.includes(project._id)}
-                  onChange={() => handleEditUserProjectToggle(project._id)}
-                />
-                {project.name}
-              </label>
-            ))}
+      {/* Delete Confirmation Modal */}
+      <div className={`modal fade ${showDeleteModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Confirm Delete</h5>
+              <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)} aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to delete this user?</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button type="button" className="btn btn-danger" onClick={confirmDelete}>Delete</button>
+            </div>
           </div>
-          <button onClick={handleUpdateUser}>Update User</button>
-          <button onClick={() => setEditingUser(null)}>Cancel</button>
         </div>
-      )}
+      </div>
+      {showDeleteModal && <div className="modal-backdrop fade show"></div>}
 
-      {/* Users List */}
-      <h3>Existing Users</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Role</th>
-            <th>Projects</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user._id}>
-              <td>{user.username}</td>
-              <td>{user.role}</td>
-              <td>
-                {user.projects && user.projects.length > 0
-                  ? user.projects.map(project => project.name).join(', ')
-                  : 'None'}
-              </td>
-              <td>
-                <button onClick={() => handleEditUser(user)}>Edit</button>
-                <button onClick={() => handleDeleteUser(user._id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+      {/* Change Password Modal */}
+      <div className={`modal fade ${showChangePasswordModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Change Password for {changePasswordUser?.username}</h5>
+              <button type="button" className="btn-close" onClick={() => setShowChangePasswordModal(false)} aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <input 
+                type="password" 
+                className="form-control" 
+                placeholder="New Password" 
+                value={newPassword} 
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowChangePasswordModal(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn btn-primary" onClick={handleChangePassword}>
+                Save Password
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showChangePasswordModal && <div className="modal-backdrop fade show"></div>}
+
+      {/* Generic Alert Modal */}
+      <div className={`modal fade ${showAlertModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">{alertTitle}</h5>
+              <button type="button" className="btn-close" onClick={() => setShowAlertModal(false)} aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <p style={{ whiteSpace: 'pre-wrap' }}>{alertMessage}</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" onClick={() => setShowAlertModal(false)}>OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showAlertModal && <div className="modal-backdrop fade show"></div>}
+    </>
   );
 }
 
 export default UserManagement;
-
-
-
-
-//TODO: use bootstrap checkbox and radio button groups for projects
-
-//TODO: Change password optional, only role change should be possible => is already the case, but maybe it would be clearer if the password box would be displayed with clicking an extra "change password" button
-
-//TODO: make single password change site for every user visible

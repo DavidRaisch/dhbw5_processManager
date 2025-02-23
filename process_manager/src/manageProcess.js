@@ -195,6 +195,13 @@ function ManageProcess() {
     setShowDeleteModal(false);
   };
 
+  // Custom function to get the label for the project dropdown.
+  const getSelectedProjectLabel = () => {
+    if (!selectedProject) return 'Select Project';
+    const found = availableProjects.find(proj => proj._id === selectedProject);
+    return found ? found.name : 'Select Project';
+  };
+
   return (
     <>
       {/* Universal Top Navigation Bar */}
@@ -257,20 +264,32 @@ function ManageProcess() {
                   />
                 </div>
                 <div className="mb-3">
-                  <select
-                    className="form-select"
-                    value={selectedProject}
-                    onChange={(e) => setSelectedProject(e.target.value)}
-                  >
-                    <option value="">Select Project</option>
-                    {availableProjects.map((project) => (
-                      <option key={project._id} value={project._id}>
-                        {project.name}
-                      </option>
-                    ))}
-                  </select>
+                  {/* Custom Bootstrap Dropdown for Project Selection */}
+                  <div className="dropdown">
+                    <button 
+                      className="form-control dropdown-toggle custom-dropdown" 
+                      type="button" 
+                      data-bs-toggle="dropdown" 
+                      aria-expanded="false"
+                    >
+                      {getSelectedProjectLabel()}
+                    </button>
+                    <ul className="dropdown-menu w-100">
+                      {availableProjects.map((project) => (
+                        <li key={project._id}>
+                          <button className="dropdown-item" onClick={() => setSelectedProject(project._id)}>
+                            {project.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-                <div className="mb-3">
+                <div>
+                  <strong>Selected Element:</strong>{' '}
+                  {selectedElement ? (selectedElement.businessObject.name || selectedElement.id) : 'None'}
+                </div>
+                <div className="mt-3">
                   <button onClick={handleSaveToDatabase} className="btn btn-primary me-2">
                     Save to Database
                   </button>
@@ -288,14 +307,26 @@ function ManageProcess() {
               </div>
               <div className="card-body">
                 <div className="mb-3">
-                  <select className="form-select" value={role} onChange={(e) => setRole(e.target.value)}>
-                    <option value="">Select Role</option>
-                    {roleOptions.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
+                  {/* Custom Bootstrap Dropdown for Role Selection */}
+                  <div className="dropdown">
+                    <button 
+                      className="form-control dropdown-toggle custom-dropdown" 
+                      type="button" 
+                      data-bs-toggle="dropdown" 
+                      aria-expanded="false"
+                    >
+                      {role || 'Select Role'}
+                    </button>
+                    <ul className="dropdown-menu w-100">
+                      {roleOptions.map((option, index) => (
+                        <li key={index}>
+                          <button className="dropdown-item" onClick={() => setRole(option)}>
+                            {option}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
                 <div className="mb-3">
                   <input
@@ -375,6 +406,7 @@ function ManageProcess() {
 }
 
 export default ManageProcess;
+
 
 
 

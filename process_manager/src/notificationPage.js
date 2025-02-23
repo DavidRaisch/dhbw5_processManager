@@ -64,16 +64,22 @@ function Notifications() {
   };
 
   // Approve a notification.
-  const approveNotification = async (notificationId) => {
+  const approveNotification = async (notif) => {
     try {
+      // Extract instance name from the notification message using regex.
+      // Assumes the message is in the format: ... instance "InstanceName"
+      const regex = /instance "([^"]+)"/;
+      const match = notif.message.match(regex);
+      const instanceName = match ? match[1] : 'this instance';
+      
       const updates = {
         targetRole: 'Employee',
         status: 'approved',
-        message: 'Your approval request has been approved.',
+        message: `Your approval request for instance "${instanceName}" has been approved.`,
       };
 
-      await axios.put(`http://localhost:5001/api/notifications/${notificationId}`, updates);
-      setNotifications(prev => prev.filter(notif => notif._id !== notificationId));
+      await axios.put(`http://localhost:5001/api/notifications/${notif._id}`, updates);
+      setNotifications(prev => prev.filter(n => n._id !== notif._id));
     } catch (err) {
       console.error('Error updating notification:', err.response?.data || err);
       alert('Error updating notification');
@@ -128,7 +134,7 @@ function Notifications() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      approveNotification(notif._id);
+                      approveNotification(notif);
                     }}
                     style={{ marginRight: '5px' }}
                   >
@@ -167,6 +173,4 @@ function Notifications() {
 export default Notifications;
 
 
-
-//TODO: make approval response identical, so it should differentiate if cancel or next step approval, and on which instance
 

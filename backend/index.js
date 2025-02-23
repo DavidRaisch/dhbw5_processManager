@@ -258,6 +258,27 @@ app.post('/api/users/:userId/assign-projects', async (req, res) => {
   }
 });
 
+// Change Password Endpoint
+app.put('/api/users/:id/changePassword', async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    // Compare the provided current password with the stored hash
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Current password is incorrect.' });
+    // Update the password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+    res.json({ message: 'Password updated successfully.' });
+  } catch (err) {
+    console.error('Error updating password:', err);
+    res.status(500).json({ error: 'Error updating password.' });
+  }
+});
+
+
 /* ====================
    PROJECT MANAGEMENT ENDPOINTS
    ===================== */
@@ -284,6 +305,23 @@ app.get('/api/projects', async (req, res) => {
     res.status(500).json({ error: 'Error retrieving projects' });
   }
 });
+
+// Update Project Endpoint (PUT /api/projects/:id)
+app.put('/api/projects/:id', async (req, res) => {
+  const { description } = req.body;
+  try {
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      { description },
+      { new: true }
+    );
+    if (!project) return res.status(404).json({ error: 'Project not found.' });
+    res.json({ message: 'Project updated successfully', project });
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating project' });
+  }
+});
+
 
 // Delete Project Endpoint (DELETE /api/projects/:id)
 app.delete('/api/projects/:id', async (req, res) => {

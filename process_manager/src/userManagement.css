@@ -133,5 +133,27 @@ body {
     padding: 0.2rem 0.6rem;
     font-size: 0.9rem;
   }
+
+  /* Custom styling for the role dropdown to mimic a form-control input */
+.custom-dropdown {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* On hover, show a blue border (similar to btn-primary hover) */
+.custom-dropdown:hover {
+  border-color: #007bff;
+}
+
+/* Ensure the dropdown menu spans the full width of the dropdown button */
+.dropdown-menu.w-100 {
+  width: 100%;
+}
+
   
   
