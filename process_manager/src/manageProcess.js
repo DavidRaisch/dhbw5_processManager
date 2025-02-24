@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 import 'bpmn-js/dist/assets/diagram-js.css';
@@ -9,6 +10,8 @@ import TopNavBar from './navBar';
 import './manageProcess.css';
 
 function ManageProcess() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [processName, setProcessName] = useState('');
   const [processList, setProcessList] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
@@ -112,6 +115,21 @@ function ManageProcess() {
     }
   };
 
+  // New useEffect to check if a processId was passed via location.state (from a notification)
+  useEffect(() => {
+    if (location.state && location.state.processId) {
+      const processId = location.state.processId;
+      axios.get(`http://localhost:5001/api/processes/${processId}`)
+        .then(response => {
+          const proc = response.data;
+          handleLoadProcess(proc);
+          // Clear location state so that reloading doesn't re-load the process
+          navigate(location.pathname, { replace: true });
+        })
+        .catch(err => console.error("Error loading process from notification:", err));
+    }
+  }, [location.state, navigate]);
+
   const handleSaveToDatabase = () => {
     if (!processName) {
       triggerAlert('Missing Process Name', 'Please enter a process name.');
@@ -132,6 +150,23 @@ function ManageProcess() {
         .then((response) => {
           triggerAlert('Success', response.data.message);
           fetchProcesses();
+
+          // --- New Notification Logic ---
+          // If the current user is an employee, send a notification to managers.
+          if (user.role === 'Employee') {
+            axios.post('http://localhost:5001/api/notifications', {
+              message: `Employee ${user.username} created a new process "${processName}".`,
+              instanceId: response.data.process ? response.data.process._id : null,
+              requestedBy: user.username,
+              requestedById: user._id,
+              targetRole: 'Manager',
+              status: 'pending',
+              project: selectedProject
+            }).catch(err => {
+              console.error('Error sending notification:', err);
+            });
+          }
+          // --- End Notification Logic ---
         })
         .catch((err) => {
           console.error('Error saving process:', err);
@@ -409,18 +444,19 @@ export default ManageProcess;
 
 
 
+
+
 //** Additional */
-//TODO: OPTIONAL: employee can only create request to create process => manager becomes notification and has to approve the process => only then the process really gets stored
 //TODO: OPTIONAL: load xml file to create new process
 //TODO: OPTIONAL: option to make process builder full screen
 
 
 /** Things to clear */
-//TODO: does flows and process need a role and description? Do role and description have to be mandatory in general?
-//TODO: should flows after gateways be requiered to be named?
+//does flows and process need a role and description? Do role and description have to be mandatory in general?
+//should flows after gateways be requiered to be named?
 
-//TODO: should the creating a new process be priveliged to some user?
-//TODO: make creating a process procecss dependable on role of the user: Employer: needs permission from supervisior to create new process; Manager: can simply create a new Process
+//should the creating a new process be priveliged to some user?
+//make creating a process dependable on role of the user: Employer: needs permission from supervisior to create new process; Manager: can simply create a new Process
 
 
 /** for report */

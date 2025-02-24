@@ -58,9 +58,16 @@ function Notifications() {
     }
   };
 
-  // When a notification is clicked, navigate to the execute process page.
+  // When a notification is clicked, navigate appropriately.
   const handleNotificationClick = (notif) => {
-    navigate('/execute-process', { state: { instanceId: notif.instanceId } });
+    // If the notification message indicates a new process was created,
+    // navigate to the Manage Process page and pass the process ID.
+    if (notif.message.toLowerCase().includes('created a new process')) {
+      navigate('/manage-process', { state: { processId: notif.instanceId } });
+    } else {
+      // Otherwise, navigate to the Execute Process page as before.
+      navigate('/execute-process', { state: { instanceId: notif.instanceId } });
+    }
   };
 
   // Approve a notification.
@@ -130,7 +137,7 @@ function Notifications() {
                 )}
               </div>
               <div>
-                {currentUser.role === 'Manager' && notif.status === 'pending' && (
+                {currentUser.role === 'Manager' && notif.status === 'pending' && !notif.message.toLowerCase().includes('created a new process') && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -171,6 +178,7 @@ function Notifications() {
 }
 
 export default Notifications;
+
 
 
 
