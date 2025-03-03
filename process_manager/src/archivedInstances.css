@@ -1,0 +1,80 @@
+.archived-instances-container {
+  padding: 20px;
+  margin: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  overflow: visible;
+}
+
+/* Filter header styling */
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #e9ecef;
+  cursor: pointer;
+}
+
+.filter-header h4 {
+  margin: 0;
+}
+
+.toggle-icon {
+  font-size: 18px;
+}
+
+/* Filter row styling */
+.filter-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 15px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Ensure inputs and dropdowns use full width */
+.filter-group input,
+.filter-group .form-select,
+.filter-group .custom-dropdown {
+  width: 100%;
+}
+
+/* List-group styling for instance items */
+.instance-item {
+  cursor: pointer;
+  min-height: 70px;  /* Bigger height */
+  font-size: 18px;   /* Bigger font */
+}
+
+.instance-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Adjust list-group item padding */
+.list-group-item {
+  border: 1px solid #dee2e6;
+  border-radius: 0;
+  padding: 1rem 1.25rem;
+}

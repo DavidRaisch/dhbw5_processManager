@@ -181,4 +181,15 @@ export default Notifications;
 
 
 
+//TODO: bundle.js:120777 
+            
+            
+//GET http://localhost:5001/api/notifications?targetRole=Manager&projectNames=Engineering,Software net::ERR_INSUFFICIENT_RESOURCES
+
+
+//Resolve this problem
+
+//TODO: include nav bar similair design at the top
+
+
 

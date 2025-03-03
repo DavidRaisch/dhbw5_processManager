@@ -20,6 +20,7 @@ function ExecuteProcess() {
   const [newInstanceName, setNewInstanceName] = useState("");
   const [userProjects, setUserProjects] = useState([]);
   const [selectedElementDetails, setSelectedElementDetails] = useState(null);
+  const [assignedProjectName, setAssignedProjectName] = useState(''); // New state for project name
 
   // State for generic alert modal
   const [showAlertModal, setShowAlertModal] = useState(false);
@@ -41,9 +42,7 @@ function ExecuteProcess() {
   // Clear location state after processing it.
   useEffect(() => {
     if (instanceIdFromNotification) {
-      // Use navigate with replace to clear state.
       navigate(location.pathname, { replace: true });
-      // And set the instance id from notification into our state
       setSelectedInstanceId(instanceIdFromNotification);
       setSelectedProcess(null);
       setSelectedElementDetails(null);
@@ -154,7 +153,7 @@ function ExecuteProcess() {
       const response = await axios.get('http://localhost:5001/api/instances');
       const allowedNames = new Set(processList.map(p => p.name));
       const active = response.data.filter(inst => 
-        inst.status === 'running' && allowedNames.has(inst.processName)
+        inst.status === 'running' 
       );
       const archived = response.data
         .filter(inst => 
@@ -243,6 +242,7 @@ function ExecuteProcess() {
     position: 'StartEvent_1',
     status: 'running',
     created: new Date(),
+    project: process.project
   });
 
   const handleNewInstanceResponse = async (savedInstance, process) => {
@@ -292,12 +292,12 @@ function ExecuteProcess() {
   };
 
   const finishProcess = async (instanceId) => {
-    await updateInstance(instanceId, { status: 'finished' });
+    await updateInstance(instanceId, { status: 'finished', completedAt: new Date() });
     handleProcessCompletion(instanceId);
   };
 
   const cancelProcess = async (instanceId) => {
-    await updateInstance(instanceId, { status: 'canceled' });
+    await updateInstance(instanceId, { status: 'canceled', completedAt: new Date()  });
     handleProcessCompletion(instanceId);
   };
 
@@ -382,13 +382,24 @@ function ExecuteProcess() {
 
   const selectedInstance = [...activeInstances, ...archivedInstances]
     .find(i => i._id === selectedInstanceId);
+
+  // Fetch project name when selectedInstance changes
+  useEffect(() => {
+    if (selectedInstance && selectedInstance.project) {
+      axios.get(`http://localhost:5001/api/projects/${selectedInstance.project}`)
+        .then(response => {
+          setAssignedProjectName(response.data.name);
+        })
+        .catch(error => {
+          console.error("Error fetching project name:", error);
+          setAssignedProjectName("No Project Assigned");
+        });
+    }
+  }, [selectedInstance]);
+
   const nextElements = selectedInstance?.status === 'running' 
     ? selectedInstance.sequenceMap[selectedInstance.position] || []
     : [];
-  const getAssignedProjectName = () => {
-    const proc = processList.find(p => p.name === selectedInstance?.processName);
-    return proc?.project?.name || "No Project Assigned";
-  };
 
   return (
     <>
@@ -436,25 +447,12 @@ function ExecuteProcess() {
               ))}
             </ul>
 
-            <h5 className="mb-3">Archived Instances</h5>
-            <div className="overflow-auto" style={{ maxHeight: '400px' }}>
-              <ul className="list-group">
-                {archivedInstances.map((instance) => (
-                  <li
-                    key={instance._id}
-                    className={`list-group-item list-group-item-action ${selectedInstanceId === instance._id ? 'active' : ''}`}
-                    onClick={() => {
-                      setSelectedInstanceId(instance._id);
-                      setSelectedProcess(null);
-                      setSelectedElementDetails(null);
-                    }}
-                  >
-                    <div className="fw-medium">{instance.instanceName}</div>
-                    <small className="text-muted">{instance.processName} - {instance.status}</small>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <h5 className="mb-3"></h5>
+              <div>
+                <button className="btn btn-secondary w-100" onClick={() => navigate('/archived-instances')}>
+                  View Archived Instances
+                </button>
+              </div>
           </div>
 
           {/* Main Content Area */}
@@ -528,7 +526,7 @@ function ExecuteProcess() {
                             </span>
                           </div>
                           <div>
-                            <strong>Project:</strong> {getAssignedProjectName()}
+                            <strong>Project:</strong> {assignedProjectName}
                           </div>
                           <div>
                             <strong>Created:</strong> {new Date(selectedInstance.created).toLocaleString()}
@@ -696,5 +694,8 @@ export default ExecuteProcess;
 //TODO: OPTIONAL: Search Bar for available Processes
 
 
-/** Notes for report */
+/** Notes for report => Kann-Anforderungen */
 //Only processes and instances of the assigned projects are displayed for every user
+//User gets only notification to his projects
+
+//AUSBLICK: Historie von jeder Instanz wird gespeichert und kann in den archivierten Intanzen aufgerufen werden, dient als Vorteil, um im nachhinein nachvollzuziehen, was gemacht wurde, wann. etc.

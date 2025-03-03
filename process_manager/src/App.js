@@ -6,10 +6,11 @@ import StartPage from './startpage';
 import ManageProcess from './manageProcess';
 import ExecuteProcess from './executeProcess';
 import UserManagement from './userManagement';
-import ProjectManagement from './projectManagement'; // New separate project management page
+import ProjectManagement from './projectManagement'; 
 import PrivateRoute from './privateRoute';
 import Notifications from './notificationPage';
 import ChangePassword from './changePassword';
+import ArchivedInstancesPage from './archivedInstances';
 
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
           element={
             <PrivateRoute>
               <ChangePassword />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/archived-instances"
+          element={
+            <PrivateRoute>
+              <ArchivedInstancesPage />
             </PrivateRoute>
           }
         />

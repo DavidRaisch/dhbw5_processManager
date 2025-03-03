@@ -66,5 +66,10 @@ export default LoginPage;
 
 
 
+
 /** Additional Add-Ons */
 //TODO: OPTIONAL: user should be able to have multiple roles (for example admin and manager)
+
+
+/** Notes for report */
+// Bcrypt ensures authentication cannot be bypassed

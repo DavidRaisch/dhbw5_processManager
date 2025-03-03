@@ -306,6 +306,15 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
+app.get('/api/projects/:id', async (req, res) => {
+  try {
+    const projects = await Project.findById(req.params.id);
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ error: 'Error retrieving projects' });
+  }
+});
+
 // Update Project Endpoint (PUT /api/projects/:id)
 app.put('/api/projects/:id', async (req, res) => {
   const { description } = req.body;
@@ -362,6 +371,8 @@ const instanceSchema = new mongoose.Schema({
   position: { type: String, required: true },
   status: { type: String, required: true, default: 'running' },
   created: { type: Date, default: Date.now },
+  project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true },
+  completedAt: { type: Date, default: null }
 });
 const Instance = mongoose.model('Instance', instanceSchema);
 
