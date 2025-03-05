@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'react-bootstrap-icons';
 import axios from 'axios';
 import './notificationPage.css';
+import TopNavBar from './navBar';
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -105,6 +106,8 @@ function Notifications() {
   };
 
   return (
+    <>
+    <TopNavBar currentPage="Archived Instances" />
     <div className="notifications-page" style={{ padding: '20px' }}>
       <button onClick={() => navigate(-1)} style={{ marginBottom: '10px' }}>
         <ArrowLeft size={16} /> Back
@@ -174,6 +177,7 @@ function Notifications() {
         </button>
       )}
     </div>
+    </>
   );
 }
 
@@ -189,7 +193,6 @@ export default Notifications;
 
 //Resolve this problem
 
-//TODO: include nav bar similair design at the top
 
 
 

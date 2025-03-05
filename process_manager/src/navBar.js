@@ -199,3 +199,6 @@ function TopNavBar({ currentPage, minimal }) {
 
 export default TopNavBar;
 
+
+
+//TODO: distance between the boxes should be the same
