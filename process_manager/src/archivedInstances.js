@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Filter, ArrowLeftCircle} from 'react-bootstrap-icons';
+import { Filter, ArrowLeft} from 'react-bootstrap-icons';
 import TopNavBar from './navBar';
 import './archivedInstances.css';
 
@@ -191,7 +191,7 @@ function ArchivedInstancesPage() {
           <div className="card-header d-flex justify-content-between align-items-center">
             <h5 className="mb-0">Archived Instances</h5>
             <button className="btn btn-secondary" onClick={() => navigate(-1)}>
-              <ArrowLeftCircle size={20} /> Back
+              <ArrowLeft size={20} /> Back
             </button>
           </div>
         </div>

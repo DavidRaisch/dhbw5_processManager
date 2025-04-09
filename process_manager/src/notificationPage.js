@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'react-bootstrap-icons';
 import axios from 'axios';
@@ -9,6 +9,7 @@ function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [userProjects, setUserProjects] = useState([]); // Array of project names
   const navigate = useNavigate();
+    const intervalRef = useRef(null);
   
   // currentUser from sessionStorage (this may only include _id, username, and role)
   const currentUser = JSON.parse(sessionStorage.getItem('user'));
@@ -37,6 +38,13 @@ function Notifications() {
   // Once userProjects is fetched, load notifications.
   useEffect(() => {
     fetchNotifications();
+
+    intervalRef.current = setInterval(fetchNotifications, 1000);
+
+    // Cleanup function
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [userProjects]);
 
   const fetchNotifications = async () => {
@@ -182,17 +190,6 @@ function Notifications() {
 }
 
 export default Notifications;
-
-
-
-//TODO: bundle.js:120777 
-            
-            
-//GET http://localhost:5001/api/notifications?targetRole=Manager&projectNames=Engineering,Software net::ERR_INSUFFICIENT_RESOURCES
-
-
-//Resolve this problem
-
 
 
 

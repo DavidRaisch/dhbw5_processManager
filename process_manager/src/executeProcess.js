@@ -18,9 +18,10 @@ function ExecuteProcess() {
   const [selectedInstanceId, setSelectedInstanceId] = useState(null);
   const [selectedProcess, setSelectedProcess] = useState(null);
   const [newInstanceName, setNewInstanceName] = useState("");
-  const [userProjects, setUserProjects] = useState([]);
+  // Store full project objects for better matching by id.
+  const [userProjects, setUserProjects] = useState([]); 
   const [selectedElementDetails, setSelectedElementDetails] = useState(null);
-  const [assignedProjectName, setAssignedProjectName] = useState(''); // New state for project name
+  const [assignedProjectName, setAssignedProjectName] = useState(''); // State for project name
 
   // State for generic alert modal
   const [showAlertModal, setShowAlertModal] = useState(false);
@@ -55,9 +56,9 @@ function ExecuteProcess() {
       try {
         const response = await axios.get(`http://localhost:5001/api/users/${currentUser._id}`);
         const userDetails = response.data;
+        // Instead of saving only project names, save full project objects (or at least _id and name)
         if (userDetails.projects && Array.isArray(userDetails.projects)) {
-          const names = userDetails.projects.map(proj => proj.name);
-          setUserProjects(names);
+          setUserProjects(userDetails.projects);
         }
       } catch (err) {
         console.error("Error fetching user details:", err);
@@ -67,13 +68,23 @@ function ExecuteProcess() {
   }, [currentUser._id]);
 
   // Process and instance data fetching
+  // Wait until both userProjects and processes are available.
   useEffect(() => {
-    userProjects.length > 0 ? fetchProcesses() : setProcessList([]);
+    if (userProjects.length > 0) {
+      fetchProcesses();
+    } else {
+      setProcessList([]);
+    }
   }, [userProjects]);
 
+  // Fetch instances only when both processList and userProjects are ready.
   useEffect(() => {
-    processList.length > 0 ? fetchInstances() : setActiveInstances([]);
-  }, [processList]);
+    if (processList.length > 0 && userProjects.length > 0) {
+      fetchInstances();
+    } else {
+      setActiveInstances([]);
+    }
+  }, [processList, userProjects]);
 
   // BPMN viewer lifecycle management
   useEffect(() => {
@@ -136,30 +147,58 @@ function ExecuteProcess() {
     setSelectedElementDetails(details);
   };
 
+  // Updated fetchProcesses: now compare project IDs from the process against the userProjects.
   const fetchProcesses = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/processes');
-      const filtered = response.data.filter(proc => 
-        proc.project && userProjects.includes(proc.project.name)
-      );
+      const filtered = response.data.filter(proc => {
+        if (!proc.project) return false;
+        // Determine the project id from process.project, whether it's an object or a string.
+        const processProjectId = typeof proc.project === 'object' && proc.project !== null 
+          ? proc.project._id 
+          : proc.project;
+        // Check if any user project matches this id.
+        return userProjects.some(proj => proj._id === processProjectId);
+      });
       setProcessList(filtered);
     } catch (err) {
       console.error('Error fetching processes:', err);
     }
   };
 
+  // Updated fetchInstances: now compare instance project id against userProjects.
   const fetchInstances = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/instances');
+      
+      // Debug log: see what the API returns
+      console.log("Fetched instances:", response.data);
+      console.log("User projects:", userProjects);
+
+      const active = response.data.filter(inst => {
+        if (inst.status !== 'running' || !inst.project) return false;
+        
+        // If instance.project is an object, extract its _id; otherwise assume it's the project id.
+        const instanceProjectId = typeof inst.project === 'object' && inst.project !== null 
+          ? inst.project._id 
+          : inst.project;
+        
+        // Debug log each instance's project for verification.
+        console.log(`Instance "${inst.instanceName}" has project id:`, instanceProjectId);
+        
+        // Return true only if one of the user's projects matches this id.
+        return userProjects.some(proj => proj._id === instanceProjectId);
+      });
+
+      // For archived instances, we filter as before (you can adjust if needed).
       const allowedNames = new Set(processList.map(p => p.name));
-      const active = response.data.filter(inst => 
-        inst.status === 'running' 
-      );
       const archived = response.data
-        .filter(inst => 
+        .filter(inst =>
           inst.status !== 'running' && allowedNames.has(inst.processName)
         )
         .sort((a, b) => new Date(b.created) - new Date(a.created));
+      
+      console.log("Filtered active instances:", active);
       setActiveInstances(active);
       setArchivedInstances(archived);
     } catch (err) {
@@ -231,6 +270,7 @@ function ExecuteProcess() {
     return flowMap;
   };
 
+  // In instance data, we pass process.project as is (now a full object or string representing the id).
   const buildInstanceData = (process, instanceName, flowMap) => ({
     processId: process._id,
     processName: process.name,
@@ -314,7 +354,9 @@ function ExecuteProcess() {
       triggerAlert("Missing User ID", "No user id found, please login again.");
       return;
     }
+    // Find the process for the selected instance.
     const processOfInstance = processList.find(p => p.name === selectedInstance.processName);
+    // Using the project id from the process (which is either an object or string).
     const projectId = processOfInstance?.project?._id || processOfInstance?.project;
     if (!projectId) {
       triggerAlert("Missing Project", "No project assigned to the process.");
@@ -386,7 +428,7 @@ function ExecuteProcess() {
   // Fetch project name when selectedInstance changes
   useEffect(() => {
     if (selectedInstance && selectedInstance.project) {
-      axios.get(`http://localhost:5001/api/projects/${selectedInstance.project}`)
+      axios.get(`http://localhost:5001/api/projects/${selectedInstance.project._id || selectedInstance.project}`)
         .then(response => {
           setAssignedProjectName(response.data.name);
         })
@@ -422,7 +464,9 @@ function ExecuteProcess() {
                   }}
                 >
                   <div className="fw-bold">{process.name}</div>
-                  <small className="text-muted">{process.project?.name || 'No Project'}</small>
+                  <small className="text-muted">
+                    {process.project?.name || 'No Project'}
+                  </small>
                 </li>
               ))}
             </ul>
@@ -448,11 +492,11 @@ function ExecuteProcess() {
             </ul>
 
             <h5 className="mb-3"></h5>
-              <div>
-                <button className="btn btn-secondary w-100" onClick={() => navigate('/archived-instances')}>
-                  View Archived Instances
-                </button>
-              </div>
+            <div>
+              <button className="btn btn-secondary w-100" onClick={() => navigate('/archived-instances')}>
+                View Archived Instances
+              </button>
+            </div>
           </div>
 
           {/* Main Content Area */}
@@ -685,6 +729,7 @@ function ExecuteProcess() {
 }
 
 export default ExecuteProcess;
+
 
 
 

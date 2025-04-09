@@ -12,6 +12,8 @@ import './manageProcess.css';
 function ManageProcess() {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Component states.
   const [processName, setProcessName] = useState('');
   const [processList, setProcessList] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
@@ -19,42 +21,59 @@ function ManageProcess() {
   const [description, setDescription] = useState('');
   const [availableProjects, setAvailableProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
+  // New state to hold user projects.
+  const [userProjects, setUserProjects] = useState([]);
   
   // State for delete confirmation modal.
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [processToDelete, setProcessToDelete] = useState(null);
-
+  
   // State for generic alert modal.
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
-
+  
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
-
+  
   // Get logged in user from sessionStorage.
   const user = JSON.parse(sessionStorage.getItem('user'));
   const roleOptions = ['Admin', 'Manager', 'Employee'];
-
+  
   // Helper function to trigger an alert modal.
   const triggerAlert = (title, message) => {
     setAlertTitle(title);
     setAlertMessage(message);
     setShowAlertModal(true);
   };
-
+  
+  // Fetch full user details (including projects) after mount.
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/users/${user._id}`);
+        // Save full projects objects in userProjects state.
+        setUserProjects(response.data.projects || []);
+      } catch (err) {
+        console.error("Error fetching user details:", err);
+      }
+    };
+    fetchUserDetails();
+  }, [user._id]);
+  
+  // Initialize BPMN modeler and fetch processes & available projects.
   useEffect(() => {
     bpmnModeler.current = new BpmnModeler({
       container: bpmnEditorRef.current,
-      additionalModules: [ customRules ],
+      additionalModules: [customRules],
       moddleExtensions: {
         role: customExtension
       }
     });
-
+  
     bpmnModeler.current.createDiagram().catch(console.error);
-
-    // When an element is clicked, update the selected element and load its role/description.
+  
+    // When an element is clicked, update selected element and load its role/description.
     bpmnModeler.current.on('element.click', (event) => {
       const element = event.element;
       setSelectedElement(element);
@@ -63,15 +82,23 @@ function ManageProcess() {
       setRole(loadedRole);
       setDescription(businessObject.description || '');
     });
-
-    fetchProcesses();
+  
+    // Only fetch processes after userProjects is loaded.
+    // We also fetch available projects.
     fetchAvailableProjects();
-
+    
     return () => {
       bpmnModeler.current.destroy();
     };
   }, []);
-
+  
+  // Whenever userProjects or processes are updated, fetch processes so filtering can take place.
+  useEffect(() => {
+    if (userProjects.length > 0) {
+      fetchProcesses();
+    }
+  }, [userProjects]);
+  
   useEffect(() => {
     if (selectedElement) {
       const modeling = bpmnModeler.current.get('modeling');
@@ -80,7 +107,56 @@ function ManageProcess() {
       modeling.updateProperties(element, { role, description });
     }
   }, [role, description, selectedElement]);
-
+  
+  // Update fetchProcesses to filter saved processes by user's projects.
+  const fetchProcesses = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/processes');
+      
+      // Debug: log userProjects for verification.
+      console.log("User projects:", userProjects);
+      
+      const filteredProcesses = response.data.filter(proc => {
+        if (!proc.project) return false;
+        // Extract the process project id, handling object or string.
+        const procProjectId = typeof proc.project === 'object' && proc.project !== null 
+          ? proc.project._id 
+          : proc.project;
+        // Check if this process's project id is in the user's projects.
+        const isMatch = userProjects.some(p => p._id === procProjectId);
+        console.log(`Process "${proc.name}" with project id: ${procProjectId}. Match: ${isMatch}`);
+        return isMatch;
+      });
+      setProcessList(filteredProcesses);
+    } catch (err) {
+      console.error('Error fetching processes:', err);
+    }
+  };
+  
+  const fetchAvailableProjects = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/projects');
+      setAvailableProjects(response.data);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+    }
+  };
+  
+  // Check if a processId was passed via location.state (from a notification)
+  useEffect(() => {
+    if (location.state && location.state.processId) {
+      const processId = location.state.processId;
+      axios.get(`http://localhost:5001/api/processes/${processId}`)
+        .then(response => {
+          const proc = response.data;
+          handleLoadProcess(proc);
+          // Clear location state so that reloading doesn't re-load the process.
+          navigate(location.pathname, { replace: true });
+        })
+        .catch(err => console.error("Error loading process from notification:", err));
+    }
+  }, [location.state, navigate]);
+  
   const validateDiagram = () => {
     const elementRegistry = bpmnModeler.current.get('elementRegistry');
     const errors = [];
@@ -96,40 +172,7 @@ function ManageProcess() {
     });
     return errors;
   };
-
-  const fetchProcesses = async () => {
-    try {
-      const response = await axios.get('http://localhost:5001/api/processes');
-      setProcessList(response.data);
-    } catch (err) {
-      console.error('Error fetching processes:', err);
-    }
-  };
-
-  const fetchAvailableProjects = async () => {
-    try {
-      const response = await axios.get('http://localhost:5001/api/projects');
-      setAvailableProjects(response.data);
-    } catch (err) {
-      console.error('Error fetching projects:', err);
-    }
-  };
-
-  // New useEffect to check if a processId was passed via location.state (from a notification)
-  useEffect(() => {
-    if (location.state && location.state.processId) {
-      const processId = location.state.processId;
-      axios.get(`http://localhost:5001/api/processes/${processId}`)
-        .then(response => {
-          const proc = response.data;
-          handleLoadProcess(proc);
-          // Clear location state so that reloading doesn't re-load the process
-          navigate(location.pathname, { replace: true });
-        })
-        .catch(err => console.error("Error loading process from notification:", err));
-    }
-  }, [location.state, navigate]);
-
+  
   const handleSaveToDatabase = () => {
     if (!processName) {
       triggerAlert('Missing Process Name', 'Please enter a process name.');
@@ -150,9 +193,9 @@ function ManageProcess() {
         .then((response) => {
           triggerAlert('Success', response.data.message);
           fetchProcesses();
-
+  
           // --- New Notification Logic ---
-          // If the current user is an employee, send a notification to managers.
+          // If current user is an employee, send a notification to managers.
           if (user.role === 'Employee') {
             axios.post('http://localhost:5001/api/notifications', {
               message: `Employee ${user.username} created a new process "${processName}".`,
@@ -174,7 +217,7 @@ function ManageProcess() {
         });
     });
   };
-
+  
   const handleCreateNewProcess = () => {
     bpmnModeler.current
       .createDiagram()
@@ -190,7 +233,7 @@ function ManageProcess() {
         triggerAlert('Error', 'An error occurred while creating a new process.');
       });
   };
-
+  
   const handleLoadProcess = (process) => {
     bpmnModeler.current
       .importXML(process.xml)
@@ -199,14 +242,14 @@ function ManageProcess() {
         setSelectedElement(null);
         setRole('');
         setDescription('');
-        setSelectedProject(process.project ? process.project._id || process.project : '');
+        setSelectedProject(process.project ? (typeof process.project === 'object' ? process.project._id : process.project) : '');
       })
       .catch((err) => {
         console.error('Error loading process:', err);
         triggerAlert('Error', 'An error occurred while loading the process.');
       });
   };
-
+  
   const handleDeleteProcess = (id) => {
     axios
       .delete(`http://localhost:5001/api/processes/${id}`)
@@ -219,7 +262,7 @@ function ManageProcess() {
         triggerAlert('Error', 'An error occurred while deleting the process.');
       });
   };
-
+  
   const confirmDelete = () => {
     if (processToDelete) {
       handleDeleteProcess(processToDelete);
@@ -227,14 +270,14 @@ function ManageProcess() {
     }
     setShowDeleteModal(false);
   };
-
+  
   // Custom function to get the label for the project dropdown.
   const getSelectedProjectLabel = () => {
     if (!selectedProject) return 'Select Project';
     const found = availableProjects.find(proj => proj._id === selectedProject);
     return found ? found.name : 'Select Project';
   };
-
+  
   return (
     <>
       {/* Universal Top Navigation Bar */}
@@ -268,7 +311,7 @@ function ManageProcess() {
               ))}
             </div>
           </div>
-
+  
           {/* Main Content Area */}
           <div className="col-md-9">
             {/* BPMN Editor */}
@@ -280,7 +323,7 @@ function ManageProcess() {
                 <div ref={bpmnEditorRef} className="bpmn-editor-container"></div>
               </div>
             </div>
-
+  
             {/* Process Information */}
             <div className="card mb-3">
               <div className="card-header">
@@ -332,7 +375,7 @@ function ManageProcess() {
                 </div>
               </div>
             </div>
-
+  
             {/* Role & Description Assignment */}
             <div className="card">
               <div className="card-header">
@@ -379,7 +422,7 @@ function ManageProcess() {
           </div>
         </div>
       </div>
-
+  
       {/* Delete Confirmation Modal */}
       <div className={`modal fade ${showDeleteModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
@@ -408,7 +451,7 @@ function ManageProcess() {
         </div>
       </div>
       {showDeleteModal && <div className="modal-backdrop fade show"></div>}
-
+  
       {/* Generic Alert Modal */}
       <div className={`modal fade ${showAlertModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
@@ -439,11 +482,6 @@ function ManageProcess() {
 }
 
 export default ManageProcess;
-
-
-
-
-
 
 
 //** Additional */

@@ -90,3 +90,8 @@ function App() {
 export default App;
 
 
+
+//TODO: create a Docker image for frontend, backend and database
+
+//TODO: structure the code in project a little (javascript folder, html, css, etc.)
+

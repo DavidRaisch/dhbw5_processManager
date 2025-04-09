@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiLogOut } from 'react-icons/fi';
 import { Person, House, Gear, PlayCircle, Bell, PersonFillGear } from 'react-bootstrap-icons';
@@ -15,11 +15,18 @@ function TopNavBar({ currentPage, minimal }) {
   // Only set up these states/effects if we're not in minimal mode.
   const [notifications, setNotifications] = useState([]);
   const [userProjects, setUserProjects] = useState([]);
+  const intervalRef = useRef(null);
+  const cancelTokenRef = useRef(null);
 
+  
   useEffect(() => {
-    if (!isMinimal) {
+    if (!isMinimal && user?._id) {
+      const source = axios.CancelToken.source();
+
       axios
-        .get(`http://localhost:5001/api/users/${user._id}`)
+        .get(`http://localhost:5001/api/users/${user._id}`, {
+          cancelToken: source.token
+        })
         .then((response) => {
           const userDetails = response.data;
           if (userDetails.projects && Array.isArray(userDetails.projects)) {
@@ -27,21 +34,52 @@ function TopNavBar({ currentPage, minimal }) {
             setUserProjects(names);
           }
         })
-        .catch((err) => console.error('Error fetching user details:', err));
+        .catch((err) => {
+          if (!axios.isCancel(err)) {
+            console.error('Error fetching user details:', err);
+          }
+        });
+
+      return () => source.cancel('Request canceled due to component unmount or dependency change');
     }
-  }, [isMinimal, user]);
+  }, [isMinimal, user?._id]); // Only depend on user._id
 
   useEffect(() => {
-    if (!isMinimal) {
-      const projectQuery = userProjects.length > 0 ? userProjects.join(',') : '';
-      axios
-        .get('http://localhost:5001/api/notifications', {
-          params: { targetRole: user.role, projectNames: projectQuery },
+    if (!isMinimal && user?.role) {
+      const fetchNotifications = () => {
+        const source = axios.CancelToken.source();
+        cancelTokenRef.current = source;
+        const projectQuery = userProjects.length > 0 ? userProjects.join(',') : '';
+
+        axios.get('http://localhost:5001/api/notifications', {
+          params: { 
+            targetRole: user.role, 
+            projectNames: projectQuery 
+          },
+          cancelToken: source.token
         })
-        .then((response) => setNotifications(response.data))
-        .catch((err) => console.error('Error fetching notifications:', err));
+        .then(response => setNotifications(response.data))
+        .catch(err => {
+          if (!axios.isCancel(err)) {
+            console.error('Error fetching notifications:', err);
+          }
+        });
+      };
+
+      // Initial fetch
+      fetchNotifications();
+
+      // Set up interval for auto-refresh
+      intervalRef.current = setInterval(fetchNotifications, 1000);
+
+      // Cleanup function
+      return () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (cancelTokenRef.current) cancelTokenRef.current.cancel();
+      };
     }
-  }, [isMinimal, userProjects, user]);
+  }, [isMinimal, userProjects, user?.role]);
+  
 
   const handleLogout = () => {
     sessionStorage.removeItem('user');
@@ -201,4 +239,4 @@ export default TopNavBar;
 
 
 
-//TODO: distance between the boxes should be the same
+//TODO: OPTIONAL: distance between the boxes should be the same
