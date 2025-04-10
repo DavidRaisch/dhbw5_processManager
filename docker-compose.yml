@@ -6,6 +6,8 @@ services:
     command: mongod --auth  # 🔥 Wichtig
     volumes:
       - mongodb_data:/data/db
+      # Mount the initialization script into the container.
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
