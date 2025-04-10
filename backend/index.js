@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 app.use(cors());
@@ -11,7 +11,10 @@ app.use(bodyParser.json());
 
 // Connect to MongoDB
 mongoose
-  .connect('mongodb://localhost:27017/bpmn', { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bpmn', { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
+  })
   .then(() => {
     console.log('MongoDB connected');
   })

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:4.4
+    command: mongod --auth  # 🔥 Wichtig
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: bpmn
+    ports:
+      - "27017:27017"
+
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5001"
+    environment:
+      MONGODB_URI: "mongodb://admin:admin@mongo:27017/bpmn?authSource=admin"
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./process_manager
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongodb_data:
