@@ -6,7 +6,7 @@ if (!db.users.findOne({ username: "admin" })) {
   db.users.insert({
     username: "admin",
     // This is an example bcrypt hash for the password "admin" using 10 rounds.
-    password: "$2a$10$DXnxxZ1ev1U1JfVgoeWlWeS71/4Gf/5Kci6JLfHfN5t9l4tKQq6PG",
+    password: "$2b$10$cg1dd/OKwHkbkasNq9b0M.fIVd1xDw/.qoz2Ujy.nzdYHaMJ/aCja",
     role: "Admin",
     projects: []
   });
