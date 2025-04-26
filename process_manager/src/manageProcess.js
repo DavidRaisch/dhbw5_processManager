@@ -23,6 +23,10 @@ function ManageProcess() {
   const [selectedProject, setSelectedProject] = useState('');
   // New state to hold user projects.
   const [userProjects, setUserProjects] = useState([]);
+  const [initialProcessName, setInitialProcessName] = useState('');
+  const [initialSelectedProject, setInitialSelectedProject] = useState('');
+  const [hasModelChanged, setHasModelChanged] = useState(false);
+  const [hasUiChanged, setHasUiChanged] = useState(false);
   
   // State for delete confirmation modal.
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -35,6 +39,7 @@ function ManageProcess() {
   
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
+  const initialXmlRef = useRef('');
   
   // Get logged in user from sessionStorage.
   const user = JSON.parse(sessionStorage.getItem('user'));
@@ -71,7 +76,12 @@ function ManageProcess() {
       }
     });
   
-    bpmnModeler.current.createDiagram().catch(console.error);
+    bpmnModeler.current.createDiagram()
+      .then(async () => {
+        const { xml } = await bpmnModeler.current.saveXML({ format: false });
+        initialXmlRef.current = xml;
+      })
+      .catch(console.error);
   
     // When an element is clicked, update selected element and load its role/description.
     bpmnModeler.current.on('element.click', (event) => {
@@ -82,6 +92,14 @@ function ManageProcess() {
       setRole(loadedRole);
       setDescription(businessObject.description || '');
     });
+    // Track model changes via XML diff on any command change
+    {
+      const eventBus = bpmnModeler.current.get('eventBus');
+      eventBus.on('commandStack.changed', async () => {
+        const { xml: currentXml } = await bpmnModeler.current.saveXML({ format: false });
+        setHasModelChanged(currentXml !== initialXmlRef.current);
+      });
+    }
   
     // Only fetch processes after userProjects is loaded.
     // We also fetch available projects.
@@ -98,15 +116,6 @@ function ManageProcess() {
       fetchProcesses();
     }
   }, [userProjects]);
-  
-  useEffect(() => {
-    if (selectedElement) {
-      const modeling = bpmnModeler.current.get('modeling');
-      const elementRegistry = bpmnModeler.current.get('elementRegistry');
-      const element = elementRegistry.get(selectedElement.id);
-      modeling.updateProperties(element, { role, description });
-    }
-  }, [role, description, selectedElement]);
   
   // Update fetchProcesses to filter saved processes by user's projects.
   const fetchProcesses = async () => {
@@ -193,7 +202,12 @@ function ManageProcess() {
         .then((response) => {
           triggerAlert('Success', response.data.message);
           fetchProcesses();
-  
+          // Reset baseline after save
+          bpmnModeler.current.saveXML({ format: false }).then(({ xml: newXml }) => {
+            initialXmlRef.current = newXml;
+            setHasModelChanged(false);
+            setHasUiChanged(false);
+          });
           // --- New Notification Logic ---
           // If current user is an employee, send a notification to managers.
           if (user.role === 'Employee') {
@@ -221,12 +235,22 @@ function ManageProcess() {
   const handleCreateNewProcess = () => {
     bpmnModeler.current
       .createDiagram()
+      .then(async () => {
+        const { xml } = await bpmnModeler.current.saveXML({ format: false });
+        initialXmlRef.current = xml;
+      })
       .then(() => {
         setProcessName('');
         setSelectedElement(null);
         setRole('');
         setDescription('');
         setSelectedProject('');
+        setInitialProcessName('');
+        setInitialSelectedProject('');
+        const stack = bpmnModeler.current.get('commandStack');
+        stack.clear();
+        setHasModelChanged(false);
+        setHasUiChanged(false);
       })
       .catch((err) => {
         console.error('Error creating new diagram:', err);
@@ -237,12 +261,23 @@ function ManageProcess() {
   const handleLoadProcess = (process) => {
     bpmnModeler.current
       .importXML(process.xml)
+      .then(async () => {
+        const { xml } = await bpmnModeler.current.saveXML({ format: false });
+        initialXmlRef.current = xml;
+      })
       .then(() => {
         setProcessName(process.name);
         setSelectedElement(null);
         setRole('');
         setDescription('');
-        setSelectedProject(process.project ? (typeof process.project === 'object' ? process.project._id : process.project) : '');
+        const projId = process.project ? (typeof process.project === 'object' ? process.project._id : process.project) : '';
+        setSelectedProject(projId);
+        setInitialProcessName(process.name);
+        setInitialSelectedProject(projId);
+        const stack = bpmnModeler.current.get('commandStack');
+        stack.clear();
+        setHasModelChanged(false);
+        setHasUiChanged(false);
       })
       .catch((err) => {
         console.error('Error loading process:', err);
@@ -336,7 +371,11 @@ function ManageProcess() {
                     className="form-control"
                     placeholder="Process Name"
                     value={processName}
-                    onChange={(e) => setProcessName(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setProcessName(val);
+                      setHasUiChanged(val !== initialProcessName || selectedProject !== initialSelectedProject);
+                    }}
                   />
                 </div>
                 <div className="mb-3">
@@ -353,7 +392,10 @@ function ManageProcess() {
                     <ul className="dropdown-menu w-100">
                       {availableProjects.map((project) => (
                         <li key={project._id}>
-                          <button className="dropdown-item" onClick={() => setSelectedProject(project._id)}>
+                          <button className="dropdown-item" onClick={() => {
+                            setSelectedProject(project._id);
+                            setHasUiChanged(processName !== initialProcessName || project._id !== initialSelectedProject);
+                          }}>
                             {project.name}
                           </button>
                         </li>
@@ -362,7 +404,7 @@ function ManageProcess() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <button onClick={handleSaveToDatabase} className="btn btn-primary me-2">
+                  <button onClick={handleSaveToDatabase} disabled={!(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
                     Save to Database
                   </button>
                   <button onClick={handleCreateNewProcess} className="btn btn-secondary">
@@ -392,7 +434,13 @@ function ManageProcess() {
                     <ul className="dropdown-menu w-100">
                       {roleOptions.map((option, index) => (
                         <li key={index}>
-                          <button className="dropdown-item" onClick={() => setRole(option)}>
+                          <button className="dropdown-item" onClick={() => {
+                            setRole(option);
+                            const modeling = bpmnModeler.current.get('modeling');
+                            const elementRegistry = bpmnModeler.current.get('elementRegistry');
+                            const element = elementRegistry.get(selectedElement.id);
+                            modeling.updateProperties(element, { role: option });
+                          }}>
                             {option}
                           </button>
                         </li>
@@ -406,7 +454,14 @@ function ManageProcess() {
                     className="form-control"
                     placeholder="Description"
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setDescription(val);
+                      const modeling = bpmnModeler.current.get('modeling');
+                      const elementRegistry = bpmnModeler.current.get('elementRegistry');
+                      const element = elementRegistry.get(selectedElement.id);
+                      modeling.updateProperties(element, { description: val });
+                    }}
                   />
                 </div>
                 <div>
@@ -479,6 +534,8 @@ function ManageProcess() {
 
 export default ManageProcess;
 
+//TODO: Employee cant create processes => only required processes to create and also cant modify processes => only request modifications
+
 
 //** Additional */
 //TODO: OPTIONAL: load xml file to create new process
@@ -492,8 +549,3 @@ export default ManageProcess;
 
 //should the creating a new process be priveliged to some user?
 //make creating a process dependable on role of the user: Employer: needs permission from supervisior to create new process; Manager: can simply create a new Process
-
-
-/** for report */
-// delete button isnt visible for employees, they can request the cancelation of active instances, but not the process att all
-// delete button asks if manager is sure, he wants to delete the process
