@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {ArrowLeft} from 'react-bootstrap-icons';
 import TopNavBar from './navBar';
 import './changePassword.css';
 
@@ -76,7 +77,9 @@ function ChangePassword() {
           {success && <div className="alert alert-success">{success}</div>}
           <button type="submit" className="btn btn-primary">Set new Password</button>
         </form>
-        <button className="btn btn-secondary mt-3" onClick={() => navigate(-1)}>Back</button>
+        <button className="btn btn-secondary mt-3" onClick={() => navigate(-1)}>
+          <ArrowLeft size={20} /> Back
+        </button>
       </div>
     </>
   );

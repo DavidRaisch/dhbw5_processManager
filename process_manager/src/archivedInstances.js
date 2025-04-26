@@ -443,6 +443,3 @@ function ArchivedInstancesPage() {
 
 export default ArchivedInstancesPage;
 
-
-//TODO: make back icon and back in good style => should be transparent until hovered.
-

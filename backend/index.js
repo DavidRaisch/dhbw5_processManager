@@ -198,10 +198,10 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// GET a single user with projects populated
+// GET a single user with projects populated and password excluded
 app.get('/api/users/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).populate('projects', 'name');
+    const user = await User.findById(req.params.id, { password: 0 }).populate('projects', 'name');
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (err) {
@@ -320,16 +320,21 @@ app.get('/api/projects/:id', async (req, res) => {
 
 // Update Project Endpoint (PUT /api/projects/:id)
 app.put('/api/projects/:id', async (req, res) => {
-  const { description } = req.body;
+  // Name und Beschreibung aus dem Request-Body ziehen
+  const { name, description } = req.body;
   try {
+    // Beide Felder updaten
     const project = await Project.findByIdAndUpdate(
       req.params.id,
-      { description },
+      { name, description },
       { new: true }
     );
-    if (!project) return res.status(404).json({ error: 'Project not found.' });
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found.' });
+    }
     res.json({ message: 'Project updated successfully', project });
   } catch (err) {
+    console.error('Error updating project:', err);
     res.status(500).json({ error: 'Error updating project' });
   }
 });

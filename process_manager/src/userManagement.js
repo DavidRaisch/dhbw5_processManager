@@ -19,12 +19,12 @@ function UserManagement() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
-  // New state for change password modal.
+  // State for change password modal.
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [changePasswordUser, setChangePasswordUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
 
-  // Helper function to trigger an alert modal.
+  // Helper to trigger alert modal
   const triggerAlert = (title, message) => {
     setAlertTitle(title);
     setAlertMessage(message);
@@ -38,25 +38,29 @@ function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/users');
-      setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
+      const { data } = await axios.get('http://localhost:5001/api/users');
+      setUsers(data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
     }
   };
 
   const fetchAvailableProjects = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/projects');
-      setAvailableProjects(response.data);
-    } catch (error) {
-      console.error('Error fetching available projects:', error);
+      const { data } = await axios.get('http://localhost:5001/api/projects');
+      setAvailableProjects(data);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
     }
   };
 
   const handleCreateUser = async () => {
-    if (!newUser.username || !newUser.password) {
-      triggerAlert('Missing Fields', 'Username and Password are required');
+    // require username, password, and at least one project
+    if (!newUser.username || !newUser.password || newUser.projects.length === 0) {
+      triggerAlert(
+        'Missing Fields',
+        'Username, Password and at least one project must be assigned'
+      );
       return;
     }
     const uniqueProjects = [...new Set(newUser.projects)];
@@ -72,22 +76,27 @@ function UserManagement() {
   };
 
   const handleEditUser = (user) => {
-    // Convert projects to an array of IDs if they are objects.
-    const projects =
-      user.projects && Array.isArray(user.projects)
-        ? user.projects.map(proj => (typeof proj === 'object' ? proj._id : proj))
-        : [];
+    const projects = Array.isArray(user.projects)
+      ? user.projects.map(p => (typeof p === 'object' ? p._id : p))
+      : [];
     setEditingUser({ ...user, projects });
   };
 
   const handleUpdateUser = async () => {
-    if (!editingUser.username) {
-      triggerAlert('Missing Username', 'Username is required');
+    // require at least one project
+    if (!editingUser.username || editingUser.projects.length === 0) {
+      triggerAlert(
+        'Missing Fields',
+        'Username and at least one project must be assigned'
+      );
       return;
     }
     const uniqueProjects = [...new Set(editingUser.projects)];
     try {
-      await axios.put(`http://localhost:5001/api/users/${editingUser._id}`, { ...editingUser, projects: uniqueProjects });
+      await axios.put(
+        `http://localhost:5001/api/users/${editingUser._id}`,
+        { ...editingUser, projects: uniqueProjects }
+      );
       setEditingUser(null);
       fetchUsers();
       triggerAlert('Success', 'User updated successfully');
@@ -109,36 +118,30 @@ function UserManagement() {
   };
 
   const confirmDelete = () => {
-    if (userToDelete) {
-      handleDeleteUser(userToDelete);
-      setUserToDelete(null);
-    }
+    if (userToDelete) handleDeleteUser(userToDelete);
+    setUserToDelete(null);
     setShowDeleteModal(false);
   };
 
   // Toggle project selection for new user.
   const handleNewUserProjectToggle = (projectId) => {
-    setNewUser(prevState => {
-      let projects;
-      if (prevState.projects.includes(projectId)) {
-        projects = prevState.projects.filter(id => id !== projectId);
-      } else {
-        projects = [...prevState.projects, projectId];
-      }
-      return { ...prevState, projects: [...new Set(projects)] };
+    setNewUser(prev => {
+      const has = prev.projects.includes(projectId);
+      const projects = has
+        ? prev.projects.filter(id => id !== projectId)
+        : [...prev.projects, projectId];
+      return { ...prev, projects };
     });
   };
 
   // Toggle project selection for editing user.
   const handleEditUserProjectToggle = (projectId) => {
-    setEditingUser(prevState => {
-      let projects;
-      if (prevState.projects.includes(projectId)) {
-        projects = prevState.projects.filter(id => id !== projectId);
-      } else {
-        projects = [...prevState.projects, projectId];
-      }
-      return { ...prevState, projects: [...new Set(projects)] };
+    setEditingUser(prev => {
+      const has = prev.projects.includes(projectId);
+      const projects = has
+        ? prev.projects.filter(id => id !== projectId)
+        : [...prev.projects, projectId];
+      return { ...prev, projects };
     });
   };
 
@@ -163,37 +166,30 @@ function UserManagement() {
 
   return (
     <>
-      {/* Top Navigation Bar */}
       <TopNavBar currentPage="Manage Users" />
 
       <div className="container-fluid my-4">
         <h2 className="mb-4">User Management</h2>
-        
+
         {/* New User Form */}
         <div className="card mb-4">
-          <div className="card-header">
-            <h5>Create New User</h5>
-          </div>
+          <div className="card-header"><h5>Create New User</h5></div>
           <div className="card-body">
-            <div className="mb-3">
-              <input 
-                type="text"
-                className="form-control"
-                placeholder="Username"
-                value={newUser.username}
-                onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-              />
-            </div>
-            <div className="mb-3">
-              <input 
-                type="password"
-                className="form-control"
-                placeholder="Password"
-                value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-              />
-            </div>
-            {/* Custom Bootstrap Role Dropdown */}
+            <input 
+              type="text"
+              className="form-control mb-3"
+              placeholder="Username"
+              value={newUser.username}
+              onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+            />
+            <input 
+              type="password"
+              className="form-control mb-3"
+              placeholder="Password"
+              value={newUser.password}
+              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            />
+            {/* Role Dropdown */}
             <div className="dropdown mb-3">
               <button 
                 className="form-control dropdown-toggle custom-dropdown" 
@@ -201,21 +197,25 @@ function UserManagement() {
                 data-bs-toggle="dropdown" 
                 aria-expanded="false"
               >
-                {newUser.role || 'Select Role'}
+                {newUser.role}
               </button>
               <ul className="dropdown-menu w-100">
-                {roleOptions.map((role) => (
+                {roleOptions.map(role => (
                   <li key={role}>
-                    <button className="dropdown-item" onClick={() => setNewUser({ ...newUser, role })}>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => setNewUser({ ...newUser, role })}
+                    >
                       {role}
                     </button>
                   </li>
                 ))}
               </ul>
             </div>
+            {/* Projects */}
             <div className="project-assignment-box mb-3">
               <h5>Assign Projects</h5>
-              {availableProjects.map((project) => (
+              {availableProjects.map(project => (
                 <label key={project._id} className="form-check-label me-2">
                   <input
                     type="checkbox"
@@ -227,7 +227,12 @@ function UserManagement() {
                 </label>
               ))}
             </div>
-            <button className="btn btn-primary" onClick={handleCreateUser}>
+            <button
+              className={`btn btn-primary ${!newUser.username || !newUser.password || newUser.projects.length === 0
+                ? 'opacity-50'
+                : ''}`}
+              onClick={handleCreateUser}
+            >
               Create User
             </button>
           </div>
@@ -236,20 +241,18 @@ function UserManagement() {
         {/* Edit User Form */}
         {editingUser && (
           <div className="card mb-4">
-            <div className="card-header">
-              <h5>Edit User</h5>
-            </div>
+            <div className="card-header"><h5>Edit User</h5></div>
             <div className="card-body">
+              {/* Username jetzt editierbar */}
               <div className="mb-3">
                 <input 
                   type="text"
                   className="form-control"
                   value={editingUser.username}
-                  readOnly
+                  onChange={e => setEditingUser({ ...editingUser, username: e.target.value })}
                 />
               </div>
-              {/* No password input here; change password is handled separately */}
-              {/* Custom Bootstrap Dropdown for Role in Edit */}
+              {/* Role Dropdown */}
               <div className="dropdown mb-3">
                 <button 
                   className="form-control dropdown-toggle custom-dropdown" 
@@ -257,21 +260,25 @@ function UserManagement() {
                   data-bs-toggle="dropdown" 
                   aria-expanded="false"
                 >
-                  {editingUser.role || 'Select Role'}
+                  {editingUser.role}
                 </button>
                 <ul className="dropdown-menu w-100">
-                  {roleOptions.map((role) => (
+                  {roleOptions.map(role => (
                     <li key={role}>
-                      <button className="dropdown-item" onClick={() => setEditingUser({ ...editingUser, role })}>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => setEditingUser({ ...editingUser, role })}
+                      >
                         {role}
                       </button>
                     </li>
                   ))}
                 </ul>
               </div>
+              {/* Projects */}
               <div className="project-assignment-box mb-3">
                 <h5>Assign Projects</h5>
-                {availableProjects.map((project) => (
+                {availableProjects.map(project => (
                   <label key={project._id} className="form-check-label me-2">
                     <input
                       type="checkbox"
@@ -283,7 +290,10 @@ function UserManagement() {
                   </label>
                 ))}
               </div>
-              <button className="btn btn-primary me-2" onClick={handleUpdateUser}>
+              <button
+                className={`btn btn-primary me-2 ${(!editingUser.username || editingUser.projects.length === 0) ? 'opacity-50' : ''}`}
+                onClick={handleUpdateUser}
+              >
                 Update User
               </button>
               <button className="btn btn-secondary" onClick={() => setEditingUser(null)}>
@@ -295,9 +305,7 @@ function UserManagement() {
 
         {/* Users List */}
         <div className="card">
-          <div className="card-header">
-            <h5>Existing Users</h5>
-          </div>
+          <div className="card-header"><h5>Existing Users</h5></div>
           <div className="card-body p-0">
             <table className="table table-striped mb-0">
               <thead>
@@ -309,13 +317,13 @@ function UserManagement() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {users.map(user => (
                   <tr key={user._id}>
                     <td>{user.username}</td>
                     <td>{user.role}</td>
                     <td>
-                      {user.projects && user.projects.length > 0
-                        ? user.projects.map(project => project.name).join(', ')
+                      {user.projects?.length
+                        ? user.projects.map(p => p.name).join(', ')
                         : 'None'}
                     </td>
                     <td>
@@ -331,10 +339,13 @@ function UserManagement() {
                       >
                         Change Password
                       </button>
-                      <button className="btn btn-danger btn-sm" onClick={() => {
-                        setUserToDelete(user._id);
-                        setShowDeleteModal(true);
-                      }}>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => {
+                          setUserToDelete(user._id);
+                          setShowDeleteModal(true);
+                        }}
+                      >
                         Delete
                       </button>
                     </td>
@@ -347,7 +358,7 @@ function UserManagement() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <div className={`modal fade ${showDeleteModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+      <div className={`modal fade ${showDeleteModal ? 'show d-block' : ''}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
@@ -367,7 +378,7 @@ function UserManagement() {
       {showDeleteModal && <div className="modal-backdrop fade show"></div>}
 
       {/* Change Password Modal */}
-      <div className={`modal fade ${showChangePasswordModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+      <div className={`modal fade ${showChangePasswordModal ? 'show d-block' : ''}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
@@ -397,7 +408,7 @@ function UserManagement() {
       {showChangePasswordModal && <div className="modal-backdrop fade show"></div>}
 
       {/* Generic Alert Modal */}
-      <div className={`modal fade ${showAlertModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+      <div className={`modal fade ${showAlertModal ? 'show d-block' : ''}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
@@ -419,3 +430,8 @@ function UserManagement() {
 }
 
 export default UserManagement;
+
+
+
+
+//TODO: A Project must be assigned to a user

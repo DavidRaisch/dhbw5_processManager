@@ -1,5 +1,9 @@
 /* startPage.css */
 
+.start-page-container {
+  padding-top: 80px;
+}
+
 /* User Role Badge (Dropdown Toggle) */
 .user-role-badge {
     background: rgba(255, 255, 255, 0.9);

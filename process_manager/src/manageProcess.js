@@ -361,10 +361,6 @@ function ManageProcess() {
                     </ul>
                   </div>
                 </div>
-                <div>
-                  <strong>Selected Element:</strong>{' '}
-                  {selectedElement ? (selectedElement.businessObject.name || selectedElement.id) : 'None'}
-                </div>
                 <div className="mt-3">
                   <button onClick={handleSaveToDatabase} className="btn btn-primary me-2">
                     Save to Database
@@ -487,6 +483,7 @@ export default ManageProcess;
 //** Additional */
 //TODO: OPTIONAL: load xml file to create new process
 //TODO: OPTIONAL: option to make process builder full screen
+//TODO: OPTIONAL: make description of flows after Gateway requiered
 
 
 /** Things to clear */

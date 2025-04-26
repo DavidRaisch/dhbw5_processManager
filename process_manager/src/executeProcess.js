@@ -732,11 +732,6 @@ export default ExecuteProcess;
 
 
 
-
-//TODO: view archived instance should be transparent until hovered.
-
-
-
 /** Additional Improvments */
 //TODO: OPTIONAL: Search Bar for available Processes
 
