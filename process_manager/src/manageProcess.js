@@ -38,6 +38,10 @@ function ManageProcess() {
   const [originalProcessName, setOriginalProcessName] = useState('');
   const [originalProject, setOriginalProject] = useState('');
   const [requesterId, setRequesterId] = useState(null);
+  const [requesterName, setRequesterName] = useState('');
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewType, setPreviewType] = useState(null);
+  const [initialProps, setInitialProps] = useState({});
   
   // State for delete confirmation modal.
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -92,6 +96,7 @@ function ManageProcess() {
               const { xml } = await bpmnModeler.current.saveXML({ format: false });
               initialXmlRef.current = xml;
             })
+            .then(recordInitialProps)
             .then(() => {
               setProcessName(notif.processName || '');
               const proj = notif.project?._id || notif.project;
@@ -176,6 +181,7 @@ function ManageProcess() {
         const { xml } = await bpmnModeler.current.saveXML({ format: false });
         initialXmlRef.current = xml;
       })
+      .then(recordInitialProps)
       .catch(console.error);
   
     // When an element is clicked, update selected element and load its role/description.
@@ -388,6 +394,7 @@ function ManageProcess() {
         const { xml } = await bpmnModeler.current.saveXML({ format: false });
         initialXmlRef.current = xml;
       })
+      .then(recordInitialProps)
       .then(() => {
         setProcessName('');
         setSelectedElement(null);
@@ -422,6 +429,7 @@ function ManageProcess() {
         const { xml } = await bpmnModeler.current.saveXML({ format: false });
         initialXmlRef.current = xml;
       })
+      .then(recordInitialProps)
       .then(() => {
         setProcessName(process.name);
         setSelectedElement(null);
@@ -525,6 +533,69 @@ function ManageProcess() {
     return items;
   };
 
+  // Record initial role and description of elements
+  const recordInitialProps = () => {
+    const registry = bpmnModeler.current.get('elementRegistry');
+    const propsMap = {};
+    registry.getAll().forEach(el => {
+      const bo = el.businessObject;
+      propsMap[el.id] = {
+        role: bo['role:role'] || bo.role || '',
+        description: bo.description || ''
+      };
+    });
+    setInitialProps(propsMap);
+  };
+
+  // Preview changes before save or request
+  const handlePreviewChanges = async (type) => {
+    if (!processName) {
+      triggerAlert('Missing Process Name', 'Please enter a process name.');
+      return;
+    }
+    if (!selectedProject) {
+      triggerAlert('Missing Project', 'Please select a project.');
+      return;
+    }
+    const errors = validateDiagram();
+    if (errors.length > 0) {
+      triggerAlert('Validation Error', 'The following errors occurred:\n' + errors.join('\n'));
+      return;
+    }
+    const { xml } = await bpmnModeler.current.saveXML({ format: true });
+    const baseXml = initialXmlRef.current || '';
+    const diffs = diffLines(baseXml, xml);
+    setDiffText(diffs);
+    let items = computeSimpleChanges(diffs);
+    // Process name change
+    if (initialProcessName && processName && initialProcessName !== processName) {
+      items.unshift(`Process name changed: '${initialProcessName}' → '${processName}'`);
+    }
+    // Project change
+    if (initialSelectedProject && selectedProject && initialSelectedProject !== selectedProject) {
+      const oldProjName = availableProjects.find(p => p._id === initialSelectedProject)?.name || initialSelectedProject;
+      const newProjName = availableProjects.find(p => p._id === selectedProject)?.name || selectedProject;
+      items.unshift(`Project changed: '${oldProjName}' → '${newProjName}'`);
+    }
+    // Detect role/description changes
+    const registry = bpmnModeler.current.get('elementRegistry');
+    registry.getAll().forEach(el => {
+      const bo = el.businessObject;
+      const init = initialProps[el.id] || {};
+      const newRole = bo['role:role'] || bo.role || '';
+      if (init.role !== newRole) {
+        items.push(`${bo.name || el.id}: role changed: '${init.role}' → '${newRole}'`);
+      }
+      const newDesc = bo.description || '';
+      if (init.description !== newDesc) {
+        items.push(`${bo.name || el.id}: description changed: '${init.description}' → '${newDesc}'`);
+      }
+    });
+    setChangeItems(items);
+    setPreviewType(type);
+    setShowPreviewModal(true);
+  };
+  
   // Manager approves request
   const handleApproveRequest = () => {
     bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
@@ -672,7 +743,7 @@ function ManageProcess() {
                       <button onClick={handleDenyRequest} className="btn btn-danger">Deny Request</button>
                     </>
                   ) : (
-                    <button onClick={handleSaveToDatabase} disabled={!(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
+                    <button onClick={() => handlePreviewChanges(user.role === 'Employee' ? 'request' : 'save')} disabled={!(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
                       {user.role === 'Employee' ? 'Request Save' : 'Save to Database'}
                     </button>
                   )}
@@ -822,6 +893,48 @@ function ManageProcess() {
         </div>
       </div>
       {showAlertModal && <div className="modal-backdrop fade show"></div>}
+  
+      {/* Preview Changes Modal */}
+      {showPreviewModal && (
+        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+          <div className="modal-dialog modal-lg" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Preview Changes</h5>
+                <button type="button" className="btn-close" onClick={() => setShowPreviewModal(false)} aria-label="Close"></button>
+              </div>
+              <div className="modal-body">
+                <div className="change-list-panel mb-3" style={{ maxHeight: '200px', overflow: 'auto', background: '#e9ecef', padding: '10px' }}>
+                  {changeItems.length > 0 ? (
+                    <ul>{changeItems.map((item, idx) => (<li key={idx}>{item}</li>))}</ul>
+                  ) : (
+                    <p>No changes detected.</p>
+                  )}
+                </div>
+                <div className="xml-diff-panel" style={{ maxHeight: '300px', overflow: 'auto', background: '#f8f9fa', padding: '10px' }}>
+                  {diffText.map((part, i) => (
+                    <span key={i} style={{ color: part.added ? 'green' : part.removed ? 'red' : 'black' }}>
+                      {part.value}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowPreviewModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-primary" onClick={() => {
+                  setShowPreviewModal(false);
+                  if (previewType === 'request') {
+                    requestProcess();
+                  } else {
+                    handleSaveToDatabase();
+                  }
+                }}>Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showPreviewModal && <div className="modal-backdrop fade show"></div>}
     </>
   );
 }
