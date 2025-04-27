@@ -55,6 +55,7 @@ function ManageProcess() {
   const bpmnModeler = useRef(null);
   const bpmnEditorRef = useRef(null);
   const initialXmlRef = useRef('');
+  const initialPrettyXmlRef = useRef('');
   
   // Get logged in user from sessionStorage.
   const user = JSON.parse(sessionStorage.getItem('user'));
@@ -96,7 +97,7 @@ function ManageProcess() {
               const { xml } = await bpmnModeler.current.saveXML({ format: false });
               initialXmlRef.current = xml;
             })
-            .then(recordInitialProps)
+            .then(recordInitialState)
             .then(() => {
               setProcessName(notif.processName || '');
               const proj = notif.project?._id || notif.project;
@@ -181,7 +182,7 @@ function ManageProcess() {
         const { xml } = await bpmnModeler.current.saveXML({ format: false });
         initialXmlRef.current = xml;
       })
-      .then(recordInitialProps)
+      .then(recordInitialState)
       .catch(console.error);
   
     // When an element is clicked, update selected element and load its role/description.
@@ -408,7 +409,7 @@ function ManageProcess() {
         const { xml } = await bpmnModeler.current.saveXML({ format: false });
         initialXmlRef.current = xml;
       })
-      .then(recordInitialProps)
+      .then(recordInitialState)
       .then(() => {
         setProcessName('');
         setSelectedElement(null);
@@ -443,7 +444,7 @@ function ManageProcess() {
         const { xml } = await bpmnModeler.current.saveXML({ format: false });
         initialXmlRef.current = xml;
       })
-      .then(recordInitialProps)
+      .then(recordInitialState)
       .then(() => {
         setProcessName(process.name);
         setSelectedElement(null);
@@ -561,6 +562,13 @@ function ManageProcess() {
     setInitialProps(propsMap);
   };
 
+  // Record initial formatted XML and role/description props
+  const recordInitialState = async () => {
+    const { xml } = await bpmnModeler.current.saveXML({ format: true });
+    initialPrettyXmlRef.current = xml;
+    recordInitialProps();
+  };
+
   // Preview changes before save or request
   const handlePreviewChanges = async (type) => {
     if (!processName) {
@@ -577,7 +585,7 @@ function ManageProcess() {
       return;
     }
     const { xml } = await bpmnModeler.current.saveXML({ format: true });
-    const baseXml = initialXmlRef.current || '';
+    const baseXml = initialPrettyXmlRef.current || '';
     const diffs = diffLines(baseXml, xml);
     setDiffText(diffs);
     let items = computeSimpleChanges(diffs);
