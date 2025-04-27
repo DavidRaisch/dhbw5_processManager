@@ -242,7 +242,21 @@ function ManageProcess() {
       console.error('Error fetching processes:', err);
     }
   };
-  
+
+  // Load latest version of a process before manual load
+  const loadProcessLatest = async (id) => {
+    try {
+      // Optional: refresh process list
+      await fetchProcesses();
+      // Fetch single process by id
+      const response = await axios.get(`http://localhost:5001/api/processes/${id}`);
+      handleLoadProcess(response.data);
+    } catch (err) {
+      console.error('Error loading process:', err);
+      triggerAlert('Error', 'Fehler beim Laden des Prozesses.');
+    }
+  };
+
   const fetchAvailableProjects = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/projects');
@@ -663,7 +677,7 @@ function ManageProcess() {
                     <em>{process.project ? process.project.name : 'No Project'}</em>
                   </div>
                   <div className="mt-2">
-                    <button onClick={() => handleLoadProcess(process)} className="btn btn-sm btn-primary me-2">
+                    <button onClick={() => loadProcessLatest(process._id)} className="btn btn-sm btn-primary me-2">
                       Load
                     </button>
                     {user?.role === 'Manager' && (
