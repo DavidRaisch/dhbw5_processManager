@@ -146,8 +146,12 @@ function Notifications() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
+              onClick={() => handleNotificationClick(notif)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleNotificationClick(notif); }}
             >
-              <div onClick={() => handleNotificationClick(notif)}>
+              <div>
                 <p>{notif.message}</p>
                 <small>{new Date(notif.timestamp).toLocaleString()}</small>
                 {notif.project && (
@@ -157,25 +161,21 @@ function Notifications() {
                 )}
               </div>
               <div>
-                {currentUser.role === 'Manager' && notif.status === 'pending' && !notif.message.toLowerCase().includes('created a new process') && (
+                {currentUser.role === 'Manager' && notif.instanceId && notif.status === 'pending' && (
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      approveNotification(notif);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); approveNotification(notif); }}
                     style={{ marginRight: '5px' }}
                   >
                     Accept
                   </button>
                 )}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteNotification(notif._id);
-                  }}
-                >
-                  Delete
-                </button>
+                {!(currentUser.role === 'Manager' && notif.processName) && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); deleteNotification(notif._id); }}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </li>
           ))}

@@ -8,6 +8,7 @@ import { customExtension } from './customExtension';
 import customRules from './customRules'; // our custom rules module
 import TopNavBar from './navBar';
 import './manageProcess.css';
+import { diffLines } from 'diff';
 
 function ManageProcess() {
   const navigate = useNavigate();
@@ -29,6 +30,14 @@ function ManageProcess() {
   const [hasUiChanged, setHasUiChanged] = useState(false);
   const [notificationId, setNotificationId] = useState(null);
   const [currentProcessId, setCurrentProcessId] = useState(null);
+  const [originalXml, setOriginalXml] = useState('');
+  const [proposedXml, setProposedXml] = useState('');
+  const [diffText, setDiffText] = useState([]);
+  const [showXmlDiff, setShowXmlDiff] = useState(false);
+  const [changeItems, setChangeItems] = useState([]);
+  const [originalProcessName, setOriginalProcessName] = useState('');
+  const [originalProject, setOriginalProject] = useState('');
+  const [requesterId, setRequesterId] = useState(null);
   
   // State for delete confirmation modal.
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -75,6 +84,9 @@ function ManageProcess() {
       axios.get(`http://localhost:5001/api/notifications/${notifId}`)
         .then(res => {
           const notif = res.data;
+          setProposedXml(notif.xml);
+          setRequesterId(notif.requestedById);
+          setRequesterName(notif.requestedBy);
           bpmnModeler.current.importXML(notif.xml)
             .then(async () => {
               const { xml } = await bpmnModeler.current.saveXML({ format: false });
@@ -89,12 +101,65 @@ function ManageProcess() {
               setHasModelChanged(false);
               setHasUiChanged(false);
               setNotificationId(notifId);
+              setCurrentProcessId(notif.processId);
+              // Load original process XML for diff
+              if (notif.processId) {
+                axios.get(`http://localhost:5001/api/processes/${notif.processId}`)
+                  .then(procRes => {
+                    const orig = procRes.data.xml;
+                    setOriginalXml(orig);
+                    setOriginalProcessName(procRes.data.name);
+                    const origProjId = typeof procRes.data.project === 'object' && procRes.data.project !== null
+                      ? procRes.data.project._id
+                      : procRes.data.project;
+                    setOriginalProject(origProjId);
+                    const diffs = diffLines(orig, notif.xml);
+                    setDiffText(diffs);
+                    let items = computeSimpleChanges(diffs);
+                    // Process name change
+                    if (procRes.data.name && processName && procRes.data.name !== processName) {
+                      items.unshift(`Process name changed: '${procRes.data.name}' → '${processName}'`);
+                    }
+                    // Project change
+                    if (origProjId && selectedProject && origProjId !== selectedProject) {
+                      const oldProjName = availableProjects.find(p => p._id === origProjId)?.name || origProjId;
+                      const newProjName = availableProjects.find(p => p._id === selectedProject)?.name || selectedProject;
+                      items.unshift(`Project changed: '${oldProjName}' → '${newProjName}'`);
+                    }
+                    setChangeItems(items);
+                    navigate(location.pathname, { replace: true });
+                  })
+                  .catch(err => console.error('Error fetching original process:', err));
+              } else {
+                // No original process to diff: clear state
+                navigate(location.pathname, { replace: true });
+              }
             });
         })
         .catch(err => console.error('Error loading notification:', err));
-      navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate]);
+  
+  // Automatically compute and show diff when a notification is loaded
+  useEffect(() => {
+    if (notificationId && proposedXml) {
+      const baseXml = originalXml || '';
+      const diffs = diffLines(baseXml, proposedXml);
+      setDiffText(diffs);
+      let items = computeSimpleChanges(diffs);
+      // Process name change
+      if (originalProcessName && processName && originalProcessName !== processName) {
+        items.unshift(`Process name changed: '${originalProcessName}' → '${processName}'`);
+      }
+      // Project change
+      if (originalProject && selectedProject && originalProject !== selectedProject) {
+        const oldProjName = availableProjects.find(p => p._id === originalProject)?.name || originalProject;
+        const newProjName = availableProjects.find(p => p._id === selectedProject)?.name || selectedProject;
+        items.unshift(`Project changed: '${oldProjName}' → '${newProjName}'`);
+      }
+      setChangeItems(items);
+    }
+  }, [notificationId, originalXml, proposedXml, processName, selectedProject, originalProcessName, originalProject, availableProjects]);
   
   // Initialize BPMN modeler and fetch processes & available projects.
   useEffect(() => {
@@ -344,6 +409,13 @@ function ManageProcess() {
   };
   
   const handleLoadProcess = (process) => {
+    // Clear review/notification UI on manual load
+    setNotificationId(null);
+    setShowXmlDiff(false);
+    setDiffText([]);
+    setChangeItems([]);
+    setOriginalXml('');
+    setProposedXml('');
     bpmnModeler.current
       .importXML(process.xml)
       .then(async () => {
@@ -399,6 +471,110 @@ function ManageProcess() {
     return found ? found.name : 'Select Project';
   };
   
+  // Helper to summarize diffs into friendly change descriptions
+  const computeSimpleChanges = (diffs) => {
+    const items = [];
+    for (let i = 0; i < diffs.length;) {
+      const part = diffs[i];
+      // Changed element attributes
+      if (part.removed && i + 1 < diffs.length && diffs[i+1].added) {
+        const oldVal = part.value.trim();
+        const newVal = diffs[i+1].value.trim();
+        const tagMatch = oldVal.match(/^<\s*([^\s>]+)/);
+        const tagName = tagMatch ? tagMatch[1] : 'Element';
+        const oldAttrs = {};
+        oldVal.replace(/([a-zA-Z0-9_:]+)="([^"]*)"/g, (_, k, v) => { oldAttrs[k] = v; });
+        const newAttrs = {};
+        newVal.replace(/([a-zA-Z0-9_:]+)="([^"]*)"/g, (_, k, v) => { newAttrs[k] = v; });
+        const id = oldAttrs.id || oldAttrs.name || '';
+        Object.keys({ ...oldAttrs, ...newAttrs }).forEach(attr => {
+          const o = oldAttrs[attr], n = newAttrs[attr];
+          if (o !== undefined && n !== undefined && o !== n) {
+            items.push(`${tagName} ${id}: attribute ${attr} changed: '${o}' → '${n}'`);
+          } else if (o !== undefined && n === undefined) {
+            items.push(`${tagName} ${id}: attribute ${attr} removed`);
+          } else if (o === undefined && n !== undefined) {
+            items.push(`${tagName} ${id}: attribute ${attr} added: '${n}'`);
+          }
+        });
+        i += 2;
+      // New element added
+      } else if (part.added) {
+        const newVal = part.value.trim();
+        const tagMatch = newVal.match(/^<\s*([^\s>]+)/);
+        const tagName = tagMatch ? tagMatch[1] : 'Element';
+        const attrs = {};
+        newVal.replace(/([a-zA-Z0-9_:]+)="([^"]*)"/g, (_, k, v) => { attrs[k] = v; });
+        const id = attrs.id || attrs.name || '';
+        items.push(`${tagName} ${id} added`);
+        i++;
+      // Element removed entirely
+      } else if (part.removed) {
+        const oldVal = part.value.trim();
+        const tagMatch = oldVal.match(/^<\s*([^\s>]+)/);
+        const tagName = tagMatch ? tagMatch[1] : 'Element';
+        const attrs = {};
+        oldVal.replace(/([a-zA-Z0-9_:]+)="([^"]*)"/g, (_, k, v) => { attrs[k] = v; });
+        const id = attrs.id || attrs.name || '';
+        items.push(`${tagName} ${id} removed`);
+        i++;
+      } else {
+        i++;
+      }
+    }
+    return items;
+  };
+
+  // Manager approves request
+  const handleApproveRequest = () => {
+    bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
+      axios.post('http://localhost:5001/api/processes', { name: processName, xml, project: selectedProject })
+        .then(() => {
+          // notify employee
+          axios.post('http://localhost:5001/api/notifications', {
+            message: `Manager ${user.username} has approved your request to save process "${processName}".`,
+            instanceId: null,
+            requestedBy: user.username,
+            requestedById: user._id,
+            targetRole: 'Employee',
+            status: 'approved',
+            project: selectedProject,
+            processName,
+            processId: currentProcessId,
+            xml
+          });
+          // delete original notification
+          if (requesterId) axios.delete(`http://localhost:5001/api/notifications/${notificationId}`);
+          triggerAlert('Success', 'Request approved and process saved');
+          setNotificationId(null);
+        })
+        .catch(err => { console.error(err); triggerAlert('Error', 'Error approving request.'); });
+    });
+  };
+  // Manager denies request
+  const handleDenyRequest = () => {
+    // delete original notification
+    axios.delete(`http://localhost:5001/api/notifications/${notificationId}`)
+      .then(() => {
+        // notify employee with original XML for proper loading
+        axios.post('http://localhost:5001/api/notifications', {
+          message: `Manager ${user.username} has denied your request to save process "${processName}".`,
+          instanceId: null,
+          requestedBy: user.username,
+          requestedById: user._id,
+          targetRole: 'Employee',
+          status: 'dismissed',
+          project: selectedProject,
+          processName,
+          processId: currentProcessId,
+          xml: originalXml
+        });
+        triggerAlert('Denied', 'Request denied');
+        setNotificationId(null);
+      })
+      .catch(err => { console.error(err); triggerAlert('Error', 'Error denying request.'); });
+  };
+
   return (
     <>
       {/* Universal Top Navigation Bar */}
@@ -432,7 +608,7 @@ function ManageProcess() {
               ))}
             </div>
           </div>
-  
+
           {/* Main Content Area */}
           <div className="col-md-9">
             {/* BPMN Editor */}
@@ -444,7 +620,7 @@ function ManageProcess() {
                 <div ref={bpmnEditorRef} className="bpmn-editor-container"></div>
               </div>
             </div>
-  
+
             {/* Process Information */}
             <div className="card mb-3">
               <div className="card-header">
@@ -490,17 +666,48 @@ function ManageProcess() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <button onClick={handleSaveToDatabase} disabled={notificationId ? false : !(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
-                    {notificationId ? 'Approve Request'
-                      : user.role === 'Employee' ? 'Request Save' : 'Save to Database'}
-                  </button>
+                  {notificationId && user.role === 'Manager' ? (
+                    <>  
+                      <button onClick={handleApproveRequest} className="btn btn-success me-2">Approve Request</button>
+                      <button onClick={handleDenyRequest} className="btn btn-danger">Deny Request</button>
+                    </>
+                  ) : (
+                    <button onClick={handleSaveToDatabase} disabled={!(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
+                      {user.role === 'Employee' ? 'Request Save' : 'Save to Database'}
+                    </button>
+                  )}
                   <button onClick={handleCreateNewProcess} className="btn btn-secondary">
                     Create New Process
                   </button>
+                  {notificationId && diffText.length > 0 && (
+                    <button onClick={() => setShowXmlDiff(!showXmlDiff)} className="btn btn-outline-secondary ms-2">
+                      {showXmlDiff ? 'Hide XML' : 'Show XML'}
+                    </button>
+                  )}
                 </div>
+                {notificationId && (
+                  <div className="change-list-panel mt-3" style={{ maxHeight: '300px', overflow: 'auto', background: '#e9ecef', padding: '10px' }}>
+                    {changeItems.length > 0 ? (
+                      <ul>
+                        {changeItems.map((item, idx) => (<li key={idx}>{item}</li>))}
+                      </ul>
+                    ) : (
+                      <p>No changes detected.</p>
+                    )}
+                  </div>
+                )}
+                {showXmlDiff && (
+                  <div className="xml-diff-panel mt-2" style={{ maxHeight: '200px', overflow: 'auto', background: '#f8f9fa', padding: '10px' }}>
+                    {diffText.map((part, i) => (
+                      <span key={i} style={{ color: part.added ? 'green' : part.removed ? 'red' : 'black' }}>
+                        {part.value}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-  
+
             {/* Role & Description Assignment */}
             <div className="card">
               <div className="card-header">
@@ -560,7 +767,7 @@ function ManageProcess() {
           </div>
         </div>
       </div>
-  
+
       {/* Delete Confirmation Modal */}
       <div className={`modal fade ${showDeleteModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
