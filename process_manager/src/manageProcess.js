@@ -27,6 +27,8 @@ function ManageProcess() {
   const [initialSelectedProject, setInitialSelectedProject] = useState('');
   const [hasModelChanged, setHasModelChanged] = useState(false);
   const [hasUiChanged, setHasUiChanged] = useState(false);
+  const [notificationId, setNotificationId] = useState(null);
+  const [currentProcessId, setCurrentProcessId] = useState(null);
   
   // State for delete confirmation modal.
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -65,6 +67,34 @@ function ManageProcess() {
     };
     fetchUserDetails();
   }, [user._id]);
+  
+  // Load notification request for manager
+  useEffect(() => {
+    if (location.state?.notificationId) {
+      const notifId = location.state.notificationId;
+      axios.get(`http://localhost:5001/api/notifications/${notifId}`)
+        .then(res => {
+          const notif = res.data;
+          bpmnModeler.current.importXML(notif.xml)
+            .then(async () => {
+              const { xml } = await bpmnModeler.current.saveXML({ format: false });
+              initialXmlRef.current = xml;
+            })
+            .then(() => {
+              setProcessName(notif.processName || '');
+              const proj = notif.project?._id || notif.project;
+              setSelectedProject(proj);
+              setInitialProcessName(notif.processName || '');
+              setInitialSelectedProject(proj);
+              setHasModelChanged(false);
+              setHasUiChanged(false);
+              setNotificationId(notifId);
+            });
+        })
+        .catch(err => console.error('Error loading notification:', err));
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate]);
   
   // Initialize BPMN modeler and fetch processes & available projects.
   useEffect(() => {
@@ -182,7 +212,53 @@ function ManageProcess() {
     return errors;
   };
   
+  const requestProcess = () => {
+    // For employees: request permission to save process
+    if (!processName) {
+      triggerAlert('Missing Process Name', 'Please enter a process name.');
+      return;
+    }
+    if (!selectedProject) {
+      triggerAlert('Missing Project', 'Please select a project.');
+      return;
+    }
+    const errors = validateDiagram();
+    if (errors.length > 0) {
+      triggerAlert('Validation Error', 'The following errors occurred:\n' + errors.join('\n'));
+      return;
+    }
+    bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
+      // prepare notification payload for manager
+      const notificationPayload = {
+        message: `Employee ${user.username} requested permission to save process "${processName}".`,
+        instanceId: null,
+        requestedBy: user.username,
+        requestedById: user._id,
+        targetRole: 'Manager',
+        status: 'pending',
+        project: selectedProject,
+        processName: processName,
+        processId: currentProcessId,
+        xml
+      };
+      console.log('requestProcess payload:', notificationPayload);
+      axios.post('http://localhost:5001/api/notifications', notificationPayload)
+        .then(() => {
+          triggerAlert('Success', 'Request sent to Manager.');
+        }).catch(err => {
+          // Show detailed error from server if available
+          console.error('Error sending request:', err.response?.data || err);
+          const errorMsg = err.response?.data?.error || err.message || 'Error sending request.';
+          triggerAlert('Error', `Request failed: ${errorMsg}`);
+        });
+    });
+  };
+
   const handleSaveToDatabase = () => {
+    if (user.role === 'Employee') {
+      requestProcess();
+      return;
+    }
     if (!processName) {
       triggerAlert('Missing Process Name', 'Please enter a process name.');
       return;
@@ -213,7 +289,7 @@ function ManageProcess() {
           if (user.role === 'Employee') {
             axios.post('http://localhost:5001/api/notifications', {
               message: `Employee ${user.username} created a new process "${processName}".`,
-              instanceId: response.data.process ? response.data.process._id : null,
+              instanceId: null,
               requestedBy: user.username,
               requestedById: user._id,
               targetRole: 'Manager',
@@ -223,7 +299,15 @@ function ManageProcess() {
               console.error('Error sending notification:', err);
             });
           }
-          // --- End Notification Logic ---
+          // Manager approving notification: after save, clear notification
+          const notify = () => {
+            if (notificationId) {
+              axios.delete(`http://localhost:5001/api/notifications/${notificationId}`)
+                .catch(err => console.error('Error deleting notification:', err));
+              setNotificationId(null);
+            }
+          };
+          notify();
         })
         .catch((err) => {
           console.error('Error saving process:', err);
@@ -247,6 +331,7 @@ function ManageProcess() {
         setSelectedProject('');
         setInitialProcessName('');
         setInitialSelectedProject('');
+        setCurrentProcessId(null);
         const stack = bpmnModeler.current.get('commandStack');
         stack.clear();
         setHasModelChanged(false);
@@ -274,6 +359,7 @@ function ManageProcess() {
         setSelectedProject(projId);
         setInitialProcessName(process.name);
         setInitialSelectedProject(projId);
+        setCurrentProcessId(process._id);
         const stack = bpmnModeler.current.get('commandStack');
         stack.clear();
         setHasModelChanged(false);
@@ -404,8 +490,9 @@ function ManageProcess() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <button onClick={handleSaveToDatabase} disabled={!(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
-                    Save to Database
+                  <button onClick={handleSaveToDatabase} disabled={notificationId ? false : !(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
+                    {notificationId ? 'Approve Request'
+                      : user.role === 'Employee' ? 'Request Save' : 'Save to Database'}
                   </button>
                   <button onClick={handleCreateNewProcess} className="btn btn-secondary">
                     Create New Process
@@ -534,7 +621,8 @@ function ManageProcess() {
 
 export default ManageProcess;
 
-//TODO: Employee cant create processes => only required processes to create and also cant modify processes => only request modifications
+//TODO: Employee cant create processes => only required processes to create and also cant modify processes => only request modifications => DONE
+//TODO: Manager gets Info on modifications
 
 
 //** Additional */

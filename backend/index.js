@@ -26,12 +26,15 @@ mongoose
    const notificationSchema = new mongoose.Schema({
     message: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
-    instanceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Instance', required: true },
+    instanceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Instance'},
     requestedBy: { type: String, required: true },
     requestedById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     targetRole: { type: String, enum: ['Admin', 'Manager', 'Employee'], default: 'Manager' },
     status: { type: String, enum: ['pending', 'approved', 'dismissed'], default: 'pending' },
-    project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true }
+    project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true },
+    processName: { type: String },
+    xml: { type: String },
+    processId: { type: mongoose.Schema.Types.ObjectId, ref: 'Process' }
   });
   const Notification = mongoose.model('Notification', notificationSchema);
   
@@ -42,8 +45,9 @@ mongoose
 
 // Create a new notification
 app.post('/api/notifications', async (req, res) => {
-  const { message, instanceId, requestedBy, requestedById, targetRole, status, project } = req.body;
-  if (!message || !instanceId || !requestedBy || !requestedById || !project) {
+  console.log('[Notifications] POST /api/notifications body:', req.body);
+  const { message, instanceId, requestedBy, requestedById, targetRole, status, project, processName, xml, processId } = req.body;
+  if (!message || !requestedBy || !requestedById || !project) {
     return res.status(400).json({ error: 'Missing required fields for notification.' });
   }
   try {
@@ -54,7 +58,10 @@ app.post('/api/notifications', async (req, res) => {
       requestedById,
       targetRole: targetRole || 'Manager',
       status: status || 'pending',
-      project
+      project,
+      processName,
+      xml,
+      processId
     });
     await notification.save();
     res.json({ message: 'Notification created', notification });
@@ -88,8 +95,17 @@ app.get('/api/notifications', async (req, res) => {
   }
 });
 
-
-
+// GET single notification by ID (for loading process requests)
+app.get('/api/notifications/:id', async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id).populate('project', 'name');
+    if (!notification) return res.status(404).json({ error: 'Notification not found' });
+    res.json(notification);
+  } catch (err) {
+    console.error('Error fetching notification:', err);
+    res.status(500).json({ error: 'Error fetching notification' });
+  }
+});
 
 // Delete a notification by ID
 app.delete('/api/notifications/:id', async (req, res) => {
