@@ -73,8 +73,8 @@ function Notifications() {
       // Navigate to process management for employee request
       navigate('/manage-process', { state: { notificationId: notif._id } });
     } else if (notif.instanceId) {
-      // Navigate to execution for instance-related notifications
-      navigate('/execute-process', { state: { instanceId: notif.instanceId } });
+      // Navigate to execution for instance-related notifications with notification id
+      navigate('/execute-process', { state: { instanceId: notif.instanceId, notificationId: notif._id } });
     }
   };
 
@@ -161,17 +161,10 @@ function Notifications() {
                 )}
               </div>
               <div>
-                {currentUser.role === 'Manager' && notif.instanceId && notif.status === 'pending' && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); approveNotification(notif); }}
-                    style={{ marginRight: '5px' }}
-                  >
-                    Accept
-                  </button>
-                )}
-                {!(currentUser.role === 'Manager' && notif.processName) && (
+                {currentUser.role === 'Employee' && (
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteNotification(notif._id); }}
+                    className="btn btn-outline-danger"
                   >
                     Delete
                   </button>

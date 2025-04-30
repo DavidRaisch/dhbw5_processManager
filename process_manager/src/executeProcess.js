@@ -10,6 +10,7 @@ function ExecuteProcess() {
   const location = useLocation();
   const navigate = useNavigate();
   const instanceIdFromNotification = location.state?.instanceId;
+  const notificationIdFromNotification = location.state?.notificationId;
 
   // State management
   const [processList, setProcessList] = useState([]);
@@ -22,6 +23,7 @@ function ExecuteProcess() {
   const [userProjects, setUserProjects] = useState([]); 
   const [selectedElementDetails, setSelectedElementDetails] = useState(null);
   const [assignedProjectName, setAssignedProjectName] = useState(''); // State for project name
+  const [pendingNotificationId, setPendingNotificationId] = useState(null);
 
   // State for generic alert modal
   const [showAlertModal, setShowAlertModal] = useState(false);
@@ -42,13 +44,20 @@ function ExecuteProcess() {
 
   // Clear location state after processing it.
   useEffect(() => {
-    if (instanceIdFromNotification) {
+    const instId = instanceIdFromNotification;
+    const notifId = notificationIdFromNotification;
+    if (instId || notifId) {
       navigate(location.pathname, { replace: true });
-      setSelectedInstanceId(instanceIdFromNotification);
-      setSelectedProcess(null);
-      setSelectedElementDetails(null);
+      if (instId) {
+        setSelectedInstanceId(instId);
+        setSelectedProcess(null);
+        setSelectedElementDetails(null);
+      }
+      if (notifId) {
+        setPendingNotificationId(notifId);
+      }
     }
-  }, [instanceIdFromNotification, location.pathname, navigate]);
+  }, [instanceIdFromNotification, notificationIdFromNotification, location.pathname, navigate]);
 
   // User and project initialization
   useEffect(() => {
@@ -443,6 +452,41 @@ function ExecuteProcess() {
     ? selectedInstance.sequenceMap[selectedInstance.position] || []
     : [];
 
+  // Manager response to instance approval requests
+  const respondToInstanceRequest = async (accepted) => {
+    if (!pendingNotificationId || !selectedInstance) return;
+    try {
+      // Remove original notification
+      await axios.delete(`http://localhost:5001/api/notifications/${pendingNotificationId}`);
+      // Notify employee
+      await axios.post('http://localhost:5001/api/notifications', {
+        message: accepted
+          ? `Request accepted & continued to next step for instance "${selectedInstance.instanceName}".`
+          : `Request denied for instance "${selectedInstance.instanceName}".`,
+        instanceId: selectedInstance._id,
+        requestedBy: currentUser.username,
+        requestedById: currentUser._id,
+        targetRole: 'Employee',
+        status: accepted ? 'approved' : 'dismissed',
+        project: selectedInstance.project?._id || selectedInstance.project
+      });
+      if (accepted) {
+        const nextElements = selectedInstance.sequenceMap[selectedInstance.position] || [];
+        if (nextElements.length === 0) {
+          await finishProcess(selectedInstanceId);
+        } else {
+          handleNextStep(selectedInstanceId);
+        }
+      }
+      triggerAlert('Success', accepted ? 'Request accepted & moved to next step.' : 'Request denied.');
+      // Exit notification mode: revert to normal controls
+      setPendingNotificationId(null);
+    } catch (err) {
+      console.error('Error responding to request:', err);
+      triggerAlert('Error', 'Error processing request.');
+    }
+  };
+
   return (
     <>
       {/* Universal Top Navigation Bar */}
@@ -614,29 +658,29 @@ function ExecuteProcess() {
                             </div>
                           ) : (
                             <>
-                              {selectedInstance.gatewayChoices?.length > 0 ? (
-                                <div className="p-3 border rounded">
-                                  <h5>Select Path:</h5>
-                                  <div className="d-flex flex-wrap gap-2 justify-content-center">
-                                    {selectedInstance.gatewayChoices.map((choice) => (
-                                      <button
-                                        key={choice.target}
-                                        onClick={() => handleGatewayChoice(selectedInstanceId, choice.target)}
-                                        className="btn btn-primary"
-                                      >
-                                        {choice.name}
-                                      </button>
-                                    ))}
-                                  </div>
+                              {pendingNotificationId ? (
+                                <div className="d-flex flex-column align-items-center gap-2">
+                                  {nextElements.length === 0 ? (
+                                    <button onClick={() => respondToInstanceRequest(true)} className="btn btn-success w-auto">
+                                      Accept Request & Complete Process
+                                    </button>
+                                  ) : (
+                                    <button onClick={() => respondToInstanceRequest(true)} className="btn btn-success w-auto">
+                                      Accept Request & Continue to Next Step
+                                    </button>
+                                  )}
+                                  <button onClick={() => respondToInstanceRequest(false)} className="btn btn-danger w-auto">
+                                    Deny Request
+                                  </button>
                                 </div>
                               ) : (
                                 <div className="d-flex justify-content-center gap-2">
                                   {nextElements.length === 0 ? (
-                                    <button onClick={() => finishProcess(selectedInstanceId)} className="btn btn-success">
+                                    <button onClick={() => finishProcess(selectedInstanceId)} className="btn btn-success w-auto">
                                       Complete Process
                                     </button>
                                   ) : (
-                                    <button onClick={() => handleNextStep(selectedInstanceId)} className="btn btn-primary">
+                                    <button onClick={() => handleNextStep(selectedInstanceId)} className="btn btn-primary w-auto">
                                       Continue to Next Step &rarr;
                                     </button>
                                   )}
@@ -729,15 +773,3 @@ function ExecuteProcess() {
 }
 
 export default ExecuteProcess;
-
-
-
-/** Additional Improvments */
-//TODO: OPTIONAL: Search Bar for available Processes
-
-
-/** Notes for report => Kann-Anforderungen */
-//Only processes and instances of the assigned projects are displayed for every user
-//User gets only notification to his projects
-
-//AUSBLICK: Historie von jeder Instanz wird gespeichert und kann in den archivierten Intanzen aufgerufen werden, dient als Vorteil, um im nachhinein nachvollzuziehen, was gemacht wurde, wann. etc.
