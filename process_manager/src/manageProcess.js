@@ -599,20 +599,6 @@ function ManageProcess() {
       const newProjName = availableProjects.find(p => p._id === selectedProject)?.name || selectedProject;
       items.unshift(`Project changed: '${oldProjName}' → '${newProjName}'`);
     }
-    // Detect role/description changes
-    const registry = bpmnModeler.current.get('elementRegistry');
-    registry.getAll().forEach(el => {
-      const bo = el.businessObject;
-      const init = initialProps[el.id] || {};
-      const newRole = bo['role:role'] || bo.role || '';
-      if (init.role !== newRole) {
-        items.push(`${bo.name || el.id}: role changed: '${init.role}' → '${newRole}'`);
-      }
-      const newDesc = bo.description || '';
-      if (init.description !== newDesc) {
-        items.push(`${bo.name || el.id}: description changed: '${init.description}' → '${newDesc}'`);
-      }
-    });
     setChangeItems(items);
     setPreviewType(type);
     setShowPreviewModal(true);
