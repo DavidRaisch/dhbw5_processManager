@@ -848,6 +848,12 @@ function ManageProcess() {
                       <button onClick={handleDenyRequest} className="btn btn-danger">Deny Request</button>
                     </>
                   )}
+                  {notificationId && user.role === 'Manager' && notifRequestType === 'delete' && !showDeletionApprovalModal && (
+                    <>
+                      <button onClick={() => handleApproveDeletion()} className="btn btn-success me-2">Approve Deletion</button>
+                      <button onClick={() => handleDenyDeletion()} className="btn btn-danger">Deny Deletion</button>
+                    </>
+                  )}
                   {!notificationId && (
                     <button
                       onClick={() => handlePreviewChanges(user.role === 'Employee' ? 'request' : 'save')}
@@ -1016,7 +1022,7 @@ function ManageProcess() {
               <p>Do you want to approve deletion of process "{processName}"?</p>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={() => setShowDeletionApprovalModal(false)}>Cancel</button>
+              <button type="button" className="btn btn-secondary me-2" onClick={() => setShowDeletionApprovalModal(false)}>Show Process</button>
               <button type="button" className="btn btn-success" onClick={() => { handleApproveDeletion(); setShowDeletionApprovalModal(false); }}>Approve</button>
               <button type="button" className="btn btn-danger" onClick={() => { handleDenyDeletion(); setShowDeletionApprovalModal(false); }}>Deny</button>
             </div>
