@@ -69,11 +69,11 @@ function Notifications() {
 
   // When a notification is clicked, navigate appropriately.
   const handleNotificationClick = (notif) => {
-    if (notif.processId) {
-      // Navigate to process management for employee request
+    // For save/delete requests, always navigate to process management
+    if (notif.requestType === 'save' || notif.requestType === 'delete') {
       navigate('/manage-process', { state: { notificationId: notif._id } });
     } else if (notif.instanceId) {
-      // Navigate to execution for instance-related notifications with notification id
+      // Navigate to execution for instance-related notifications
       navigate('/execute-process', { state: { instanceId: notif.instanceId, notificationId: notif._id } });
     }
   };

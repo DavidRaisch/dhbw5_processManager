@@ -27,6 +27,7 @@ mongoose
     message: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
     instanceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Instance'},
+    requestType: { type: String, enum: ['save','delete'], default: 'save' },
     requestedBy: { type: String, required: true },
     requestedById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     targetRole: { type: String, enum: ['Admin', 'Manager', 'Employee'], default: 'Manager' },
@@ -46,7 +47,7 @@ mongoose
 // Create a new notification
 app.post('/api/notifications', async (req, res) => {
   console.log('[Notifications] POST /api/notifications body:', req.body);
-  const { message, instanceId, requestedBy, requestedById, targetRole, status, project, processName, xml, processId } = req.body;
+  const { message, instanceId, requestedBy, requestedById, targetRole, status, project, processName, xml, processId, requestType } = req.body;
   if (!message || !requestedBy || !requestedById || !project) {
     return res.status(400).json({ error: 'Missing required fields for notification.' });
   }
@@ -54,6 +55,7 @@ app.post('/api/notifications', async (req, res) => {
     const notification = new Notification({
       message,
       instanceId,
+      requestType: requestType || 'save',
       requestedBy,
       requestedById,
       targetRole: targetRole || 'Manager',

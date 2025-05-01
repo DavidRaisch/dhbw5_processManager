@@ -41,6 +41,8 @@ function ManageProcess() {
   const [requesterName, setRequesterName] = useState('');
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewType, setPreviewType] = useState(null);
+  const [notifRequestType, setNotifRequestType] = useState(null);
+  const [showDeletionApprovalModal, setShowDeletionApprovalModal] = useState(false);
   const [initialProps, setInitialProps] = useState({});
   
   // State for delete confirmation modal.
@@ -89,6 +91,9 @@ function ManageProcess() {
       axios.get(`http://localhost:5001/api/notifications/${notifId}`)
         .then(res => {
           const notif = res.data;
+          const type = notif.requestType || 'save';
+          setNotifRequestType(type);
+          setShowDeletionApprovalModal(type === 'delete');
           setProposedXml(notif.xml);
           setRequesterId(notif.requestedById);
           setRequesterName(notif.requestedBy);
@@ -183,9 +188,25 @@ function ManageProcess() {
         initialXmlRef.current = xml;
       })
       .then(recordInitialState)
-      .catch(console.error);
-  
-    // When an element is clicked, update selected element and load its role/description.
+      .then(() => {
+        setProcessName('');
+        setSelectedElement(null);
+        setRole('');
+        setDescription('');
+        setSelectedProject('');
+        setInitialProcessName('');
+        setInitialSelectedProject('');
+        setCurrentProcessId(null);
+        const stack = bpmnModeler.current.get('commandStack');
+        stack.clear();
+        setHasModelChanged(false);
+        setHasUiChanged(false);
+      })
+      .catch((err) => {
+        console.error('Error creating new diagram:', err);
+        triggerAlert('Error', 'An error occurred while creating a new process.');
+      });
+    // Restore element selection and change detection
     bpmnModeler.current.on('element.click', (event) => {
       const element = event.element;
       setSelectedElement(element);
@@ -194,15 +215,12 @@ function ManageProcess() {
       setRole(loadedRole);
       setDescription(businessObject.description || '');
     });
-    // Track model changes via XML diff on any command change
-    {
-      const eventBus = bpmnModeler.current.get('eventBus');
-      eventBus.on('commandStack.changed', async () => {
-        const { xml: currentXml } = await bpmnModeler.current.saveXML({ format: false });
-        setHasModelChanged(currentXml !== initialXmlRef.current);
-      });
-    }
-  
+    const eventBus = bpmnModeler.current.get('eventBus');
+    eventBus.on('commandStack.changed', async () => {
+      const { xml: currentXml } = await bpmnModeler.current.saveXML({ format: false });
+      setHasModelChanged(currentXml !== initialXmlRef.current);
+    });
+
     // Only fetch processes after userProjects is loaded.
     // We also fetch available projects.
     fetchAvailableProjects();
@@ -338,6 +356,32 @@ function ManageProcess() {
           triggerAlert('Error', `Request failed: ${errorMsg}`);
         });
     });
+  };
+
+  const requestDeletion = async (processId) => {
+    try {
+      const res = await axios.get(`http://localhost:5001/api/processes/${processId}`);
+      const proc = res.data;
+      const payload = {
+        message: `Employee ${user.username} requested deletion of process "${proc.name}".`,
+        instanceId: null,
+        requestedBy: user.username,
+        requestedById: user._id,
+        targetRole: 'Manager',
+        status: 'pending',
+        project: proc.project,
+        processName: proc.name,
+        processId: proc._id,
+        xml: proc.xml,
+        requestType: 'delete',
+      };
+      await axios.post('http://localhost:5001/api/notifications', payload);
+      triggerAlert('Success', 'Deletion request sent to Manager.');
+    } catch (err) {
+      console.error('Error sending deletion request:', err.response?.data || err);
+      const errorMsg = err.response?.data?.error || err.message || 'Error sending deletion request.';
+      triggerAlert('Error', `Request failed: ${errorMsg}`);
+    }
   };
 
   const handleSaveToDatabase = () => {
@@ -654,6 +698,51 @@ function ManageProcess() {
       .catch(err => { console.error(err); triggerAlert('Error', 'Error denying request.'); });
   };
 
+  const handleApproveDeletion = () => {
+    axios.delete(`http://localhost:5001/api/processes/${currentProcessId}`)
+      .then(() => {
+        // notify employee
+        axios.post('http://localhost:5001/api/notifications', {
+          message: `Manager ${user.username} approved your deletion request for process "${processName}".`,
+          instanceId: null,
+          requestedBy: user.username,
+          requestedById: user._id,
+          targetRole: 'Employee',
+          status: 'approved',
+          project: selectedProject,
+          processName,
+          processId: currentProcessId,
+        });
+        if (notificationId) axios.delete(`http://localhost:5001/api/notifications/${notificationId}`);
+        triggerAlert('Success', 'Request approved and process deleted');
+        setNotificationId(null);
+        setCurrentProcessId(null);
+      })
+      .catch(err => {
+        console.error(err);
+        triggerAlert('Error', 'Error deleting process.');
+      });
+  };
+
+  const handleDenyDeletion = () => {
+    // notify employee
+    axios.post('http://localhost:5001/api/notifications', {
+      message: `Manager ${user.username} denied your deletion request for process "${processName}".`,
+      instanceId: null,
+      requestedBy: user.username,
+      requestedById: user._id,
+      targetRole: 'Employee',
+      status: 'denied',
+      project: selectedProject,
+      processName,
+      processId: currentProcessId,
+    });
+    if (notificationId) axios.delete(`http://localhost:5001/api/notifications/${notificationId}`);
+    triggerAlert('Denied', 'Request denied');
+    setNotificationId(null);
+    setCurrentProcessId(null);
+  };
+
   return (
     <>
       {/* Universal Top Navigation Bar */}
@@ -674,6 +763,14 @@ function ManageProcess() {
                     <button onClick={() => loadProcessLatest(process._id)} className="btn btn-sm btn-primary me-2">
                       Load
                     </button>
+                    {user?.role === 'Employee' && (
+                      <button
+                        onClick={() => requestDeletion(process._id)}
+                        className="btn btn-sm btn-danger me-2"
+                      >
+                        Request Deletion
+                      </button>
+                    )}
                     {user?.role === 'Manager' && (
                       <button
                         onClick={() => { setProcessToDelete(process._id); setShowDeleteModal(true); }}
@@ -745,13 +842,18 @@ function ManageProcess() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  {notificationId && user.role === 'Manager' ? (
-                    <>  
+                  {notificationId && user.role === 'Manager' && notifRequestType === 'save' && (
+                    <>
                       <button onClick={handleApproveRequest} className="btn btn-success me-2">Approve Request</button>
                       <button onClick={handleDenyRequest} className="btn btn-danger">Deny Request</button>
                     </>
-                  ) : (
-                    <button onClick={() => handlePreviewChanges(user.role === 'Employee' ? 'request' : 'save')} disabled={!(hasModelChanged || hasUiChanged)} className="btn btn-primary me-2">
+                  )}
+                  {!notificationId && (
+                    <button
+                      onClick={() => handlePreviewChanges(user.role === 'Employee' ? 'request' : 'save')}
+                      disabled={!(hasModelChanged || hasUiChanged)}
+                      className="btn btn-primary me-2"
+                    >
                       {user.role === 'Employee' ? 'Request Save' : 'Save to Database'}
                     </button>
                   )}
@@ -901,6 +1003,27 @@ function ManageProcess() {
         </div>
       </div>
       {showAlertModal && <div className="modal-backdrop fade show"></div>}
+  
+      {/* Deletion Approval Modal */}
+      <div className={`modal fade ${showDeletionApprovalModal ? "show d-block" : ""}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Deletion Request</h5>
+              <button type="button" className="btn-close" onClick={() => setShowDeletionApprovalModal(false)} aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <p>Do you want to approve deletion of process "{processName}"?</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowDeletionApprovalModal(false)}>Cancel</button>
+              <button type="button" className="btn btn-success" onClick={() => { handleApproveDeletion(); setShowDeletionApprovalModal(false); }}>Approve</button>
+              <button type="button" className="btn btn-danger" onClick={() => { handleDenyDeletion(); setShowDeletionApprovalModal(false); }}>Deny</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showDeletionApprovalModal && <div className="modal-backdrop fade show"></div>}
   
       {/* Preview Changes Modal */}
       {showPreviewModal && (
