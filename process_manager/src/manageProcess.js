@@ -717,6 +717,7 @@ function ManageProcess() {
         triggerAlert('Success', 'Request approved and process deleted');
         setNotificationId(null);
         setCurrentProcessId(null);
+        fetchProcesses(); // Refresh the list of saved processes
       })
       .catch(err => {
         console.error(err);
