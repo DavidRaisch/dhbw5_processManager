@@ -78,39 +78,6 @@ function Notifications() {
     }
   };
 
-  // Approve a notification.
-  const approveNotification = async (notif) => {
-    try {
-      if (notif.xml && notif.processName) {
-        // Approve process request: save or overwrite process
-        await axios.post('http://localhost:5001/api/processes', {
-          name: notif.processName,
-          xml: notif.xml,
-          project: notif.project?._id || notif.project
-        });
-        // Remove notification
-        await axios.delete(`http://localhost:5001/api/notifications/${notif._id}`);
-        alert('Process request approved and saved.');
-        setNotifications(prev => prev.filter(n => n._id !== notif._id));
-      } else if (notif.instanceId) {
-        // Approve instance request
-        const regex = /instance "([^"]+)"/;
-        const match = notif.message.match(regex);
-        const instanceName = match ? match[1] : 'this instance';
-        const updates = {
-          targetRole: 'Employee',
-          status: 'approved',
-          message: `Your approval request for instance "${instanceName}" has been approved.`,
-        };
-        await axios.put(`http://localhost:5001/api/notifications/${notif._id}`, updates);
-        setNotifications(prev => prev.filter(n => n._id !== notif._id));
-      }
-    } catch (err) {
-      console.error('Error approving notification:', err.response?.data || err);
-      alert('Error approving notification');
-    }
-  };
-
   // Delete a notification.
   const deleteNotification = async (notificationId) => {
     try {
