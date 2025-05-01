@@ -154,6 +154,12 @@ function ManageProcess() {
   // Automatically compute and show diff when a notification is loaded
   useEffect(() => {
     if (notificationId && proposedXml) {
+      // If it's a save request for a new process, show single message
+      if (notifRequestType === 'save' && !currentProcessId) {
+        setDiffText([]);
+        setChangeItems(['New Process will be created']);
+        return;
+      }
       const baseXml = originalXml || '';
       const diffs = diffLines(baseXml, proposedXml);
       setDiffText(diffs);
@@ -170,7 +176,7 @@ function ManageProcess() {
       }
       setChangeItems(items);
     }
-  }, [notificationId, originalXml, proposedXml, processName, selectedProject, originalProcessName, originalProject, availableProjects]);
+  }, [notificationId, originalXml, proposedXml, processName, selectedProject, originalProcessName, originalProject, availableProjects, notifRequestType, currentProcessId]);
   
   // Initialize BPMN modeler and fetch processes & available projects.
   useEffect(() => {
@@ -1091,7 +1097,5 @@ export default ManageProcess;
 
 /** Things to clear */
 //does flows and process need a role and description? Do role and description have to be mandatory in general?
-//should flows after gateways be requiered to be named?
-
 //should the creating a new process be priveliged to some user?
 //make creating a process dependable on role of the user: Employer: needs permission from supervisior to create new process; Manager: can simply create a new Process
