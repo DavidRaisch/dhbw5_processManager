@@ -447,6 +447,7 @@ function ManageProcess() {
             }
           };
           notify();
+          window.location.reload();
         })
         .catch((err) => {
           console.error('Error saving process:', err);
