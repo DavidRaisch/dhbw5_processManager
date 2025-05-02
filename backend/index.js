@@ -454,6 +454,24 @@ app.delete('/api/processes/:id', async (req, res) => {
   }
 });
 
+// Update Process Endpoint (PUT /api/processes/:id)
+app.put('/api/processes/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, xml, project } = req.body;
+  if (!name || !xml) return res.status(400).json({ error: 'Name and XML are required.' });
+  try {
+    const process = await Process.findById(id);
+    if (!process) return res.status(404).json({ error: 'Process not found.' });
+    process.name = name;
+    process.xml = xml;
+    process.project = project;
+    await process.save();
+    res.json({ message: 'Process updated successfully.', process });
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating process.' });
+  }
+});
+
 // Instances endpoints remain unchanged.
 app.post('/api/instances', async (req, res) => {
   try {

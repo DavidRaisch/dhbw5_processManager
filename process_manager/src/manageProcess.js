@@ -409,8 +409,11 @@ function ManageProcess() {
       return;
     }
     bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
-      axios
-        .post('http://localhost:5001/api/processes', { name: processName, xml, project: selectedProject })
+      const payload = { name: processName, xml, project: selectedProject };
+      const req = currentProcessId
+        ? axios.put(`http://localhost:5001/api/processes/${currentProcessId}`, payload)
+        : axios.post('http://localhost:5001/api/processes', payload);
+      req
         .then((response) => {
           triggerAlert('Success', response.data.message);
           fetchProcesses();
@@ -657,7 +660,11 @@ function ManageProcess() {
   // Manager approves request
   const handleApproveRequest = () => {
     bpmnModeler.current.saveXML({ format: true }).then(({ xml }) => {
-      axios.post('http://localhost:5001/api/processes', { name: processName, xml, project: selectedProject })
+      const payload = { name: processName, xml, project: selectedProject };
+      const req = currentProcessId
+        ? axios.put(`http://localhost:5001/api/processes/${currentProcessId}`, payload)
+        : axios.post('http://localhost:5001/api/processes', payload);
+      req
         .then(() => {
           // notify employee
           axios.post('http://localhost:5001/api/notifications', {
@@ -676,6 +683,7 @@ function ManageProcess() {
           if (requesterId) axios.delete(`http://localhost:5001/api/notifications/${notificationId}`);
           triggerAlert('Success', 'Request approved and process saved');
           setNotificationId(null);
+          fetchProcesses(); // Refresh saved processes list
         })
         .catch(err => { console.error(err); triggerAlert('Error', 'Error approving request.'); });
     });
