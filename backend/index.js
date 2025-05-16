@@ -27,7 +27,7 @@ mongoose
     message: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
     instanceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Instance'},
-    requestType: { type: String, enum: ['save','delete'], default: 'save' },
+    requestType: { type: String, enum: ['save','delete', ''], default: '' },
     requestedBy: { type: String, required: true },
     requestedById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     targetRole: { type: String, enum: ['Admin', 'Manager', 'Employee'], default: 'Manager' },
@@ -55,7 +55,7 @@ app.post('/api/notifications', async (req, res) => {
     const notification = new Notification({
       message,
       instanceId,
-      requestType: requestType || 'save',
+      requestType,
       requestedBy,
       requestedById,
       targetRole: targetRole || 'Manager',

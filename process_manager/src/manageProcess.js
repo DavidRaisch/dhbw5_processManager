@@ -349,7 +349,8 @@ function ManageProcess() {
         project: selectedProject,
         processName: processName,
         processId: currentProcessId,
-        xml
+        xml,
+        requestType: 'save'
       };
       console.log('requestProcess payload:', notificationPayload);
       axios.post('http://localhost:5001/api/notifications', notificationPayload)
@@ -433,7 +434,7 @@ function ManageProcess() {
               requestedById: user._id,
               targetRole: 'Manager',
               status: 'pending',
-              project: selectedProject
+              project: selectedProject,
             }).catch(err => {
               console.error('Error sending notification:', err);
             });
