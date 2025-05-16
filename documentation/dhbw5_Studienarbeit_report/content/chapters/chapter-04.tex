@@ -1,0 +1,26 @@
+%!TEX root = ../../document/document.tex
+
+% For every chapter create a file in the /content/chapters folder with the name
+% chapter-XX.tex where XX is the chapter number  (e.g. 01, 02, 03, ..., 99).
+
+
+\chapter{Fazit und Ausblick}
+\section*{Fazit}
+\todo{Kapitel Fazit schreiben}
+% Die Arbeit zeigt, dass moderne IT-Infrastrukturen unter Einsatz von Technologien wie Docker, Terraform und Ansible effizient konzipiert und automatisiert bereitgestellt werden können. Die containerisierte Web-Applikation wird über standardisierte APIs mit externen Diensten, wie etwa dem Translator, verbunden und demonstriert so, dass eine modulare Integration von \ac{SaaS}- und \ac{PaaS}-Komponenten in eine Cloud-Umgebung gelingen kann. Die Verwendung von \ac{IaC} ermöglicht es, die gesamte Infrastruktur reproduzierbar und skalierbar zu realisieren. Durch die Automatisierung von Bereitstellungsprozessen werden manuelle Eingriffe minimiert und die Zuverlässigkeit der Systeme gesteigert. Insgesamt belegt das Projekt, dass eine systematische Herangehensweise an die Komplexität moderner IT-Systeme zu einer effizienten und wartungsfreundlichen Lösung führt.
+
+\newpage
+\section*{Ausblick}
+Im Rahmen der vorliegenden Studienarbeit konnten aufgrund begrenzter zeitlicher und inhaltlicher Ressourcen nicht alle potenziellen Erweiterungen und Funktionalitäten umgesetzt werden. Während der Entwicklung wurde eine lokale Datenbank eingesetzt, da sie für den prototypischen Charakter des Projekts eine einfache und effiziente Lösung darstellt. Diese Datenbank ermöglicht jedoch keine persistente Speicherung über unterschiedliche Systemstarts oder Systemumgebungen hinweg und ist daher für den produktiven Einsatz nicht geeignet.
+Für den späteren produktiven Betrieb empfiehlt sich daher die Ablösung der lokalen Datenbank durch eine persistent verfügbare Lösung, beispielsweise eine Cloud-Datenbank oder eine zentral auf einem Firmenserver gehostete Datenbank. Welche Variante gewählt wird, hängt maßgeblich von zukünftigen Anforderungen und Rahmenbedingungen im produktiven Einsatz ab – insbesondere im Hinblick auf Skalierbarkeit, Zugriffssicherheit und Integration in bestehende Systemlandschaften. Da diese Anforderungen zum Zeitpunkt der Studienarbeit nicht definiert werden können, wird auf eine frühzeitige Integration einer solchen Lösung bewusst verzichtet. Die lokale Datenbank verbleibt somit als temporäre Lösung im Rahmen der Entwicklungsumgebung. Es ist ausdrücklich darauf hinzuweisen, dass diese nicht für den produktiven Betrieb vorgesehen ist.
+
+Darüber hinaus sind weitere Funktionalitäten identifiziert worden, die potenziell einen Mehrwert für die Benutzerfreundlichkeit und Erweiterbarkeit des Systems bieten würden. So könnte beispielsweise eine Funktion implementiert werden, die es dem Benutzer erlaubt, neue Prozesse über die grafische Benutzeroberfläche zu laden. Dabei würde die zugehörige XML-Datei direkt in die Datenbank übernommen und der neue Prozess würde anschließend zur Bearbeitung zur Verfügung stehen.
+
+Ein weiteres Beispiel ist die Möglichkeit, den Drag-and-Drop-Arbeitsbereich auf Knopfdruck zu vergrößern, sodass der Nutzer den gesamten Bildschirm zur Bearbeitung von Prozessen nutzen kann. Solche Erweiterungen würden die Interaktion mit dem System verbessern und die Effizienz bei der Prozessmodellierung erhöhen.
+
+Diese Beispiele verdeutlichen, dass Softwareprojekte grundsätzlich einem iterativen Entwicklungsprozess unterliegen. Sie werden durch Rückmeldungen von Anwendern und sich ändernde Anforderungen kontinuierlich weiterentwickelt. Auch das hier vorgestellte System bietet Potenzial für zukünftige Funktionserweiterungen, die im Rahmen weiterer Arbeiten oder eines produktiven Einsatzes realisiert werden könnten.
+
+\todo{Komplette Arbeit nochmal lesen}
+
+
+

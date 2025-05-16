@@ -1,0 +1,87 @@
+\babel@toc {ngerman}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Beispiel für EPK-Aufbau}}{8}{figure.3.1}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Beispiel für BPMN-Aufbau}}{10}{figure.3.2}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Login-Fenster des ProcessManagers}}{13}{figure.3.3}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Startseite des ProcessManagers}}{13}{figure.3.4}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Drag-and-Drop- und Code-basierte Methode}}{14}{figure.3.5}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Interface für das Auswählen eines Prozesses}}{17}{figure.3.6}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Interface bei einem gestarteten Prozess}}{17}{figure.3.7}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Zusatzinforamtionen eines Events}}{18}{figure.3.8}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Prozess ausführen mit Zugriffsmanagement}}{18}{figure.3.9}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Interface für das Bearbeiten eines Prozesses}}{19}{figure.3.10}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Abfrage für Löschen eines Prozesses}}{19}{figure.3.11}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Szenarien beim Löschen von Prozessen}}{20}{figure.3.12}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Die Projektstruktur des Process-Managers}}{31}{figure.4.1}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Die Login-Seite des Process-Managers}}{33}{figure.4.2}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Die Überprüfung der Get-Abfrage der Benutzer mit Postman}}{38}{figure.4.3}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Die Benutzer Start-Seite}}{39}{figure.4.4}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Die Navigationsleiste von Administratoren}}{40}{figure.4.5}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Das Formular zur Erstellung neuer Projekte}}{41}{figure.4.6}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Die Fehlernachricht des Projekt-Erstellungsprozess bei ungültiger Eingabe}}{41}{figure.4.7}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Die Tabelle der erstellten Projekten}}{42}{figure.4.8}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Das seperate Fenster mit Projekt-Informationen}}{43}{figure.4.9}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Das Formular zum Bearbeiten eines erstellten Projekts}}{43}{figure.4.10}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Das Formular zur Erstellung neuer Benutzer}}{45}{figure.4.11}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Die Fehlernachricht des Benutzer-Erstllungsprozess bei ungültiger Eingabe}}{46}{figure.4.12}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Die Tabelle der erstellten Benutzer}}{48}{figure.4.13}%
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Das Formular zum Bearbeiten eines erstellten Benutzers}}{49}{figure.4.14}%
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Das sepereate Eingabefeld zum Password ändern}}{50}{figure.4.15}%
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Die Navigationsleiste von Benutzer}}{51}{figure.4.16}%
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Das Dropdown-Feld mit den Benutzerinformationen}}{51}{figure.4.17}%
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Die Passwortänderungsseite für den Benutzer}}{52}{figure.4.18}%
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Die Benachrichtigung-Seite für alle Benutzer}}{55}{figure.4.19}%
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Eine Benachrichtigung des Typs Anfrage}}{56}{figure.4.20}%
+\contentsline {figure}{\numberline {4.21}{\ignorespaces Eine Benachrichtigung des Typs Anfrage}}{56}{figure.4.21}%
+\contentsline {figure}{\numberline {4.22}{\ignorespaces Übersicht über die ManageProcess-Seite}}{59}{figure.4.22}%
+\contentsline {figure}{\numberline {4.23}{\ignorespaces BPMN-Editor mit geladenem Prozess}}{61}{figure.4.23}%
+\contentsline {figure}{\numberline {4.24}{\ignorespaces Das Prozess-Informationsfenster eines Managers}}{61}{figure.4.24}%
+\contentsline {figure}{\numberline {4.25}{\ignorespaces Das Fenster für die Zuweisung von Role und Beschreibung eines Elements}}{62}{figure.4.25}%
+\contentsline {figure}{\numberline {4.26}{\ignorespaces Die Fehlernachricht bei fehlenden Rollen und Beschreibungen}}{63}{figure.4.26}%
+\contentsline {figure}{\numberline {4.27}{\ignorespaces Die Übersicht der Änderungen im Modal}}{64}{figure.4.27}%
+\contentsline {figure}{\numberline {4.28}{\ignorespaces Die Benachrichtigung für den Änderungsantrag}}{65}{figure.4.28}%
+\contentsline {figure}{\numberline {4.29}{\ignorespaces Der Änderungsantrag aus Sicht des Managers}}{65}{figure.4.29}%
+\contentsline {figure}{\numberline {4.30}{\ignorespaces Der Änderungsantrag bei Erstellen eines neuen Prozesses}}{66}{figure.4.30}%
+\contentsline {figure}{\numberline {4.31}{\ignorespaces Die negative Rückmeldung des Änderungsantrags}}{66}{figure.4.31}%
+\contentsline {figure}{\numberline {4.32}{\ignorespaces Die Prozess-Liste aus Sicht eines Managers}}{67}{figure.4.32}%
+\contentsline {figure}{\numberline {4.33}{\ignorespaces Die Bestätigungsfrage vor dem Löschen eines Prozesses}}{68}{figure.4.33}%
+\contentsline {figure}{\numberline {4.34}{\ignorespaces Die Prozess-Liste aus Sicht eines Employee}}{69}{figure.4.34}%
+\contentsline {figure}{\numberline {4.35}{\ignorespaces Die Anfrage für das Löschen des Prozesses}}{69}{figure.4.35}%
+\contentsline {figure}{\numberline {4.36}{\ignorespaces Das Modal-Fenster für die Anfrage zum Löschen}}{70}{figure.4.36}%
+\contentsline {figure}{\numberline {4.37}{\ignorespaces Das Prozess-Informations Feld für die Anfrage zum Löschen}}{70}{figure.4.37}%
+\contentsline {figure}{\numberline {4.38}{\ignorespaces Die postive Rückmeldung nach Anfrage zum Löschen}}{71}{figure.4.38}%
+\contentsline {figure}{\numberline {4.39}{\ignorespaces Die vollständige Execute Process-Seite}}{73}{figure.4.39}%
+\contentsline {figure}{\numberline {4.40}{\ignorespaces Die Execute Process-Seite mit angeklickenden Prozess}}{74}{figure.4.40}%
+\contentsline {figure}{\numberline {4.41}{\ignorespaces Die Execute Process-Seite mit angeklickender Instanz}}{75}{figure.4.41}%
+\contentsline {figure}{\numberline {4.42}{\ignorespaces Die Ansicht eines Employee für eine Genehmigungsanfrage}}{77}{figure.4.42}%
+\contentsline {figure}{\numberline {4.43}{\ignorespaces Die Beanchrichtigung für die Genehmigungsanfrage}}{77}{figure.4.43}%
+\contentsline {figure}{\numberline {4.44}{\ignorespaces Die Ansicht der Genehmigungsentscheidung}}{78}{figure.4.44}%
+\contentsline {figure}{\numberline {4.45}{\ignorespaces Die Rückmeldung auf die Genehmigungsanfrage}}{78}{figure.4.45}%
+\contentsline {figure}{\numberline {4.46}{\ignorespaces Das Element Informations-Feld}}{79}{figure.4.46}%
+\contentsline {figure}{\numberline {4.47}{\ignorespaces Die Seite mit allen archivierten Instanzen}}{80}{figure.4.47}%
+\contentsline {figure}{\numberline {4.48}{\ignorespaces Der Mini-Kalender zur Datum-Auswahl}}{81}{figure.4.48}%
+\contentsline {figure}{\numberline {4.49}{\ignorespaces Hinweis auf aktive Instanzen am Filter-Symbol}}{81}{figure.4.49}%
+\contentsline {figure}{\numberline {4.50}{\ignorespaces Hinweis auf keine passende Instanzen mit den gewählten Filter}}{82}{figure.4.50}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A1}{\ignorespaces Fehlernachricht beim Login -- leeres Login-Feld}}{A}{figure.Alph0.1}%
+\contentsline {figure}{\numberline {A2}{\ignorespaces Fehlernachricht beim Login -- falsche Anmeldedaten}}{A}{figure.Alph0.2}%
+\contentsline {figure}{\numberline {A3}{\ignorespaces Die Admin Start-Seite}}{D}{figure.Alph0.3}%
+\contentsline {figure}{\numberline {A4}{\ignorespaces Die vollständige Projektverwaltungs-Seite}}{E}{figure.Alph0.4}%
+\contentsline {figure}{\numberline {A5}{\ignorespaces Sicherheitsabfrage vor dem Löschen eines erstellten Projekts}}{E}{figure.Alph0.5}%
+\contentsline {figure}{\numberline {A6}{\ignorespaces Die vollständige Benutzerverwaltungs-Seite}}{F}{figure.Alph0.6}%
+\contentsline {figure}{\numberline {A7}{\ignorespaces Sicherheitsabfrage vor dem Löschen eines erstellten Benutzers}}{F}{figure.Alph0.7}%
+\contentsline {figure}{\numberline {A8}{\ignorespaces Fehlernachricht aufgrund eines falschen aktuellen Passwort}}{G}{figure.Alph0.8}%
+\contentsline {figure}{\numberline {A9}{\ignorespaces Fehlernachricht aufgrund nicht übereinstimmende neue Passwörter}}{H}{figure.Alph0.9}%
+\contentsline {figure}{\numberline {A10}{\ignorespaces Erfolgreiche Änderung des Passworts durch den Benutzer}}{I}{figure.Alph0.10}%
+\contentsline {figure}{\numberline {A11}{\ignorespaces Das Prozess-Informationsfenster eines Benutzers}}{M}{figure.Alph0.11}%
+\contentsline {figure}{\numberline {A12}{\ignorespaces Das Prozess-Informationsfenster eines Managers mit Änderungen}}{M}{figure.Alph0.12}%
+\contentsline {figure}{\numberline {A13}{\ignorespaces Die Fehlernachricht bei fehlendem Prozess-Namen}}{M}{figure.Alph0.13}%
+\contentsline {figure}{\numberline {A14}{\ignorespaces Die Fehlernachricht bei fehlendem Projekt}}{N}{figure.Alph0.14}%
+\contentsline {figure}{\numberline {A15}{\ignorespaces Die positive Rückmeldung des Änderungsantrags}}{N}{figure.Alph0.15}%
+\contentsline {figure}{\numberline {A16}{\ignorespaces Die negative Rückmeldung nach Anfrage zum Löschen}}{N}{figure.Alph0.16}%
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

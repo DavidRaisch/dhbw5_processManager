@@ -1,0 +1,48 @@
+%!TEX root = ../../document/document.tex
+
+
+%%%%%%%%%% Settings %%%%%%%%%%
+
+% Change spaces of tables
+\setlength{\tabcolsep}{10pt}
+\renewcommand{\arraystretch}{1.5}
+
+
+%%%%%%%%%% Create new save command %%%%%%%%%%
+
+\makeatletter
+
+% \savetable{<ID>}{<adjust_settings>}{<column_setting>}{<description>}{<content>}
+
+% adjust_settings: any settings for \begin{adjustbox} e.g. center
+% column_setting: any column settings for \begin{tabular} e.g. |c|c|c|c|c|c|
+% description: caption to show below the table
+% content: the content of the table
+\newcommand\savetable[5]{%
+    \@namedef{tab@#1}{
+        \begin{adjustbox}{#2, captionbelow={#4\label{tab:#1}}, nofloat=table}
+            \begin{tabular}[c]{#3}
+                \hline
+                #5
+            \end{tabular}
+        \end{adjustbox}
+    }
+}
+
+% \usetable{<ID>}
+\newcommand\usetable[1]{%
+    \@nameuse{tab@#1}
+}
+
+% Adds a shortcut to create a new row in a table
+\newcommand\tablerow[1]{%
+    #1\\
+    \hline
+}
+
+\makeatother
+
+
+%%%%%%%%%% Content %%%%%%%%%%
+
+\input{../content/additionals/tables.tex}

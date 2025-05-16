@@ -1,0 +1,85 @@
+%!TEX root = ../document/document.tex
+
+
+%%%%%%%%%% Settings %%%%%%%%%%
+
+% Add possibility for custom settings through key-value pairs
+\newcommand{\setting}[1]{
+    \expandafter\newcommand\csname #1\endcsname{}
+    \expandafter\newcommand\csname set#1\endcsname[1]{\expandafter\renewcommand\csname#1\endcsname{##1}}
+}
+
+
+%%%%%%%%%% Content %%%%%%%%%%
+
+\setting{lang}
+
+\setting{titlestr}
+\setting{papertype}
+\setting{degree}
+\setting{studycourse}
+\setting{uni}
+\setting{unilocation}
+\setting{authorstr}
+\setting{submissiondate}
+\setting{startdate}
+\setting{processingtime}
+\setting{studentid}
+\setting{course}
+\setting{company}
+\setting{companylocation}
+\setting{supervisor}
+\setting{reviewer}
+\setting{headerleft}
+\setting{department}
+\setting{submissionlocation}
+\setting{signingdate}
+\setting{footermiddle}
+
+\setting{fontstr}
+\setting{fontsizestr}
+\setting{linespace}
+
+\setting{citingstyle}
+\setting{chapterdistance}
+
+
+%%%%%%%%%% Create ifs %%%%%%%%%%
+
+%%\newif\ifname             default behaviour
+
+% Ifs for specific pages
+\newif\ifblockingnote       \blockingnotefalse
+\newif\ifdeclaration        \declarationfalse
+\newif\ifabstractde         \abstractdefalse
+\newif\ifabstracten         \abstractenfalse
+\newif\iftableofcontents    \tableofcontentsfalse
+\newif\ifacronyms           \acronymsfalse
+\newif\ifimagelist          \imagelistfalse
+\newif\iftablelist          \tablelistfalse
+\newif\ifsymbols            \symbolsfalse
+\newif\ifformulary          \formularyfalse
+\newif\ifcodelist           \codelistfalse
+\newif\ifsources            \sourcesfalse
+\newif\ifappendix           \appendixfalse
+\newif\ifglossary           \glossaryfalse
+
+% Ifs for images
+\newif\ifshowcompanylogo    \showcompanylogofalse
+\newif\ifshowdhbwlogo       \showdhbwlogofalse
+\newif\ifshowsignature      \showsignaturefalse
+
+% Other ifs
+\newif\ifrefwithpages       \refwithpagesfalse
+\newif\ifreviewer           \reviewerfalse
+\newif\ifshowtodonotes      \showtodonotesfalse
+
+% Ifs for the dot on the cover sheet
+\newif\ifgreendot           \greendotfalse
+\newif\ifyellowdot          \yellowdotfalse
+\newif\ifreddot             \reddotfalse
+
+
+%%%%%%%%%% Load settings %%%%%%%%%%
+
+\input{../content/user_settings.tex}

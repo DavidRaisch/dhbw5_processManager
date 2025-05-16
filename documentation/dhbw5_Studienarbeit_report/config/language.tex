@@ -1,0 +1,45 @@
+%!TEX root = ../document/document.tex
+
+
+%%%%%%%%%% Settings %%%%%%%%%%
+
+% New if to check which language is set
+\newcommand{\iflang}[2]{%
+  \IfStrEq{\lang}{#1}{#2}{}
+}
+
+% New command to save the specific translations of the language
+\newcommand{\langstr}[1]{\setting{lang#1}}
+
+
+%%%%%%%%%% Define language strings %%%%%%%%%%
+
+\langstr{studycourse}
+\langstr{atthedhbw}
+\langstr{by}
+\langstr{processingtime}
+\langstr{studentid}
+\langstr{course}
+\langstr{company}
+\langstr{supervisor}
+\langstr{reviewer}
+\langstr{page}
+\langstr{pageof}
+\langstr{blockingnote}
+\langstr{declaration}
+\langstr{abstract}
+\langstr{acronyms}
+\langstr{symbols}
+\langstr{formula}
+\langstr{formulary}
+\langstr{code}
+\langstr{codelist}
+\langstr{sources}
+\langstr{furthersources}
+\langstr{appendix}
+\langstr{glossary}
+
+
+%%%%%%%%%% Load language %%%%%%%%%%
+
+\input{../config/langs/\lang.tex}

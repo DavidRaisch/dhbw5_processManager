@@ -1,0 +1,79 @@
+%!TEX root = ../../document/document.tex
+
+
+%%%%%%%%%% Settings %%%%%%%%%%
+
+% Insert the default settings for every abstract
+\newcommand{\defabstract}{
+    \thispagestyle{plain}
+    \chapter*{\langabstract}
+}
+
+% Get the abstracts from the files and add the previously defined settings
+\newcommand{\deAbstract}{%
+    \defabstract
+    \input{../content/additionals/abstract_de.tex}
+}
+\newcommand{\enAbstract}{%
+    \defabstract
+    \input{../content/additionals/abstract_en.tex}
+}
+
+
+%%%%%%%%%% Content %%%%%%%%%%
+
+\iflang{de}{
+    % Check if the german abstractshould be shown
+    \ifabstractde
+        % Show abstract and add it to the toc
+        \deAbstract
+        \addcontentsline{toc}{chapter}{\langabstract}
+        
+        % Check if the english abstract should be shown as well
+        \ifabstracten
+            \clearpage
+            \begin{otherlanguage}{english}
+                \enAbstract
+            \end{otherlanguage}
+        \fi
+    % If not, ...
+    \else
+        % ... check if the english abstract should be shown
+        \ifabstracten
+            \begin{otherlanguage}{english}
+                \enAbstract
+            \end{otherlanguage}
+            
+            % Add the abstract to the toc, as it is the only one
+            \addcontentsline{toc}{chapter}{\langabstract}
+        \fi
+    \fi
+}
+
+\iflang{en}{
+    % Check if the english abstract should be shown
+    \ifabstracten
+        % Show abstract and add it to the toc
+        \enAbstract
+        \addcontentsline{toc}{chapter}{\langabstract}
+        
+        % Check if the german abstract should be shown as well
+        \ifabstractde
+            \clearpage
+            \begin{otherlanguage}{ngerman}
+                \deAbstract
+            \end{otherlanguage}
+        \fi
+    % If not, ...
+    \else
+        % ... check if the german abstract should be shown
+        \ifabstractde
+            \begin{otherlanguage}{ngerman}
+                \deAbstract
+            \end{otherlanguage}
+            
+            % Add the abstract to the toc, as it is the only one
+            \addcontentsline{toc}{chapter}{\langabstract}
+        \fi
+    \fi
+}

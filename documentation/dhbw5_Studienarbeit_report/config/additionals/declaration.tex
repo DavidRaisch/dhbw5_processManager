@@ -1,0 +1,26 @@
+%!TEX root = ../../document/document.tex
+
+%%%%%%%%%% Content %%%%%%%%%%
+
+% Create a chapter without a number but include it in the table of contents
+\addchap{\langdeclaration}
+
+
+\iflang{de}{
+  Ich versichere hiermit, dass ich meine \papertype\ mit dem Thema
+  \begin{center}
+    \itshape\titlestr
+  \end{center}
+  selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt habe. Ich versichere zudem, dass die eingereichte elektronische Fassung mit der gedruckten Fassung übereinstimmt.
+}
+
+\iflang{en}{
+  I hereby declare that I have completed the present \papertype\ with the topic 
+  \begin{center}
+    \itshape\titlestr
+  \end{center}
+  independently, using only the sources and tools indicated. I confirm that the electronic version submitted corresponds to the printed version.
+}
+
+% Create a field for the signature
+\addsignature

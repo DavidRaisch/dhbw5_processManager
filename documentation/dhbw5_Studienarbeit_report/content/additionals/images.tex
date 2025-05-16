@@ -1,0 +1,140 @@
+%!TEX root = ../../document/document.tex
+
+% \saveimage[OPTIONAL: <linewidth=0px, padding=0mm>]{<ID>}{<figure_position>}{<graphic_settings>}{<description>}{<file_name>}
+
+% -> OPTIONAL to add a frame around the image (see https://ctan.joethei.xyz/macros/latex/contrib/gradientframe/gradientframe.pdf)
+% figure_position: where to position the figure e.g. ht (here, top)
+% graphic_settings: any settings for \includegraphics e.g. width=0.7\textwidth
+% description: caption to show below the image
+% file_name: in the folder /content/non_tex_files/images
+
+
+%%%%%%%%%%%%%%%%%%%%%%% SETUP %%%%%%%%%%%%%%%%%%%%%%
+
+% No need to edit the ones for the dhbw
+\newcommand{\dhbwDe}{\includegraphics[height=1.8cm, right, trim=0cm 2cm 0cm -2cm]{dhbw_de}}
+\newcommand{\dhbwEn}{\includegraphics[height=1.8cm, right, trim=0cm 0.5cm 0cm -0.5cm]{dhbw_en}}
+
+
+% Please edit the value starting from this line. For that, adjust the height
+% and then the trim to position the image. The trim values are in the format:
+% trim=left bottom right top
+\newcommand{\companyDeL}{\includegraphics[height=1.7cm, left, trim=0cm 1cm 0cm -1cm]{company_de}}
+\newcommand{\companyDeR}{\includegraphics[height=1.7cm, right, trim=0cm 1cm 0cm -1cm]{company_de}}
+\newcommand{\companyEnL}{\includegraphics[height=1.4cm, left, trim=0cm 1cm 0cm -1cm]{company_en}}
+\newcommand{\companyEnR}{\includegraphics[height=1.4cm, right, trim=0cm 1cm 0cm -1cm]{company_en}}
+
+\newcommand{\signature}{\includegraphics[height=1.8cm]{signature}}
+
+
+
+%%%%%%%%%%%%%%%%%%%% OWN IMAGES %%%%%%%%%%%%%%%%%%%%
+
+\saveimage[linewidth=2px, padding=3mm]{bsp}{ht}{width=0.7\textwidth}{dhbw_de.png}{Beispiel: einfügen eines Bildes \cite{2024}}
+
+\saveimage{EPK}{ht}{width=0.7\textwidth}{Beispiel für EPK-Aufbau}{Bild.jpg}
+\saveimage{BPMN}{ht}{width=1.0\textwidth}{Beispiel für BPMN-Aufbau}{BPMN_Beispiel.jpg}
+\saveimage{Login}{ht}{width=0.7\textwidth}{Login-Fenster des ProcessManagers}{Login-Fenster.png}
+\saveimage{Prozess_Erstellen}{ht}{width=1.0\textwidth}{Drag-and-Drop- und Code-basierte Methode}{Prozess_Erstellen.png}
+\saveimage{Startseite}{ht}{width=0.7\textwidth}{Startseite des ProcessManagers}{Startseite.png}
+\saveimage{Prozess_Ausführen_Liste}{ht}{width=0.7\textwidth}{Interface für das Auswählen eines Prozesses}{Prozess_Ausfuehren_Liste.png}
+\saveimage{Prozess_Ausführen_Gestartet}{ht}{width=0.85\textwidth}{Interface bei einem gestarteten Prozess}{Prozess_Ausfuehren_Gestartet.png}
+\saveimage{Prozess_Ausführen_Zusatzinfo}{ht}{width=0.90\textwidth}{Zusatzinforamtionen eines Events}{Prozess_Ausfuehren_Zusatzinfo.png}
+\saveimage{Prozess_Ausführen_Rollen}{ht}{width=1.00\textwidth}{Prozess ausführen mit Zugriffsmanagement}{Prozess_Ausfuehren_Rollen.png}
+\saveimage{Prozess_Bearbeiten_Startseite}{ht}{width=0.65\textwidth}{Interface für das Bearbeiten eines Prozesses}{Prozess_Bearbeiten_Startseite.png}
+\saveimage{Prozess_Bearbeiten_Szenarien}{ht}{width=1.00\textwidth}{Szenarien beim Löschen von Prozessen}{Prozess_Bearbeiten_Szenarien.png}
+\saveimage{Prozess_Bearbeiten_Abfrage}{!ht}{width=0.60\textwidth}{Abfrage für Löschen eines Prozesses}{Prozess_Bearbeiten_Abfrage.png}
+\saveimage{project_structure_pm}{ht}{width=1.00\textwidth}{Die Projektstruktur des Process-Managers}{project_structure_pm.jpeg}
+\saveimage{login_pm}{ht}{width=1.00\textwidth}{Die Login-Seite des Process-Managers}{login_pm.png}
+\saveimage{empty_loginfield_pm}{ht}{width=0.85\textwidth}{Fehlernachricht beim Login -- leeres Login-Feld}{empty_loginfield_pm.png}
+\saveimage{wrong_credentials_pm}{ht}{width=0.85\textwidth}{Fehlernachricht beim Login -- falsche Anmeldedaten}{wrong_credentials_pm.png}
+\saveimage{getUser_postman_pm}{ht}{width=1.00\textwidth}{Die Überprüfung der Get-Abfrage der Benutzer mit Postman}{getUser_postman_pm.jpeg}
+\saveimage{user_startPage_pm}{ht}{width=1.00\textwidth}{Die Benutzer Start-Seite}{user_startPage_pm.jpg}
+\saveimage{admin_startPage_pm}{ht}{width=1.00\textwidth}{Die Admin Start-Seite}{admin_startPage_pm.jpg}
+\saveimage{full_userManagementPage_pm}{ht}{width=1.00\textwidth}{Die vollständige Benutzerverwaltungs-Seite}{full_userManagementPage_pm.jpg}
+\saveimage{createUser_field_pm}{ht}{width=1.00\textwidth}{Das Formular zur Erstellung neuer Benutzer}{createUser_field_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{errorMessage_createUser_pm}{ht}{width=0.70\textwidth}{Die Fehlernachricht des Benutzer-Erstllungsprozess bei ungültiger Eingabe}{errorMessage_createUser_pm.jpg}
+\saveimage{existing_users_table_pm}{ht}{width=1.00\textwidth}{Die Tabelle der erstellten Benutzer}{existing_users_table_pm.jpg}
+\saveimage{editUser_inlineForm_pm}{ht}{width=1.00\textwidth}{Das Formular zum Bearbeiten eines erstellten Benutzers}{editUser_inlineForm_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{ChangePassword_admin_pm}{ht}{width=0.70\textwidth}{Das sepereate Eingabefeld zum Password ändern}{ChangePassword_admin_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{userDeletion_messages_pm}{ht}{width=0.95\textwidth}{Sicherheitsabfrage vor dem Löschen eines erstellten Benutzers}{userDeletion_messages_pm.jpg}
+\saveimage{full_projectManagementPage_pm}{ht}{width=1.00\textwidth}{Die vollständige Projektverwaltungs-Seite}{full_projectManagementPage_pm.jpg}
+\saveimage{createProject_field_pm}{ht}{width=1.00\textwidth}{Das Formular zur Erstellung neuer Projekte}{createProject_field_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{errorMessage_createProject_pm}{ht}{width=0.70\textwidth}{Die Fehlernachricht des Projekt-Erstellungsprozess bei ungültiger Eingabe}{errorMessage_createProject_pm.jpg}
+\saveimage{existing_projects_list_pm}{ht}{width=1.00\textwidth}{Die Tabelle der erstellten Projekten}{existing_projects_list_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{project_info_modal_pm}{ht}{width=0.70\textwidth}{Das seperate Fenster mit Projekt-Informationen}{project_info_modal_pm.jpg}
+\saveimage{editProject_inlineForm_pm}{ht}{width=1.00\textwidth}{Das Formular zum Bearbeiten eines erstellten Projekts}{editProject_inlineForm_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{delete_project_dialog_pm}{ht}{width=0.95\textwidth}{Sicherheitsabfrage vor dem Löschen eines erstellten Projekts}{delete_project_dialog_pm.jpg}
+\saveimage{navBar_admin_pm}{ht}{width=1.00\textwidth}{Die Navigationsleiste von Administratoren}{navBar_admin_pm.jpg}
+\saveimage{navBar_user_pm}{ht}{width=1.00\textwidth}{Die Navigationsleiste von Benutzer}{navBar_user_pm.jpg}
+\saveimage{userInfo_dropdown_pm}{ht}{width=0.20\textwidth}{Das Dropdown-Feld mit den Benutzerinformationen}{userInfo_dropdown_pm.jpg}
+\saveimage{changePassword_user_pm}{ht}{width=1.00\textwidth}{Die Passwortänderungsseite für den Benutzer}{changePassword_user_pm.jpg}
+\saveimage{incorrectCurrentPassword_user_pm}{ht}{width=1.00\textwidth}{Fehlernachricht aufgrund eines falschen aktuellen Passwort}{incorrectCurrentPassword_user_pm.jpg}
+\saveimage{newPasswordsNotMatching_user_pm}{ht}{width=1.00\textwidth}{Fehlernachricht aufgrund nicht übereinstimmende neue Passwörter}{newPasswordsNotMatching_user_pm.jpg}
+\saveimage{successfulPasswordChange_user_pm}{ht}{width=1.00\textwidth}{Erfolgreiche Änderung des Passworts durch den Benutzer}{successfulPasswordChange_user_pm.jpg}
+\saveimage{fullOverview_manageProcess_pm}{ht}{width=1.00\textwidth}{Übersicht über die ManageProcess-Seite}{fullOverview_manageProcess_pm.jpg}
+\saveimage{bpmnEditor_pm}{ht}{width=1.00\textwidth}{BPMN-Editor mit geladenem Prozess}{bpmnEditor_pm.jpg}
+\saveimage{processInfo_manager_pm}{ht}{width=1.00\textwidth}{Das Prozess-Informationsfenster eines Managers}{processInfo_manager_pm.jpg}
+\saveimage{processInfo_employee_pm}{ht}{width=1.00\textwidth}{Das Prozess-Informationsfenster eines Benutzers}{processInfo_employee_pm.jpg}
+\saveimage{processInfoChange_manager_pm}{ht}{width=1.00\textwidth}{Das Prozess-Informationsfenster eines Managers mit Änderungen}{processInfoChange_manager_pm.jpg}
+\saveimage{roleDescribtion_manageProcess_pm}{ht}{width=1.00\textwidth}{Das Fenster für die Zuweisung von Role und Beschreibung eines Elements}{roleDescribtion_manageProcess_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{manageProcess_missingProcessName_pm}{ht}{width=0.70\textwidth}{Die Fehlernachricht bei fehlendem Prozess-Namen}{manageProcess_missingProcessName_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{manageProcess_missingProject_pm}{ht}{width=0.70\textwidth}{Die Fehlernachricht bei fehlendem Projekt}{manageProcess_missingProject_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{manageProcess_missingRoleandDescribtion}{ht}{width=1.00\textwidth}{Die Fehlernachricht bei fehlenden Rollen und Beschreibungen}{manageProcess_missingRoleandDescribtion.jpg}
+\saveimage{changesModal_pm}{ht}{width=0.95\textwidth}{Die Übersicht der Änderungen im Modal}{changesModal_pm.jpg}
+\saveimage{changesNotification_manager_pm}{ht}{width=1.00\textwidth}{Die Benachrichtigung für den Änderungsantrag}{changesNotification_manager_pm.jpg}
+\saveimage{changesRequest_manager_pm}{ht}{width=1.00\textwidth}{Der Änderungsantrag aus Sicht des Managers}{changesRequest_manager_pm.jpg}
+\saveimage{newProcess_save_pm}{ht}{width=1.00\textwidth}{Der Änderungsantrag bei Erstellen eines neuen Prozesses}{newProcess_save_pm.jpg}
+\saveimage{changesRequest_denied}{ht}{width=1.00\textwidth}{Die negative Rückmeldung des Änderungsantrags}{changesRequest_denied.jpg}
+\saveimage{changesRequest_approved}{ht}{width=1.00\textwidth}{Die positive Rückmeldung des Änderungsantrags}{changesRequest_approved.jpg}
+\saveimage{ProzcessList_manager_pm}{ht}{width=0.58\textwidth}{Die Prozess-Liste aus Sicht eines Managers}{ProzcessList_manager_pm.jpg}
+\saveimage[linewidth=0px, padding=2mm]{deleteProcess_check_pm}{ht}{width=0.75\textwidth}{Die Bestätigungsfrage vor dem Löschen eines Prozesses}{deleteProcess_check_pm.jpg}
+\saveimage{ProzcessList_user_pm}{ht}{width=0.58\textwidth}{Die Prozess-Liste aus Sicht eines Employee}{ProzcessList_user_pm.jpg}
+\saveimage{procesList_deletionRequest}{!ht}{width=1.00\textwidth}{Die Anfrage für das Löschen des Prozesses}{procesList_deletionRequest.jpg}
+\saveimage[linewidth=0px, padding=2mm]{procesList_deletionRequestModal_pm}{ht}{width=0.75\textwidth}{Das Modal-Fenster für die Anfrage zum Löschen}{procesList_deletionRequestModal_pm.jpg}
+\saveimage{procesList_deletionRequestProcessInformation_pm}{ht}{width=1.00\textwidth}{Das Prozess-Informations Feld für die Anfrage zum Löschen}{procesList_deletionRequestProcessInformation_pm.jpg}
+\saveimage{procesList_deletionRequestProcessInformation_positivResponse}{ht}{width=1.00\textwidth}{Die postive Rückmeldung nach Anfrage zum Löschen}{procesList_deletionRequestProcessInformation_positivResponse.jpg}
+\saveimage{procesList_deletionRequestProcessInformation_negativResponse}{ht}{width=1.00\textwidth}{Die negative Rückmeldung nach Anfrage zum Löschen}{procesList_deletionRequestProcessInformation_negativResponse.jpg}
+\saveimage{notifications_mainPage_pm}{ht}{width=1.00\textwidth}{Die Benachrichtigung-Seite für alle Benutzer}{notifications_mainPage_pm.jpg}
+\saveimage{notification_request_pm}{ht}{width=1.00\textwidth}{Eine Benachrichtigung des Typs Anfrage}{notification_request_pm.jpg}
+\saveimage{notification_response_pm}{ht}{width=1.00\textwidth}{Eine Benachrichtigung des Typs Anfrage}{notification_response_pm.jpg}
+\saveimage{executeProcess_full_pm}{ht}{width=1.00\textwidth}{Die vollständige Execute Process-Seite}{executeProcess_full_pm.jpg}
+\saveimage{executeProcess_clickedProcess}{ht}{width=1.00\textwidth}{Die Execute Process-Seite mit angeklickenden Prozess}{executeProcess_clickedProcess.jpg}
+\saveimage{executeProcess_clickedInstances}{ht}{width=1.00\textwidth}{Die Execute Process-Seite mit angeklickender Instanz}{executeProcess_clickedInstances.jpg}
+\saveimage{executeProcess_requestApproval}{ht}{width=1.00\textwidth}{Die Ansicht eines Employee für eine Genehmigungsanfrage}{executeProcess_requestApproval.jpg}
+\saveimage{executeProcess_requestApprovalNotification}{ht}{width=1.00\textwidth}{Die Beanchrichtigung für die Genehmigungsanfrage}{executeProcess_requestApprovalNotification.jpg}
+\saveimage{executeProcess_approvalDecision}{ht}{width=1.00\textwidth}{Die Ansicht der Genehmigungsentscheidung}{executeProcess_approvalDecision.jpg}
+\saveimage{executeProcess_notificationAnswer}{ht}{width=1.00\textwidth}{Die Rückmeldung auf die Genehmigungsanfrage}{executeProcess_notificationAnswer.jpg}
+\saveimage{executeProcess_elementField}{ht}{width=1.00\textwidth}{Das Element Informations-Feld}{executeProcess_elementField.jpg}
+\saveimage{executeProcess_archivedInstances}{ht}{width=1.00\textwidth}{Die Seite mit allen archivierten Instanzen}{executeProcess_archivedInstances.jpg}
+\saveimage{executeProcess_miniCalender}{ht}{width=1.00\textwidth}{Der Mini-Kalender zur Datum-Auswahl}{executeProcess_miniCalender.jpg}
+\saveimage{executeProcess_activeFilter}{ht}{width=1.00\textwidth}{Hinweis auf aktive Instanzen am Filter-Symbol}{executeProcess_activeFilter.jpg}
+\saveimage{executeProcess_noMatchingProcesses}{ht}{width=1.00\textwidth}{Hinweis auf keine passende Instanzen mit den gewählten Filter}{executeProcess_noMatchingProcesses.jpg}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

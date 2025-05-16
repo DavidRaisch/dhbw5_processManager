@@ -1,0 +1,117 @@
+%!TEX root = ../../document/document.tex
+
+
+%%%%%%%%%% Content %%%%%%%%%%
+
+\begin{titlepage}
+
+% Depending on the settings, the company logo, the DHBW logo or both are displayed
+\ifshowcompanylogo
+	\ifshowdhbwlogo
+		% Both logos are displayed
+		\begin{minipage}[c]{0.43\textwidth}
+			\begin{center}
+				\iflang{de}{
+					\includegraphics[width=\textwidth, left]{company_de}
+				}
+				\iflang{en}{
+					\includegraphics[width=\textwidth, left]{company_en}
+				}
+			\end{center}
+		\end{minipage}
+		\begin{minipage}[c]{0.1\textwidth}
+			\hspace{\textwidth}
+		\end{minipage}
+		\begin{minipage}[c]{0.43\textwidth}
+			\begin{center}
+				\iflang{de}{
+					\includegraphics[width=\textwidth, right]{dhbw_de}
+				}
+				\iflang{en}{
+					\includegraphics[width=\textwidth, right]{dhbw_en}
+				}
+			\end{center}
+		\end{minipage}
+	\else
+		% Only the company logo is displayed
+		\begin{center}
+			\iflang{de}{
+				\includegraphics[width=0.7\textwidth]{company_de}
+			}
+			\iflang{en}{
+				\includegraphics[width=0.7\textwidth]{company_en}
+			}
+		\end{center}
+	\fi
+\else
+	\ifshowdhbwlogo
+		% Only the DHBW logo is displayed
+		\begin{center}
+			\iflang{de}{
+				\includegraphics[width=0.7\textwidth]{dhbw_de}
+			}
+			\iflang{en}{
+				\includegraphics[width=0.7\textwidth]{dhbw_en}
+			}
+		\end{center}
+	\fi
+\fi
+
+% Create spacing
+\enlargethispage{2cm}
+
+% Middle part of the cover sheet (title, ...)
+\begin{center}
+	% Place the title
+	\begin{doublespace}
+		\vspace*{12mm}
+		{\LARGE\textbf \titlestr}\\
+		\vspace*{5mm}
+	\end{doublespace}
+	
+	% Place the colored dot in the middle right of the page
+	\begin{tikzpicture}		
+		\ifreddot
+			\tikz\draw[fill=red,draw=red](-4,2) circle (1.4cm);
+		\else
+			\ifyellowdot
+				\tikz\draw[fill=yellow,draw=yellow](-4,2) circle (1.4cm);
+			\else
+				\ifgreendot
+					\tikz\draw[fill=green,draw=green](-4,2) circle (1.4cm);
+				\fi
+			\fi
+		\fi
+	\end{tikzpicture}
+	\vspace{-1.4cm}\\
+
+	% Place further information of the paper
+	\vspace*{12mm}		\large\textbf\papertype\\
+	\vspace*{3mm}		\textbf\degree\\
+	\vspace*{12mm}		\langstudycourse\ \studycourse\\
+	\vspace*{3mm}		\langatthedhbw\ \unilocation\\
+	\vspace*{12mm}		\langby\\
+	\vspace*{3mm}		\large\textbf\authorstr\\
+	\vspace*{12mm}		\submissiondate\\
+\end{center}
+
+% Create spacing
+\vfill
+
+% Lower part of the cover sheet (name, ...)
+\begin{spacing}{1.2}
+	\begin{tabbing}
+		mmmmmmmmmmmmmmmmmmmmmmmmmm             	\= 	\kill
+		\textbf\langprocessingtime       		\>  \processingtime\\
+		\textbf{\langstudentid, \langcourse}  	\>  \studentid, \course\\
+		\ifshowcompanylogo
+			\textbf\langcompany	               	\> 	\company, \companylocation\\
+		\fi
+		\textbf\langsupervisor               	\>  \supervisor\\
+		\ifreviewer
+			\textbf\langreviewer	          	\> 	\reviewer\\
+		\fi
+	\end{tabbing}
+\end{spacing}
+
+\end{titlepage}

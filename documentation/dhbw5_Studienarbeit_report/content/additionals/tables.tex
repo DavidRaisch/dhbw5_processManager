@@ -1,0 +1,39 @@
+%!TEX root = ../../document/document.tex
+
+% \savetable{<ID>}{<adjust_settings>}{<column_setting>}{<description>}{<content>}
+
+% adjust_settings: any settings for \begin{adjustbox} e.g. center
+% column_setting: any column settings for \begin{tabular} e.g. |c|c|c|c|c|c|
+% description: caption to show below the table
+% content: the content of the table
+
+
+\savetable{bsp_normal}{rotate=0, center}{|c|c|c|c|c|c|}{Beispieltabelle}{
+    \tablerow{\rowcolor{lightgray}
+        \textbf{Spalte 1} &
+        \textbf{Spalte 2 (\%)} &
+        \multicolumn{2}{|c|}{\textbf{Spalte 3}} & 
+        \multicolumn{2}{|c|}{\textbf{Spalte 4}}
+    }
+    \tablerow{A & 10 & 111 & 0,1 & Dies & 100}
+    \tablerow{B & 20 & 222 & 0,2 & ist & 200}
+    \tablerow{C & 30 & 333 & 0,3 & ein & 300}
+    \tablerow{D & 40 & 444 & 0,4 & Beispiel & 400}
+    \tablerow{
+        \textbf{Summe} &
+        \textbf{100} &
+        \textbf{1110} &
+        \textbf{1} & 
+         &
+        \textbf{1000}}
+    \tablerow{
+        \multicolumn{4}{|c|}{\textbf{Letzte}} &
+        \multicolumn{2}{|c|}{\textbf{Reihe}}
+    }
+    \tablerow{\makecell{Multilined \\ cell text} & 1 & 2 & 3 & 4 & 5}
+}
+
+\savetable{bsp_rotiert}{rotate=90, center}{|c|c|c|}{Rotierte Tabelle}{
+    \tablerow{A & 10 & test}
+    \tablerow{B & 20 & test}
+}

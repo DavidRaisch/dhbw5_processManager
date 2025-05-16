@@ -1,0 +1,347 @@
+%!TEX root = ../../document/document.tex
+
+% For every chapter create a file in the /content/chapters folder with the name
+% chapter-XX.tex where XX is the chapter number  (e.g. 01, 02, 03, ..., 99).
+
+
+\chapter{Theoretische Grundlagen} \label{theoretische_grundlagen}
+
+\section{Anforderungen} \label{Anforderungen}
+In diesem Kapitel werden die Anforderungen an das Projekt analysiert, definiert und strukturiert. Dabei wird zwischen funktionalen und nicht-funktionalen Anforderungen unterschieden, die in den Abschnitten \nameref{f_Anforderungen} und \nameref{nf_Anforderungen} näher erläutert werden.
+\subsection{Anforderungsanalyse}
+Die Anforderungsanalyse ist ein zentraler Prozess in der Systementwicklung, der sich mit der Analyse, Dokumentation und Verwaltung der Anforderungen an ein System beschäftigt. Sie umfasst die Identifizierung der Bedürfnisse und Erwartungen der Stakeholder, die Definition der Anforderungen an das System und die Sicherstellung, dass diese Anforderungen verstanden und umgesetzt werden können. Laut der Definition des \ac{IEEE} beinhaltet die Anforderungsanalyse zwei Hauptprozesse: das Studium der Benutzerbedürfnisse, um eine klare Definition der System-, Hardware- oder Softwareanforderungen zu erstellen, sowie die Verfeinerung und Detaillierung dieser Anforderungen im Verlauf des Projekts. Eine kontinuierliche Anforderungsanalyse ist notwendig, da Anforderungen sich während des Projektlebenszyklus ändern und diese Änderungen identifiziert, überprüft und integriert werden müssen. 
+
+Die Bedeutung der Anforderungsanalyse ergibt sich aus mehreren zentralen Aspekten.
+ Erstens stellt die Anforderungsanalyse sicher, dass die Wünsche und Bedürfnisse der
+ Stakeholder erfasst, dokumentiert und spezifiziert werden. Dies minimiert das Risiko, dass
+ das entwickelte System nicht den Erwartungen der Stakeholder entspricht. Zweitens kann
+ die Anforderungsspezifikation als Teil des Vertrags über die Entwicklung eines IT-Systems
+ dienen. Sie fungiert als verbindliches Dokument, das Missverständnisse reduziert, indem
+ es klar definiert, was benötigt wird, und somit unnötige Mehrarbeit und Frustration
+ vermeidet. Ein weiterer wichtiger Aspekt der Anforderungsanalyse ist die Unterstützung
+ bei Entscheidungsprozessen. Klar formulierte und gut durchdachte Anforderungen helfen
+ bei der Auswahl technischer Lösungen, die diese Anforderungen bestmöglich erfüllen.
+ Zudem trägt die Anforderungsanalyse zur Komplexitätskontrolle bei, indem sie das System
+ in verständliche Teilmodelle zerlegt, was das Verständnis und die Nutzung des Systems
+ erleichtert. 
+
+Zusammenfassend ist die Anforderungsanalyse ein unverzichtbarer Bestandteil des Projektmanagements, der die Grundlage für die erfolgreiche Entwicklung und Implementierung eines Systems bildet. Sie gewährleistet, dass die entwickelten Lösungen den Bedürfnissen der Benutzer entsprechen, und trägt wesentlich zur Qualität des gesamten Entwicklungsprozesses bei.
+
+\subsection{Funktionale Anforderungen} \label{f_Anforderungen}
+\subsection*{Muss-Anforderungen}
+\begin{enumerate}[label=\textbf{M\arabic*.}]
+    \item Das System muss eine Funktion zum Erstellen neuer Prozesse bieten.
+    \item Das System muss eine Möglichkeit zur Bearbeitung bestehender Prozesse bereitstellen.
+    \item Das System muss eine Funktion zur Ausführung von Prozessen implementieren.
+    \item Das System muss eine Liste aller gespeicherten Prozesse anzeigen können.
+    \item Das System muss die Möglichkeit bieten, Prozesse zu speichern und zu löschen.
+    \item Das System muss die Möglichkeit bieten, jedem Event im Prozess eine spezifische Rolle zuzuweisen. \label{M6}
+    \item Das System muss sicherstellen, dass nur Benutzer mit der zugewiesenen Rolle ein Event ausführen können. \label{M7}
+    \item Das System muss einen Benachrichtigungsmechanismus implementieren, um andere Rollen bei Bedarf zu informieren. \label{M8}
+    \item Das System muss die Ausführung paralleler Geschäftsprozesse ermöglichen, einschließlich der Möglichkeit, zwischen parallelen Prozessen zu wechseln.
+    \item Das System muss eine Bestätigungsabfrage beim Löschen von Prozessen implementieren.
+    \item Das System muss einen Löschmechanismus mit Berechtigungsprüfung implementieren, sodass nicht jeder Benutzer Prozesse löschen kann.
+    \item Das System muss verhindern, dass laufende Prozesse gelöscht werden, und das Löschen erst nach Abschluss des aktuellen Prozesses erlauben.
+\end{enumerate}
+\subsection*{Soll-Anforderungen}
+\begin{enumerate}[label=\textbf{S\arabic*.}]
+    \item Das System sollte eine Vorschau des Prozessablaufs während der Erstellung,Bearbeitung und vor der Ausführung anzeigen.
+    \item Das System sollte die Möglichkeit bieten, Prozesse in verschiedene Kategorien oder Typen einzuteilen.
+    \item Das System sollte eine Suchfunktion für gespeicherte Prozesse bereitstellen.
+    \item Das System sollte die Möglichkeit bieten, Benutzerrollen und -berechtigungen zu verwalten.
+\end{enumerate}
+\subsection*{Kann-Anforderungen}
+\begin{enumerate}[label=\textbf{K\arabic*.}]
+    \item Das System kann eine Funktion zur Prozessanalyse und -optimierung anbieten.
+    \item Das System kann eine mobile Version oder App für den Zugriff von unterwegs anbieten.
+    \item Das System kann eine Funktion zur automatischen Dokumentation von Prozessausführungen implementieren.
+    \item Das System kann eine Kolaborationsfunktion für die gemeinsame Arbeit an Prozessen bieten.
+    \item Das System kann eine detaillierte Protokollierung von Prozessänderungen und -löschungen bereitstellen.
+\end{enumerate}
+\newpage
+\subsection{Nicht-funktionale Anforderungen} \label{nf_Anforderungen}
+\subsection*{Muss-Anforderungen}
+\begin{enumerate}[label=\textbf{NM\arabic*.}]
+    \item Das System muss eine Benutzeroberfläche mit Drag-and-Drop-Funktionalität oder einer ähnlich intuitive Funktion für die Prozesserstellung bieten.
+    \item Das System muss ein robustes Rollen- und Berechtigungsmanagement implementieren, um die Sicherheit und Integrität der Prozesse zu gewährleisten.
+\end{enumerate}
+\subsection*{Soll-Anforderungen}
+\begin{enumerate}[label=\textbf{NS\arabic*.}]
+    \item Das System sollte eine hohe Benutzerfreundlichkeit aufweisen, um die Effizienz bei der Prozesserstellung und -ausführung zu gewährleisten.
+    \item Das System sollte eine angemessene Leistung und Reaktionszeit bei der Verarbeitung von Prozessen bieten.
+    \item Das System sollte eine hohe Verfügbarkeit aufweisen, um parallele Prozessausführungen zuverlässig zu unterstützen.
+\end{enumerate}
+\subsection*{Kann-Anforderungen}
+\begin{enumerate}[label=\textbf{NK\arabic*.}]
+    \item Das System kann eine mehrsprachige Benutzeroberfläche anbieten, um internationale Nutzung zu unterstützen.
+    \item Das System kann eine hohe Skalierbarkeit aufweisen, um mit wachsender Anzahl von Prozessen und Benutzern umgehen zu können.
+\end{enumerate}
+
+\newpage
+\section{Prozessmodelierung}
+Die Modellierung von Geschäftsprozessen stellt einen zentralen Aspekt des Prozessmanagements dar. Zwei bedeutende Notationen, die in diesem Kontext eine große Rolle spielen, sind die \ac{EPK} und die \ac{BPMN}. Beide Methoden dienen der grafischen Darstellung und Analyse von Geschäftsprozessen, unterscheiden sich jedoch in ihrer Entstehung, Anwendung und Komplexität.
+
+\subsection{Ereignisgesteuerte Prozesskette}
+Die Ereignisgesteuerte Prozesskette ist 1992 entwickelt worden und findet vor allem im deutschsprachigen Raum Anwendung. 
+Die \ac{EPK} basiert auf einer klaren Struktur aus drei Grundelementen: Ereignissen, Funktionen und logische Operatoren.
+
+\textbf{Ereignisse} beschreiben eingetretene Zustände dar. Sie sind passive Elemente und werden typischerweise durch ein sechseckiges Symbol dargestellt.\\
+\textbf{Funktionen} repräsentieren Aktivitäten oder Aufgaben, die durch ein Ereignis ausgelöst werden und selbst wiederum ein neues Ereignis auslösen können. Funktionen werden üblicherweise mit einem Rechteck mit abgerundeten Ecken dargestellt. Funktionen sind aktive Elemente des Prozesses und beschreiben was getan werden muss. \\
+\textbf{Logische Operatoren} dienen dazu, Ereignisse und Funktionen miteinander zu verbinden und den Kontrollfluss zu steuern. Dabei gibt es drei Arten von Operatoren: UND, ODER und \ac{XOR}. Diese Operatoren erlauben es, komplexe Prozessstrukturen wie Verzweigungen, Zusammenführungen und Schleifen abzubilden.
+
+Die Struktur der \ac{EPK} basiert auf festen Regeln: Jede \ac{EPK} beginnt und endet mit einem Ereignis. Funktionen und Ereignisse wechseln sich ab. Die Modellierung erfolgt von oben nach unten.\\
+\ac{EPK}s finden breite Anwendung in der Prozessdokumentation, der Zuweisung von Zuständigkeiten, sowie der Analyse und Optimierung von Geschäftsprozessen. Ihre Stärke liegt in der intuitiven Verständlichkeit, die sie auch für Anfänger zugänglich macht.\\
+\useimage{EPK}\\
+\newpage
+Die \autoref{img:EPK} dient als Beispiel, um den Ablauf einer \ac{EPK} zu veranschaulichen. Es zeigt den Prozess eines Auftrags, der mit dem Ereignis „Auftrag zur Prüfung eingegangen“ beginnt.
+Darauf folgt die Funktion „Auftrag wird geprüft“. Anschließend wird über einen logischen Operator, dargestellt durch ein \ac{XOR}-Gatter, der weitere Verlauf bestimmt.
+Es gibt zwei mögliche Wege: Wird der Auftrag angenommen, erfolgt die Funktion „Auftrag wird bearbeitet“, gefolgt vom Abschluss durch das Ereignis „Auftrag fertiggestellt“. Wird der Auftrag abgelehnt, wird der Auftrag zurückgesendet, was mit dem Ereignis „Auftrag zurückgesendet“ endet. Das Diagramm zeigt den typischen Wechsel zwischen Ereignissen (rot) und Funktionen (grün) sowie die strukturierte Modellierung von oben nach unten.
+
+\newpage
+\subsection{Business Process Model and Notation}
+Die \ac{BPMN} ist eine standardisierte grafische Darstellungsmethode zur Modellierung von Geschäftsprozessen. Sie ermöglicht es, komplexe Abläufe übersichtlich und verständlich darzustellen. \ac{BPMN} gliedert sich in vier Hauptkategorien von Elementtypen: Flussobjekte, Verbindungsobjekte, Pools und Lanes sowie Artefakte.
+
+\textbf{Flussobjekte} bilden die Kernelemente eines \ac{BPMN}-Diagramms und umfassen Ereignisse, Aktivitäten und Gateways. Ereignisse sind durch Kreise dargestellt, und können Start-, Zwischen- oder Endereignisse sein. 
+Aktivitäten repräsentieren die Aufgaben oder Arbeiten, die im Rahmen des Prozesses durchgeführt werden müssen, und werden durch abgerundete Rechtecke symbolisiert.
+Gateways, visualisiert durch Rauten, dienen als Entscheidungs- oder Verzweigungspunkt eim Prozessfluss, die unterschiedliche Pfade basierend auf Bedingungen ermöglichen. \\
+\textbf{Verbindungsobjekte} sind entscheidend für die Strukturierung des Prozesses und verbinden die Flussobjekte miteinander. Sie umfassen Sequenzflüsse, die die Reihenfolge der Aktivitäten darstellen; Nachrichtenflüsse, die den Informationsaustausch zwischen verschiedenen Teilnehmern zeigen; und Assoziationen, die zusätzliche Informationen zu Flussobjekten bereitstellen.\\
+\textbf{Pools und Lanes} organisieren die Verantwortlichkeiten innerhalb eines \ac{BPMN}-Diagramms. Ein Pool repräsentiert einen übergeordneten Prozessbeteiligten oder eine Organisationseinheit und definiert den Rahmen eines Ablaufs. Innerhalb dieses Rahmens unterteilen Lanes die Verantwortlichkeiten weiter, indem sie spezifische Rollen oder Abteilungen darstellen. Diese visuelle Trennung erleichtert das Verständnis der Beziehungen zwischen den verschiedenen Prozessteilnehmern.\\
+\textbf{Artefakte} bieten zusätzliche Informationen über den Prozess und kategorisieren Aktivitäten. Dazu gehören Datenobjekte, die notwendige Informationen für den Prozess darstellen; Gruppen, die verschiedene Aktivitäten zusammenfassen; und Textanmerkungen, die erläuternde Informationen liefern.
+
+Insgesamt ermöglicht \ac{BPMN} durch diese vier Hauptkategorien eine klare und strukturierte Darstellung von Geschäftsprozessen, was zu einer verbesserten Kommunikation zwischen den beteiligten Akteuren führt und die Analyse sowie Optimierung von Abläufen unterstützt.
+
+\newpage
+\useimage{BPMN}
+
+Die \autoref{img:BPMN} stellt einen Geschäftsprozess in \ac{BPMN}-Notation dar und nutzt Lanes, um die Zuständigkeiten der einzelnen Prozessschritte zu strukturieren. Der Prozess beginnt in „Lane One“ mit einem Startereignis und führt zunächst zur Aktivität „Activity A“. Anschließend wird an „Gateway One“ eine Entscheidung getroffen, die den Prozess in zwei mögliche Wege verzweigt: Im ersten Weg, der durch „Condition One“ definiert ist, werden die Aktivitäten „Activity B“ und „Activity C“ ausgeführt, bevor der Prozess mit „End Event One“ abgeschlossen wird. Der zweite Weg, der durch „Condition Two“ bestimmt ist, wechselt in „Lane Two“ zur Aktivität „Activity D“. Von dort erfolgt eine weitere Verzweigung an „Gateway Two“, die den Prozess in zwei weitere Richtungen leitet: Entweder wird „Activity E“ ausgeführt, bevor der Prozess mit „End Event Two“ endet, oder es wird in „Lane Three“ zur Aktivität „Activity F“ übergegangen, die mit „End Event Three“ abgeschlossen wird. Dieses Diagramm veranschaulicht die strukturierte Darstellung von Prozessen, die mithilfe von Lanes Verantwortlichkeiten abbilden und durch Gateways Entscheidungen und Parallelverzweigungen modellieren.
+
+\subsection*{Begründung der Standardisierung auf \ac{BPMN}}
+ 
+Im Rahmen dieses Projekts ist es aufgrund begrenzter Ressourcen notwendig, sich auf einen einzigen Standard zur Modellierung von Geschäftsprozessen zu konzentrieren. Die parallele Umsetzung mehrerer Modellierungsstandards würde die Komplexität deutlich erhöhen und den Projektumfang überschreiten. Daher muss eine fundierte Auswahlentscheidung getroffen werden, welcher Standard den Anforderungen des Projekts am besten gerecht wird.
+ 
+Die Entscheidung fällt auf die \ac{BPMN}, da sie in mehreren zentralen Aspekten Vorteile gegenüber \ac{EPK} bietet:
+ 
+\begin{enumerate}
+    \item \textbf{Internationale Verbreitung und Standardisierung:} \\
+    \ac{BPMN} ist ein von der \ac{OMG} standardisiertes Notationssystem, das international weit verbreitet ist. Diese breite Akzeptanz gewährleistet eine hohe Kompatibilität mit modernen \ac{IT}-Systemen und Geschäftsprozessmanagement-Tools, was insbesondere im Hinblick auf langfristige Wartbarkeit und Interoperabilität von Vorteil ist.
+    \item \textbf{Hohe Ausdrucksstärke und Flexibilität:} \\
+    Die Notation ermöglicht durch ihre differenzierte Symbolik -- etwa durch die Nutzung von Pools, Lanes sowie diversen Ereignis- und Aufgabenarten -- eine präzise und strukturierte Abbildung selbst komplexer, unternehmensübergreifender Prozesse. Diese Ausdrucksstärke unterstützt die klare Kommunikation zwischen fachlichen und technischen Stakeholdern und trägt somit zur Qualität der Prozessdokumentation bei.
+    \item \textbf{Technische Umsetzbarkeit durch verfügbare Bibliotheken:} \\
+    Für \ac{BPMN} existieren etablierte Softwarebibliotheken, die eine Drag-and-Drop-Umsetzung sowie die Einhaltung der BPMN-Spezifikation ermöglichen. Diese Bibliotheken erleichtern die technische Implementierung erheblich, da sie eine robuste Grundlage für die Modellierung und Validierung von Prozessen bieten. Dadurch kann der Entwicklungsaufwand deutlich reduziert und die Umsetzung effizient gestaltet werden.
+\end{enumerate}
+ 
+Aufgrund dieser drei Faktoren wird \ac{BPMN} als einziger Modellierungsstandard in diesem Projekt eingesetzt. Eine detaillierte, wissenschaftliche Analyse der verwendeten BPMN-Bibliothek und ihrer technischen Eigenschaften erfolgt in \autoref{Manage_Process}.
+
+
+\todo{Überprüfen, ob Prozessmodelierung und Anforderungen tauschen, ggf auch Ausarbeitung User-Workflow noch vor Anforderungen}
+\newpage
+\section{Ausarbeitung User-Workflow}
+Dieses Kapitel dient der konzeptionellen Ausarbeitung des Workflows des Process-Managers. Es stellt keine konkrete Implementierung dar, sondern fokussiert sich auf die theoretische und wissenschaftlich fundierte Entwicklung einer geeigneten Struktur. Ziel dieser Ausarbeitungen ist es, eine wissenschaftlich fundierte Grundlage zu schaffen, auf der die spätere technische Entwicklung systematisch und nachvollziehbar aufbauen kann.
+Die dargestellten Inhalte umfassen erste konzeptionelle Entwürfe sowie Skizzen der Benutzeroberfläche, in denen zentrale Funktionalitäten und Eigenschaften des Process-Managers veranschaulicht werden. Diese Skizzen sind als Gestaltungsrahmen zu verstehen, die im weiteren Verlauf der Entwicklung als Orientierung dienen.
+Im Zuge der späteren Implementierung können die hier entwickelten Strukturen und Darstellungen angepasst und weiterentwickelt werden, um spezifischen Anforderungen und praktischen Gegebenheiten gerecht zu werden.
+\subsection{Grob-Ablauf}
+Der Grobablauf des Process-Managers dient der abstrakten Darstellung des typischen Workflows eines Benutzers. Dieser Ablauf gliedert sich in vier zentrale Bestandteile: den Anmeldevorgang sowie die drei Hauptfunktionen des Process-Managers – das Erstellen, Ausführen und Bearbeiten von Prozessen. In diesem Abschnitt werden diese Bestandteile strukturiert beschrieben und durch geeignete Visualisierungen verständlich veranschaulicht.
+\subsection*{Login}
+Nach dem Starten des ProcessManager-Systems öffnet sich ein Login-Fenster (\autoref{img:Login}), das die gesamte Benutzeroberfläche abdeckt, bevor die Startseite geladen wird. Dieses Fenster ist als strukturiertes Dialogfeld mit der Überschrift \glqq ProcessManager - Login\grqq{} gestaltet. Es enthält zwei zentrale Eingabefelder: eines für den Benutzernamen und eines für das Passwort. Diese Felder dienen der Benutzerauthentifizierung und tragen zur Sicherheit des Systems bei.\\
+Zur Interaktion mit dem Login-Fenster steht den Benutzern eine \glqq Login\grqq{}-Schaltfläche zur Verfügung. Diese ermöglicht die Übermittlung der eingegebenen Anmeldeinformationen zur Überprüfung und gewährt bei erfolgreicher Authentifizierung den Zugriff auf die Startseite des Systems. \\
+Die Implementierung dieses Login-Mechanismus ist ein grundlegender Bestandteil der Zugangskontrolle und Sicherheitsarchitektur des ProcessManager-Systems. Er stellt sicher, dass ausschließlich autorisierte Benutzer Zugriff auf die Systemfunktionen und Daten erhalten. Die Eingabe individueller Anmeldedaten dient nicht nur der Identitätsprüfung, sondern bildet auch die Basis für ein rollenbasiertes Zugriffsrechtesystem, das die Berechtigungen und Aktionen innerhalb des Systems reguliert.
+
+\useimage{Login} 
+
+Nach erfolgreicher Authentifizierung wird die Startseite geladen, wie in \autoref{img:Startseite} dargestellt. Auf dieser Seite stehen drei Hauptfunktionen zur Verfügung: Prozesse erstellen, ausführen und bearbeiten. Diese Funktionen werden im Folgenden näher erläutert.\\
+\useimage{Startseite}\\
+Die Anzeigen in den unteren und oberen rechten Bereichen (\nameref{Benachrichtigungen} und \nameref{Rollenmanagement}) der Benutzeroberfläche werden zu einem späteren Zeitpunkt thematisiert (Siehe \autoref{Rollenmanagement} und \autoref{Benachrichtigungen}).
+
+\subsection*{Prozess erstellen}
+Die Funktion zur Erstellung von Prozessen im ProcessManager-System wird durch den \glqq Create Process\grqq{}-Knopf initiiert und bietet zwei unterschiedliche Methoden zur Prozessdefinition: Drag-and-Drop und Coding.
+
+Die \textbf{Drag-and-Drop Methode} (links in \autoref{img:Prozess_Erstellen}) zur Prozesserstellung nutzt eine grafische Oberfläche, die es Benutzern ermöglicht, Prozesselemente wie \glqq Ereignis {XY}\grqq{} und \glqq Aktivität {XYA}\grqq{} visuell zu platzieren und miteinander zu verknüpfen. Diese intuitive Herangehensweise erleichtert es auch weniger technisch versierten Anwendern, komplexe Prozessabläufe zu modellieren, ohne direkt mit Code interagieren zu müssen.
+
+Alternative ist eine \textbf{Code-basierte Methode} (rechts in \autoref{img:Prozess_Erstellen}) zur Prozessdarstellung möglich. In diesem Modus wird die Prozesslogik mithilfe einer spezifischen Syntax oder Programmiersprache definiert. Die Anweisung \glqq Process is illustrated by code\grqq{} weist darauf hin, dass die grafische Darstellung des Prozesses rechts neben dem Code daraus automatisch generiert wird. Diese Methode ermöglicht eine präzise und flexible Definition komplexer Prozesslogiken.\\
+
+\useimage{Prozess_Erstellen}
+
+Die Drag-and-Drop-Methode und die Code-basierte Methode unterscheiden sich deutlich in mehreren Aspekten und eignen sich je nach Kontext unterschiedlich gut. Im Folgenden sollen die beiden Methoden hinsichtlich einiger Faktoren verglichen werden, um die beste Methode für dieses Projekt finden zu können. 
+
+Bezüglich der \textbf{Benutzerfreundlichkeit} bietet die Drag-and-Drop-Methode klare Vorteile, da sie keine Programmierkenntnisse erfordert und durch ihre intuitive Bedienbarkeit insbesondere für Endnutzer geeignet ist. Die Code-basierte Methode hingegen setzt technischen Wissen voraus, was sie für weniger erfahrene Anwender weniger zugänglich macht. 
+
+Bei der \textbf{Effizienz} zeigt sich, dass Drag-and-Drop für die schnelle Umsetzung einfacher Prozesse ideal ist, da Nutzer Prozesse visuell und ohne großen Aufwand erstellen können. Allerdings kann diese Methode bei komplexeren Prozessen an ihre Grenzen stoßen. Die Code-basierte Methode benötigt mehr Zeit für die initiale Entwicklung, ist jedoch bei wiederholbaren oder komplexen Prozessen langfristig effizienter, da Anpassungen und Erweiterungen besser integrierbar sind. 
+
+In Bezug auf \textbf{Flexibilität} ist die Code-basierte Methode überlegen, da sie nahezu unbegrenzte Anpassungsmöglichkeiten bietet. Im Gegensatz dazu ist die Drag-and-Drop-Methode durch die vorgegebenen Werkzeuge eingeschränkt, was sie weniger geeignet für spezifische Anforderungen macht.
+
+Auch in der \textbf{Fehleranfälligkeit} gibt es Unterschiede: Während Drag-and-Drop die Gefahr von Syntaxfehlern minimiert, können fehlerhafte Logiken durch Missverständnisse in der Prozessstruktur entstehen. Bei der Code-basierten Methode sind Syntax- und Logikfehler zwar häufiger, können jedoch mithilfe von Debugging-Tools effizient behoben werden.
+
+Die \textbf{Wartbarkeit} ist ein weiterer entscheidender Faktor. Prozesse sind mit der Drag-and-Drop-Methode sind leicht wartbar, da Änderungen intuitiv vorgenommen werden können. Die Code-basierte Methode erfordert dagegen spezielles Wissen, ist jedoch langfristig besonders für größere und skalierbare Systeme wartungsfreundlicher.
+
+Dies zeigt sich auch in der \textbf{Skalierbarkeit}, wo die Code-basierte Entwicklung klar im Vorteil ist, da sie sich ideal für komplexe und erweiterbare Anwendungen eignet. Die Drag-and-Drop-Methode stößt hingegen bei umfangreichen Projekten schnell an ihre Grenzen, da die Übersichtlichkeit und Anpassungsfähigkeit begrenzt sind.
+
+Die Drag-and-Drop-Methode ist die optimale Wahl für dieses Projekt, da sie die Anforderungen besser erfüllt als die Code-basierte Methode. Ihre hohe Benutzerfreundlichkeit ermöglicht es, Prozesse ohne Programmierkenntnisse zu erstellen, während die Code-basierte Methode aufgrund technischer Kenntnisse eine Hürde darstellt.
+In puncto Effizienz überzeugt Drag-and-Drop durch die schnelle Erstellung einfacher Abläufe, während die Code-basierte Methode unnötig aufwendig wäre. Die geringere Flexibilität der Drag-and-Drop-Methode ist unproblematisch, da keine individuellen Anpassungen erforderlich sind – die Anforderungen von EPK und BPMN definieren bereits, welche Werkzeuge für die Prozesse genutzt werden dürfen.
+Die visuelle Steuerung der Drag-and-Drop-Methode verringert die Fehleranfälligkeit, während die Code-basierte Methode trotz Debugging-Tools anfälliger für Syntax- und Logikfehler ist. Auch bei der Wartbarkeit punktet Drag-and-Drop, da die Prozesse einfach und intuitiv zu pflegen sind, während die Code-basierte Methode mehr Aufwand erfordert.
+Da die Skalierbarkeit keine große Rolle spielt, erfüllt Drag-and-Drop die Anforderungen problemlos, ohne die Komplexität der Code-basierten Methode. Insgesamt ist Drag-and-Drop aufgrund seiner Benutzerfreundlichkeit, Effizienz, Fehlerreduktion und Wartungsfreundlichkeit die bessere Wahl.
+
+Die Möglichkeit einer Hybrid-Lösung, die die Vorteile beider Methoden kombiniert, könnte in manchen Fällen noch besser geeignet sein, insbesondere wenn eine gewisse Flexibilität und erweiterte Anpassbarkeit erforderlich wäre. Eine solche Lösung würde es ermöglichen, sowohl die Benutzerfreundlichkeit von Drag-and-Drop als auch die Flexibilität und Funktionalität der Code-basierten Methode zu nutzen. Allerdings würde die Umsetzung einer solchen Hybrid-Lösung in der Komplexität den Rahmen dieser Arbeit sprengen, da sie zusätzliche Entwicklungsressourcen und einen höheren Wartungsaufwand erfordern würde. Daher bleibt die Drag-and-Drop-Methode für die vorliegenden Anforderungen die praktikabelste Wahl.
+
+
+\subsection*{Prozesse ausführen}
+Die Funktion zur Ausführung von Prozessen im ProcessManager-System wird durch den \glqq Execute Process\grqq{}-Knopf initiiert und umfasst mehrere Tätigkeiten. Dazu zählen unter anderem die Prozessauswahl, das Abrufen von weiteren Informationen eines Ereignisses, Überprüfung von Zugriffsrechten, sowie das allgemeine Ausführen von Prozessen.
+
+Die \textbf{Auswahl eines Prozesses} erfolgt aus einer übersichtlichen Liste verfügbarer Prozesse, die im Interface des ProcessManagers angezeigt wird (\ref{img:Prozess_Ausführen_Liste}). Neben der Möglichkeit, durch die Liste zu scrollen, steht eine Suchleiste zur Verfügung, um gezielt nach Prozessen zu suchen. Dies erleichtert insbesondere in umfangreichen Prozesssammlungen das schnelle Auffinden des gewünschten Eintrags. Um die Wahl des korrekten Prozesses zu unterstützen, wird rechts neben der Liste eine Vorschau des ausgewählten Prozesses angezeigt. Diese Vorschau liefert eine Zusammenfassung der wichtigsten Informationen und ermöglicht eine visuelle Überprüfung, bevor der Prozess gestartet wird.\\
+\useimage{Prozess_Ausführen_Liste}\\
+\newpage
+Der \textbf{Start des Prozesses} könnte entweder durch einen Doppelklick auf den entsprechenden Eintrag in der Liste oder durch die Auswahl des Prozesses mit anschließendem Klick auf einen Start-Knopf erfolgen. Diese intuitive Interaktionsmöglichkeit erleichtert die Bedienung und sorgt für eine effiziente Prozessausführung. Das Starten eines Prozesses und dessen anschließende Darstellung sind in \autoref{img:Prozess_Ausführen_Gestartet} dargestellt.\\
+\useimage{Prozess_Ausführen_Gestartet}\\
+
+Um \textbf{detaillierte Informationen} zu einem bestimmten Ereignis eines Prozesses abzurufen, bietet das System die Möglichkeit, durch einen Doppelklick auf das jeweilige Ereignis entsprechende Daten anzuzeigen. Zusätzlich wird auch die benötigte Rolle angezeigt, die erforderlich ist, um das Ereignis auszuführen. Eine beispielhafte Darstellung dessen ist in \autoref{img:Prozess_Ausführen_Zusatzinfo} zu sehen.\\
+\useimage{Prozess_Ausführen_Zusatzinfo}\\
+Vor der Ausführung eines Prozesses wird überprüft, ob der Nutzer über die \textbf{erforderlichen Rechte} verfügt. Falls diese fehlen, erhält der Nutzer eine entsprechende Benachrichtigung und kann gegebenenfalls eine Anfrage zur Freigabe an einen Vorgesetzten senden. Diese Zugriffsprüfung stellt sicher, dass Prozesse nur von berechtigten Nutzern ausgeführt werden können. Dies gewährleistet, dass in jedem Prozess regelmäßig überprüft wird, ob Fehler auftreten, wodurch die Qualität des Prozesses auf höchstem Niveau gehalten wird.
+\useimage{Prozess_Ausführen_Rollen}
+
+\subsection*{Prozesse bearbeiten}
+Die Funktion zum Bearbeiten von Prozessen im ProcessManager-System wird durch den \glqq Edit Process\grqq{}-Knopf initiiert und bietet zwei hauptsächliche Funktionen: das Bearbeiten und das Löschen von Prozessen.
+Dabei ist das Interface ähnlich aufgebaut wie im Kapitel \glqq Prozess ausführen\grqq{}, wobei links eine Liste aller Prozesse und rechts eine Vorschau des ausgewählten Prozesses angezeigt wird. Zusätzlich werden die beiden Knöpfe \glqq Edit Process\grqq{} und \glqq Delete Process\grqq{} eingeführt.\\
+\useimage{Prozess_Bearbeiten_Startseite}\\
+Das Bearbeiten oder Löschen von Prozessen erfolgt, indem ein Prozess aus der Liste auf der linken Seite ausgewählt wird und anschließend der entsprechende Knopf für Bearbeiten oder Löschen betätigt wird.
+
+Wird der \textbf{Bearbeiten-Knopf} betätigt, wird der Ablauf wie beim Erstellen eines Prozesses (siehe \autoref{img:Prozess_Erstellen}) aufgerufen. Der bestehende Prozess ist bereits geladen und kann entsprechend angepasst werden.
+
+Wird der \textbf{Löschen-Knopf} betätigt, wird der Nutzer zunächst gefragt, ob er sicher ist, dass er den Prozess löschen möchte. Diese Aktion muss bestätigt oder abgelehnt werden, um versehentliches Löschen zu vermeiden.\\
+\useimage{Prozess_Bearbeiten_Abfrage}\\
+
+Die Logik hinter dem Löschen-Knopf ist je nach Rolle des Nutzers unterschiedlich, sodass es zwei Szenarien gibt:
+
+\textbf{Szenario 1:} Der Nutzer hat keine Rechte, Prozesse zu löschen.
+In diesem Fall wird der Nutzer benachrichtigt, dass eine Anfrage an den Vorgesetzten zur Löschung des Prozesses gesendet worden ist. Bestätigt der Vorgesetzte das Löschen, erhält der Nutzer eine Benachrichtigung, dass der Prozess gelöscht worden ist. (siehe \autoref{img:Prozess_Bearbeiten_Szenarien} oben)
+
+\textbf{Szenario 2:} Der Nutzer hat die erforderlichen Rechte, um Prozesse zu löschen.
+In diesem Fall wird der Nutzer benachrichtigt, dass der Prozess erfolgreich gelöscht worden ist. (siehe \autoref{img:Prozess_Bearbeiten_Szenarien} unten)
+
+Unabhängig vom Szenario wird beim Löschen eines Prozesses nicht direkt alle aktiven Instanzen gelöscht. Lediglich die Möglichkeit, neue Prozesse dieser Art zu starten, wird entfernt. Der Prozess wird aus der Liste ausführbarer Prozesse gelöscht, bereits gestartete Prozesse können jedoch weiterhin abgeschlossen werden. Neue Instanzen können nicht mehr gestartet werden.
+\useimage{Prozess_Bearbeiten_Szenarien}
+
+
+\newpage
+
+
+\subsection{Rollenmanagement} \label{Rollenmanagement}
+Das Rollenmanagement ist ein essenzieller Bestandteil moderner Organisationsstrukturen und \ac{IT}-Systeme, da es sicherstellt, dass nur autorisierte Personen Zugriff auf sensible Daten und Prozesse haben und dass Verantwortlichkeiten klar zugewiesen werden. Ein fundiertes Rollenmanagement trägt zur Verbesserung der Sicherheit, Effizienz und Nachvollziehbarkeit von Arbeitsprozessen bei.
+
+\subsection*{Zugang}
+Ein zentraler Aspekt des Rollenmanagements ist die Regelung des Zugangs zu vertraulichen Prozessen und Informationen. Unberechtigte Personen sollten keinen Zugriff erhalten, um Sicherheitsrisiken wie Datenlecks oder unbefugte Manipulation zu minimieren. Dies wird durch die Implementierung von rollenbasierten Zugriffsmechanismen (\acs{RBAC}) erreicht.\\
+\ac{RBAC} basiert auf der Zuweisung von Rollen, die spezifische Rechte und Pflichten definieren. Eine Person kann je nach Funktion eine oder mehrere Rollen übernehmen. Diese Rollen beschränken den Zugang zu Ressourcen und Prozessen auf das notwendige Minimum, was nicht nur die Sicherheit erhöht, sondern auch die Einhaltung gesetzlicher und organisatorischer Vorschriften erleichtert, wie beispielsweise das Datenschutz-Gesetz.
+
+\subsection*{Kontrolle über Prozess-Aktivitäten}
+\textbf{Rollenspezifische Aktivitäten}\\
+Die Zuweisung von Prozess-Aktivitäten an spezifische Rollen gewährleistet, dass nur qualifizierte und autorisierte Personen bestimmte Aufgaben übernehmen. Jede Aktivität innerhalb eines Prozesses wird einer verantwortlichen Rolle zugeordnet, die entweder die Aufgabe eigenständig durchführt oder deren Ausführung überwacht und die Verantwortung übernimmt.
+Diese klare Rollenverteilung fördert Transparenz und Rückverfolgbarkeit, wodurch Sicherheitsvorfälle oder ineffiziente Abläufe effizient adressiert werden können. Insbesondere in stark regulierten Sektoren wie dem Finanzwesen, dem Gesundheitssektor oder der Automobilindustrie ist diese Nachvollziehbarkeit unverzichtbar.
+
+\textbf{Löschen von Prozessen}\\
+Das Löschen von Prozessen ist eine kritische Aktion, die einer strengen Kontrolle unterliegt. Nur Rollen mit spezifischen Berechtigungen dürfen diese Aufgabe ausführen, um das Risiko von Datenverlusten oder unautorisierter Löschung sensibler Informationen zu minimieren.
+Ein mehrstufiger Genehmigungsprozess, der eine unabhängige Überprüfung vorsieht, bietet zusätzliche Sicherheit. Solche Mechanismen senken das Risiko von Fehlern oder Missbrauch und gewährleisten, dass alle Löschvorgänge dokumentiert werden und so nachvollziehbar bleiben.
+
+\subsection*{Fazit des Rollenmanagements}
+Das Rollenmanagement stellt sicher, dass Zugang und Kontrolle über Prozess-Aktivitäten klar geregelt sind. Durch den Einsatz von \ac{RBAC} und anderen Kontrollmechanismen werden Sicherheit und Effizienz verbessert, während die Einhaltung gesetzlicher und organisatorischer Vorschriften gewährleistet wird. Die sorgfältige Gestaltung und Implementierung solcher Systeme sind daher unerlässlich für jede Organisation.
+
+
+\subsection{Löschen von Prozessen}
+Das Löschen von Prozessen stellt eine kritische Operation dar, die sowohl technische als auch organisatorische Herausforderungen mit sich bringt. Um Datenverlust, Sicherheitsrisiken und regulatorische Verstöße zu vermeiden, ist eine strukturierte und regelkonforme Vorgehensweise unerlässlich. In diesem Unterkapitel wird dargelegt, wie Löschprozesse effizient und sicher gestaltet werden können.
+
+\subsection*{Grundprinzipien beim Löschen von Prozessen}
+Das Löschen von Prozessen erfordert eine sorgfältige Abwägung und Kontrolle. Dabei sollten die im Folgenden behandelten Prinzipien berücksichtigt werden.
+
+Das Löschen von Prozessen erfordert eine klare \textbf{Regelung von Berechtigungen und Verantwortlichkeiten}. Hierfür bietet sich ein rollenbasiertes Zugriffskontrollsystem, wie in Kapitel \nameref{Rollenmanagement} beschrieben, an. Diese Regelung sorgt dafür, dass nur qualifizierte und berechtigte Akteure in der Lage sind Prozesse zu löschen, was die Sicherheit erhöht. Durch die strikte Zuordnung der Verantwortlichkeiten können außerdem unbefugte und fehlerhafte Eingriffe minimiert oder komplett verhindert werden.
+
+Die Löschung von Prozessen erfordert eine sorgfältige \textbf{Prüfung des Status}. Ein Prozess kann entweder als angelegte, aber nicht gestartete Instanz oder als aktive, laufende Instanz vorliegen.\\
+Angelegte Instanzen stellen keine kritischen Anforderungen, da sie noch nicht aktiv sind und keine laufenden Aufgaben oder Abhängigkeiten aufweisen. Diese Instanzen können direkt gelöscht werden.\\
+Aktive Instanzen müssen sorgfältig beendet werden, um Datenverlust und Störungen zu vermeiden. Der Prozess muss kontrolliert abgeschlossen werden, wobei alle relevanten Zwischenergebnisse gespeichert und Abhängigkeiten berücksichtigt werden. Nach Abschluss kann die Instanz gelöscht werden. Eine umfassende Protokollierung des Löschvorgangs gewährleistet Nachvollziehbarkeit und unterstützt die Einhaltung regulatorischer Vorgaben.
+
+Die \textbf{Nachvollziehbarkeit von Löschvorgängen} ist ein essenzieller Bestandteil eines sicheren Prozessmanagements. Durch eine lückenlose Protokollierung aller Löschaktionen wird Transparenz geschaffen und die Rückverfolgbarkeit gewährleistet. Ein Löschprotokoll sollte Informationen wie den Zeitpunkt des Vorgangs, die verantwortliche Rolle oder Person, den Grund für das Löschen und die Identifikationsmerkmale des betroffenen Prozesses enthalten. Diese Daten sind nicht nur für interne Analysen hilfreich, sondern auch für externe Audits oder rechtliche Nachweise erforderlich. Die Protokollierung erhöht die Kontrolle und ermöglicht die Rekonstruktion von Prozessen, falls dies erforderlich wird.
+
+Um Risiken beim Löschen von Prozessen zu minimieren, sind \textbf{Sicherheitsmaßnahmen und Backup-Strategien} unverzichtbar. Vor einem Löschvorgang sollte eine Sicherungskopie des Prozesses erstellt werden, die im Bedarfsfall eine Wiederherstellung ermöglicht. Zusätzlich sollten Mechanismen wie ein mehrstufiger Genehmigungsprozess eingesetzt werden, um versehentliche Löschungen zu verhindern. Diese Sicherheitsvorkehrungen schützen vor unbeabsichtigten Datenverlusten.
+
+\subsection*{Umsetzung eines effizienten Löschvorgangs}
+Für eine effiziente Umsetzung eines Löschvorgangs müssen zunächst die Berechtigungen und Verantwortlichkeiten geklärt werden. Danach erfolgt eine Prüfung des Prozessstatus, um zwischen angelegten und aktiven Instanzen zu unterscheiden. Um Nachvollziehbarkeit und Sicherheit zu gewährleisten, ist eine lückenlose Protokollierung sowie ein mehrstufiger Genehmigungsprozess erforderlich. Vor der Löschung sollte zudem ein vollständiges Backup erstellt werden. Nach Abschluss des Löschvorgangs ist eine Überprüfung der Systemintegrität durchzuführen, und der gesamte Prozess sollte dokumentiert werden.
+
+\subsection*{Schlussfolgerung}
+Dieser Ablauf stellt den optimalen Fall eines Löschvorgangs dar. In der tatsächlichen Umsetzung können jedoch aufgrund des begrenzten Entwicklungszeitraums und des umfangreichen Projektumfangs Abstriche erforderlich sein. Um den Prioritäten gerecht zu werden, müssen möglicherweise einige Schritte wie etwa detaillierte Protokollierung oder umfangreiche Sicherheitsvorkehrungen, angepasst oder vereinfacht werden, um eine effiziente Durchführung zu gewährleisten.
+
+\subsection{Benachrichtigungen} \label{Benachrichtigungen}
+Benachrichtigungen spielen eine zentrale Rolle im ProcessManager-System und sind essenziell für die effektive Realisierung des gesamten Projekts. Sie dienen als Kommunikationsmechanismus, der Benutzer über wichtige Ereignisse, Statusänderungen und erforderliche Aktionen innerhalb des Prozessablaufs informiert. Die Implementierung eines robusten Benachrichtigungssystems erfüllt die Muss-Anforderung \ref{M8}, die explizit einen Mechanismus zur Information anderer Rollen bei Bedarf vorsieht.
+
+Im Kontext des Process-Managers sind Benachrichtigungen besonders wichtig für die Koordination rollenbasierter Aktionen. Da das System jedem Event im Prozess eine spezifische Rolle zuweist (\ref{M6}) und sicherstellt, dass nur Benutzer mit der entsprechenden Rolle ein Event ausführen können (\ref{M7}), sind Benachrichtigungen unerlässlich, um die beteiligten Akteure über ihre Aufgaben und Verantwortlichkeiten zu informieren.
+
+Die Umsetzung des Benachrichtigungssystems erfolgt durch Integration in die Benutzeroberfläche, wie in \autoref{img:Startseite} ersichtlich. Hier ist ein spezieller Bereich für Benachrichtigungen in der unteren rechten Ecke der Startseite vorgesehen. Diese Position gewährleistet, dass Benutzer wichtige Mitteilungen leicht wahrnehmen können, ohne den Arbeitsfluss zu unterbrechen.
+
+Die Implementierung eines gut durchdachten Benachrichtigungssystems ist entscheidend für die Realisierung eines effektiven, rollenbasierten Prozessmanagements. Es verbessert nicht nur die Kommunikation zwischen den Beteiligten, sondern trägt auch zur Einhaltung von Fristen, zur Qualitätssicherung und zur allgemeinen Effizienz des Prozessablaufs bei.
+
+\newpage
+\section{Wahl der Anwendungsart}
+Bei der Entwicklung eines Prozessmanagement-Tools mit den in Kapitel \ref{Anforderungen} genannten Anforderungen stehen grundsätzlich zwei technologische Ansätze zur Auswahl: webbasierte Anwendungen und Desktop-Anwendungen. Beide Optionen bieten spezifische Vor- und Nachteile, die im Kontext der Projektanforderungen abgewogen werden müssen.  
+
+\subsection*{Web-Anwendungen}
+Web-Anwendungen sind Softwarelösungen, die über einen Webbrowser zugänglich sind und auf einem Server ausgeführt werden. Sie erfordern keine lokale Installation und sind plattformunabhängig, da sie auf allen Geräten mit einem modernen Browser genutzt werden können. Nutzer greifen über das Internet auf die Anwendung zu, wobei die Daten auf Servern gespeichert und verarbeitet werden. Ein wesentlicher Vorteil von Webanwendungen ist ihre einfache Wartung und Aktualisierung, da Änderungen zentral vorgenommen werden und automatisch allen Nutzern zur Verfügung stehen. Webanwendungen bieten zudem die Möglichkeit zur Integration von Echtzeit-Kommunikationsmechanismen, was sie besonders für kollaborative und dynamische Anwendungen geeignet macht.
+
+\subsection*{Desktop-Anwendungen}
+Desktop-Anwendungen sind Softwareprogramme, die lokal auf einem Computer installiert und dort ausgeführt werden. Sie sind an das Betriebssystem des jeweiligen Geräts gebunden. Desktop-Anwendungen bieten in der Regel eine höhere Performance, da sie direkt auf die Ressourcen des Computers zugreifen können, und sind häufig für rechenintensive Aufgaben oder Anwendungen ohne permanente Internetverbindung konzipiert. Die Benutzer können mit Desktop-Anwendungen auch dann arbeiten, wenn keine Internetverbindung besteht, was sie in Umgebungen mit instabiler oder fehlender Netzwerkverbindung besonders nützlich macht.
+
+\subsection*{Wissenschaftliche Analyse der möglichen Anwendungsarten}
+Ein zentraler Faktor ist die \textbf{Flexibilität und Zugänglichkeit}. Webanwendungen bieten den Vorteil, plattformunabhängig zu sein und lediglich einen Browser zu benötigen. Im Gegensatz dazu sind Desktop-Anwendungen auf spezifische Betriebssysteme beschränkt, können jedoch ohne Internetverbindung genutzt werden. Für Anwendungen, die breite Zugänglichkeit und flexible Einsatzmöglichkeiten erfordern, bieten Webanwendungen klare Vorteile.
+
+Ein weiteres Kriterium ist die \textbf{Benutzerfreundlichkeit und Akzeptanz}. Webanwendungen zeichnen sich dadurch aus, dass sie gut für einen breiten Nutzerkreis mit unterschiedlichen Fachkenntnissen und Qualifikationen geeignet sind. Die intuitive Bedienung und moderne UI/UX-Designs fördern die Akzeptanz bei diversen Anwendergruppen. Darüber hinaus können Änderungen oder Aktualisierungen einfach und zentral vorgenommen und dann breitflächig integriert werden, was insbesondere in dynamischen Umgebungen von Vorteil ist. Desktop-Anwendungen hingegen bieten eine stärkere Anpassbarkeit an spezifische Benutzeranforderungen, erfordern jedoch häufig mehr Aufwand bei der Verteilung von Änderungen oder Updates. Angesichts der Projekterfordernisse, die eine hohe Zugänglichkeit und einfache Wartung voraussetzen, ist eine Web-Anwendung in diesem Kriterium vorzuziehen.
+
+Die \textbf{Sicherheit und Datenschutz} stellen ein zentrales Anliegen dar. 
+Web-Anwendungen profitieren von zentralisierten Sicherheitsmaßnahmen, die eine konsistente Implementierung und Wartung ermöglichen. Allerdings sind sie potenziell anfälliger für Online-Bedrohungen, da die Daten über Netzwerke übertragen und in zentralen Systemen gespeichert werden. 
+Desktop-Anwendungen hingegen bieten durch die lokale Speicherung eine bessere Kontrolle über sensiblen Daten. Diese Dezentralisierung macht sie jedoch abhängig von individuellen Sicherheitsmaßnahmen auf jedem Gerät, was zu uneinheitlichen Schutzniveaus führen kann.
+
+Auch \textbf{Performance und Offline-Funktionalität} sind entscheidende Faktoren. Desktop-Anwendungen bieten durch stärkere Hardwareintegration eine bessere Performance, insbesondere bei rechenintensiven Prozessen. Sie sind außerdem vollständig offline nutzbar. Webanwendungen hingegen sind von der Internetverbindung sowie der Serverleistung abhängig und besitzen in der Regel eingeschränkte Offline-Funktionalität. Für Szenarien mit hohem Leistungsbedarf oder ohne durchgängige Internetverbindung ist daher eine Desktop-Anwendung zu bevorzugen.
+
+Die \textbf{projektspezifischen Anforderungen} umfassen Aspekte wie parallele Prozessausführung, Rollenzuweisung, Benachrichtigungen sowie die Unterstützung für gemeinsames und zeitgleiches Arbeiten innerhalb der Anwendung. Webanwendungen ermöglichen durch Echtzeit-Kommunikationstechnologien eine effektive Umsetzung von Rollenzuweisungen und Benachrichtigungen. Darüber hinaus erleichtert die zentrale Infrastruktur einer Web-Anwendung die gleichzeitige Zusammenarbeit mehrerer Nutzer, da Änderungen in Echtzeit synchronisiert und allen Beteiligten direkt zugänglich gemacht werden können.
+Desktop-Anwendungen bieten hingegen eine stärkere Kontrolle über die Nutzung lokaler Ressourcen, sind jedoch weniger geeignet für das simultane Arbeiten, da sie typischerweise keine native Unterstützung für Echtzeit-Synchronisation oder Kollaboration bieten. Die zentrale Aktualisierung und die Fähigkeit zur nahtlosen Zusammenarbeit sprechen daher für die Wahl einer Web-Anwendung, insbesondere in Projekten, die auf dynamische Prozesse angewiesen sind.
+
+\subsection*{Schlussfolgerung}
+Nach Abwägung aller Kriterien erscheint eine Web-Anwendung als die am besten geeignete Wahl für das vorliegende Projekt. Sie bietet Vorteile hinsichtlich Zugänglichkeit, Benutzerfreundlichkeit, Wartbarkeit und den projektspezifischen Anforderungen. Desktop-Anwendungen wären nur dann vorzuziehen, wenn die Anforderungen an Offline-Funktionalität oder Performance eine zentrale Rolle spielen. Die Projekt-Anforderungen legen jedoch nahe, dass diese Aspekte im vorliegenden Fall keine Priorität haben, wodurch die Vorteile einer Web-Anwendung überwiegen.
+
+
+\iffalse
+\subsection*{Webbassierte Anwendung}
+\subsection*{Desktop-Anwendung}
+\fi
+
+\newpage
+\section{Wahl der Applikation-Technologie}
+Basierend auf den Anforderungen des ProcessManager-Projekts und einer detaillierten Analyse relevanter Technologien werden im Folgenden die jeweils besten Optionen für Frontend, Backend und Datenbank evaluiert. Die Bewertung erfolgt anhand von Kriterien wie Performanz, Skalierbarkeit, Wartbarkeit, Entwicklungseffizienz und der Unterstützung durch die Community.
+
+\subsection{Frontend-Technologien}
+\textbf{React} bietet eine hervorragende Performanz, insbesondere bei komplexen Benutzeroberflächen, da der Virtual DOM eine effiziente Aktualisierung von UI-Elementen ermöglicht. Als Bibliothek statt Framework gewährt React den Entwicklern große Flexibilität in der Strukturierung und Integration von Anwendungen. Die flache Lernkurve ermöglicht eine schnelle Einarbeitung neuer Teammitglieder, und die modulare Struktur von React-Komponenten erleichtert Wartung und Erweiterung. Mit einer großen Community und einem reichhaltigen Ökosystem bietet React einfachen Zugang zu Bibliotheken und Tools, was die Entwicklung effizienter macht.
+
+\textbf{Angular}, ein Framework, zeichnet sich durch eine umfassende Struktur aus, die für große Unternehmensanwendungen geeignet ist. Es bietet Optimierungen wie Tree-Shaking und Ahead-of-Time Compilation, was die Performanz verbessert. Jedoch ist die Lernkurve steil, und die Komplexität der Architektur kann die Entwicklungszeit verlängern. Angular überzeugt bei der Wartbarkeit durch starke Typisierung und integrierte Tools.
+
+\textbf{Vue.js} punktet mit einer intuitiven Lernkurve und einer effizienten Rendering-Engine. Es ist skalierbar und einfach zu implementieren, eignet sich jedoch weniger für sehr große Anwendungen aufgrund der begrenzten Flexibilität und einer kleineren Community im Vergleich zu React.
+
+\textbf{Empfehlung:} React wird für das Frontend des ProcessManager-Projekts empfohlen, da es eine ideale Balance zwischen Flexibilität, Performanz und Entwicklungseffizienz bietet. Die große Community-Unterstützung erleichtert zudem die langfristige Wartung und Erweiterung.
+
+\subsection{Backend-Technologien}
+Node.js bietet eine hohe Performanz, insbesondere bei I/O-intensiven Anwendungen, dank seiner ereignisgesteuerten, asynchronen Architektur. Die einheitliche Nutzung von JavaScript im Frontend und Backend reduziert den Entwicklungsaufwand erheblich. Eine große und aktive Community sowie eine Vielzahl von Bibliotheken ermöglichen die schnelle Implementierung von Funktionalitäten. Node.js zeichnet sich zudem durch seine Skalierbarkeit aus, was für das ProcessManager-Projekt essenziell ist.
+
+Spring Boot, basierend auf Java, liefert hervorragende Performance für rechenintensive Aufgaben und eine robuste Architektur. Allerdings ist die Komplexität höher, was die Entwicklungszeit und den Schulungsaufwand für neue Entwickler erhöht. Spring Boot ist besonders für Unternehmensanwendungen geeignet, die strenge Typisierung und ausgefeilte Sicherheitsmechanismen benötigen.
+
+Django, ein Framework auf Basis von Python, bietet dank seiner "Batteries included"-Philosophie eine hohe Entwicklungseffizienz. Es ist gut strukturiert und eignet sich für mittlere bis große Anwendungen. Im Bereich der Skalierbarkeit bleibt es jedoch hinter Node.js zurück.
+
+Empfehlung: Node.js ist die beste Wahl für das Backend des ProcessManager-Projekts, da es eine hohe Performanz, Skalierbarkeit und Flexibilität bietet. Die einheitliche JavaScript-Umgebung erleichtert die Zusammenarbeit zwischen Frontend- und Backend-Teams.
+
+\subsection{Datenbank-Technologie}
+MongoDB ist eine NoSQL-Datenbank, die sich durch ein dynamisches Schema und eine hervorragende horizontale Skalierbarkeit auszeichnet. Sie ist besonders geeignet für Anwendungen mit dynamischen Datenmodellen wie im ProcessManager-Projekt. MongoDB ermöglicht schnelle Anpassungen und bietet eine hohe Performanz bei Lese- und Schreiboperationen. Die Community und das Ökosystem sind umfangreich, was die Integration in bestehende Systeme erleichtert.
+
+Relationale Datenbanken wie MySQL oder PostgreSQL bieten strenge ACID-Eigenschaften und eignen sich besonders für Anwendungen mit komplexen Abfragen und hohem Bedarf an Datenintegrität. Sie sind jedoch durch ihr festes Schema weniger flexibel und primär vertikal skalierbar, was sie weniger geeignet für dynamische und skalierbare Anwendungen macht.
+
+Oracle bietet höchste Performanz und strenge Datenkonsistenz, ist jedoch mit hohen Lizenzkosten und einem hohen Wartungsaufwand verbunden. Für kleinere und dynamische Anwendungen wie den ProcessManager ist Oracle überdimensioniert.
+
+Empfehlung: MongoDB wird als optimale Wahl empfohlen, da es die Flexibilität und Skalierbarkeit bietet, die für die dynamischen Prozessmodelle des Projekts erforderlich sind. Die einfache Integration und hohe Performanz machen es zur idealen Datenbank-Technologie.
+%ENDE BEARBEITUNG
+
+\subsection{Fazit}
+Nach eingehender Analyse und Bewertung der technologischen Anforderungen des ProcessManager-Projekts ergibt sich eine klare Empfehlung für die verwendeten Technologien:
+
+Das Frontend sollte mit React entwickelt werden, da diese Bibliothek durch ihre Flexibilität, hohe Performance und die starke Unterstützung einer breiten Community überzeugt. Für das Backend ist Node.js die bevorzugte Wahl, da es eine einheitliche JavaScript-Umgebung bietet und durch hohe Performanz sowie ausgezeichnete Skalierbarkeit punktet. Als Datenbank empfiehlt sich MongoDB, deren dynamische Struktur, Flexibilität und Skalierbarkeit ideal auf die Bedürfnisse des Projekts zugeschnitten sind.
+
+Diese Technologie-Kombination bietet eine optimale Balance zwischen Entwicklungseffizienz, Leistung und Wartbarkeit. Die Komponenten harmonieren nahtlos miteinander und gewährleisten eine umfassende Erfüllung der spezifischen Projektanforderungen. Mit dieser Auswahl wird eine skalierbare, leistungsstarke und zukunftssichere Implementierung des ProcessManager-Projekts ermöglicht.

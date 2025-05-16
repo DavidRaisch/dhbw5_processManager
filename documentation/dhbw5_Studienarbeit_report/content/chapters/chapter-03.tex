@@ -1,0 +1,685 @@
+% !TEX root = ../../document/document.tex
+
+% For every chapter create a file in the /content/chapters folder with the name
+% chapter-XX.tex where XX is the chapter number  (e.g. 01, 02, 03, ..., 99).
+
+
+\chapter{Implementierung}
+In diesem Kapitel wird die tatsächliche Umsetzung und Implementierung des geplanten Process-Managers aus \autoref{theoretische_grundlagen} thematisiert. Dabei wird die Projektstruktur erläutert und alle wichtigen Funktionen des Process-Managers erklärt und anschaulich gezeigt. 
+
+
+\section{Überblick und Kontext der Implementierung}
+\useimage{project_structure_pm}
+Das Projekt gliedert sich in drei zentrale Komponenten: das Frontend, das Backend und die Datenbank. Eine vereinfachte Darstellung der Projektstruktur ist in \autoref{img:project_structure_pm} zu sehen. Die drei grau hinterlegten Rechtecke repräsentieren die genannten Hauptkomponenten, während die blaue Umrandung die Bereitstellung dieser Komponenten mittels Docker symbolisiert. Eine detaillierte Auseinandersetzung mit der Docker-basierten Bereitstellung erfolgt in \autoref{docker}.
+Mit Hilfe des Frontends wird den Benutzern Funktionen wie das Verwalten oder das Ausführen von Prozessen ermöglicht. Dabei kommuniziert das Frontend mit dem Backend, um Daten aus der Datenbank zu erhalten. Das Backend kommuniziert sowohl mit dem Frontend als auch der Datenbank und enthält so den wichtigsten Teil des Projekts für die Kommunikation, die API-Endpunkte. So kann sichergestellt werden, dass die verwalteten Daten in der Datenbank anschaulich dem Benutzer auf dem Frontend zur Verfügung gestellt werden. In der Datenbank werden wichtige Daten-Sammlungen wie Benutzer, Projekte, Prozesse, Instanzen oder Benarichtigungen verwaltet. 
+
+Die Verbindung zwischen Backend und Datenbank erfolgt über die Node.js-Bibliothek Mongoose, welche die Kommunikation mit einer MongoDB-Instanz ermöglicht. Der folgende Code-Ausschnitt \ref{code:user_database_pm} zeigt die konkrete Implementierung dieser Verbindung innerhalb des Backends:
+\usecode{connection_mongodb_pm}
+Dabei wird über die Umgebungsvariable \glqq MONGODB\_URI\grqq\ die Adresse der Datenbank definiert. Falls diese Variable nicht gesetzt ist, wird auf eine lokale Instanz zurückgegriffen. Die Parameter \glqq useNewUrlParser\grqq\ und \glqq useUnifiedTopology\grqq\ dienen der Kompatibilität mit aktuellen MongoDB-Treibern. Die erfolgreiche Verbindung wird über eine Konsolenausgabe bestätigt, während potenzielle Fehler im Fehlerfall protokolliert werden.
+
+Nur durch eine gute Zusammenarbeit dieser drei Komponenten, kann der Process-Manager vollständig und effizient funktionieren. 
+Die einzelnen Bestandteile und deren Zusammenspiel wird im Laufe dieses Kapitels noch genauer, anhand der wichtigsten Funktionen, beschrieben.
+
+\section{Login}
+Der Login des Process-Managers ist klassisch. Der Benutzer muss seinen Benutzernamen und das passende Passwort eingeben, bevor er auf die Startseite des Process-Managers weitergeleitet wird. Diese Benutzeroberfläche ist in \autoref{img:login_pm} zu sehen.
+\useimage{login_pm}
+
+Dabei müssen drei Fälle beachtet werden. Der erste Fall ist der Benutzer gibt einen vorhandenen Benutzername mit passendem Passwort ein. In diesem Fall wird der Benutzer auf die Startseite des Process-Managers weitergeleitet. Allerdings könnte der Benutzer auch ein nicht passendes Passwort zu dem angegebenen Benutzer angeben oder eins der beiden Felder komplett leer lassen. Diese beiden Bilder sind im Anhang in \autoref{img:empty_loginfield_pm} und \autoref{img:wrong_credentials_pm} zu sehen. 
+
+Sofern eines der beiden Eingabefelder nicht ausgefüllt wird, erfolgt eine Validierung durch die im Browser integrierte Standardfunktion. Für den seltenen Fall, dass der verwendete Browser keine derartige Validierung unterstützt, ist zusätzlich eine serverseitige Fehlerbehandlung implementiert, die den Benutzer bei unvollständiger Eingabe entsprechend informiert. Dieser Mechanismus ist in \autoref{code:login_endpoint_pm}, Zeile 3–4 dargestellt.
+Eine detaillierte Betrachtung der Fehlerbehandlung bei ungültigen Login-Daten erfolgt im Abschnitt zur Backend-Logik.
+
+\textbf{Private Routing}
+
+Es ist sicherzustellen, dass auf sämtliche Bereiche des Process-Managers – mit Ausnahme der Login-Seite – ausschließlich nach erfolgreichem Login zugegriffen werden kann. Ein direkter Aufruf von Seiten über die URL ohne vorherige Authentifizierung muss unterbunden werden. Dies wird durch den Einsatz von Private Routing gewährleistet. Dies ist im \autoref{code:routing_example} verkürzt veranschaulich und in \autoref{code:routing} im Anhang ist das komplette Routing des Process-Managers zu sehen.
+
+\usecode{routing_example}
+
+Private Routing stellt sicher, dass alle geschützten Seiten des Process-Managers bei fehlender Authentifizierung automatisch zur Login-Seite umleiten. Die Login-Seite selbst ist die einzige Seite, die nicht über das PrivateRoute-Tag geschützt ist und somit auch für nicht angemeldete Benutzer zugänglich bleibt.
+
+\textbf{Nutzer-Sammlung in Datenbank}
+
+Für den Login-Vorgang wird eine Datenbank mit einer Sammlung von Nutzerinformationen benötigt. Diese Datenbank enthält alle relevanten Angaben zu den Benutzern, darunter: Benutzername, Passwort, Rolle sowie zugewiesene Projekte (siehe \autoref{code:user_database_pm}). Für die Authentifizierung beim Login sind jedoch ausschließlich der Benutzername und das verschlüsselte Passwort erforderlich.
+
+\usecode{user_database_pm}
+
+\textbf{Wieso sollte das Passwort unbedingt verschlüsselt gespeichert werden?}
+
+Die Verschlüsselung bzw.\ sichere Hashing des Passworts schützt die Daten der Nutzer bei einem möglichen unautorisierten Zugriff auf die Datenbank. Ohne Verschlüsselung könnten Angreifer Passwörter im Klartext auslesen und missbrauchen. Durch die Verwendung von Einweg-Hashfunktionen mit Salt wird sichergestellt, dass selbst bei gleichen Passwörtern unterschiedliche Hashwerte entstehen, was die Sicherheit zusätzlich erhöht. Damit wird ein grundlegender Datenschutzstandard erfüllt und das Risiko von Identitätsdiebstahl reduziert.
+
+\textbf{Login-Endpunkt im Backend}
+
+Die Verarbeitung der Login-Logik, die hier im Frontend grafisch dargestellt ist, wird im Backend implementiert. Um diese nachvollziehen zu können, muss der Code in \autoref{code:login_endpoint_pm} genauer betrachtet werden.
+
+\usecode{login_endpoint_pm}
+
+Der Login-Endpunkt dient der Authentifizierung von Benutzern über eine HTTP-POST-Anfrage. Nachdem sichergestellt wurde, dass sowohl Benutzername als auch Passwort übermittelt worden sind, beginnt in Zeile 5 der asynchrone Verarbeitungsprozess innerhalb eines try-catch-Blocks.
+
+Zunächst wird in Zeile 6 durch den Aufruf von \glqq User.findOne({ username })\grqq{} versucht, ein Benutzerobjekt in der Datenbank zu finden, dessen Benutzername mit dem übermittelten Wert übereinstimmt. Dabei handelt es sich um eine asynchrone Datenbankabfrage (siehe Glossareintrag \gls{Async}), die den Programmfluss nicht blockiert, sondern auf das Ergebnis wartet, ohne andere Prozesse zu unterbrechen.
+Die Eindeutigkeit des Benutzernamens wird dabei durch das \glqq unique-Flag\grqq{} im Schema sichergestellt, wie in der Definition des Mongoose-Modells (siehe \autoref{code:user_database_pm}) ersichtlich.
+Dadurch ist gewährleistet, dass jeder Benutzername nur einmal in der Datenbank vorkommen kann, was die Zuverlässigkeit und Effizienz der Suche verbessert.\\
+Falls kein passender Benutzer gefunden wird, wird in Zeile 7 mit dem HTTP-Statuscode \glqq 401 (Unauthorized)\grqq{} eine Fehlermeldung zurückgegeben, die auf ungültige Anmeldedaten hinweist.
+
+Im Anschluss erfolgt in Zeile 8 der Vergleich des übermittelten Passworts mit dem in der Datenbank gespeicherten Passwort-Hash. Hierzu wird die Bibliothek bcrypt verwendet, die für sichere Passwortverarbeitung in webbasierten Anwendungen eingesetzt wird. bcrypt erzeugt aus dem Klartextpasswort mittels eines sogenannten Salt-Verfahrens einen Hash-Wert, der in der Datenbank gespeichert wird. Beim Login prüft \glqq bcrypt.compare()\grqq{}, ob das eingegebene Passwort mit dem gespeicherten Hash übereinstimmt, ohne das ursprüngliche Passwort selbst rekonstruieren zu müssen. Diese Methode schützt effektiv vor dem unbefugten Zugriff auf Passwörter, selbst im Falle eines Datenlecks.\\
+Falls der Vergleich fehlschlägt, wird erneut mit Statuscode 401 eine entsprechende Fehlermeldung ausgegeben (Zeile 9). Andernfalls wird in Zeile 10 eine Erfolgsnachricht übermittelt, die zusätzlich ein Objekt mit ausgewählten Benutzerdaten enthält: der Benutzer-ID (\_id), dem Benutzernamen sowie der Benutzerrolle. Diese Informationen sind für die Authentifizierung und rollenbasierte Autorisierung in der Anwendung von Bedeutung.
+
+Sollte es beim Zugriff auf die Datenbank oder während der Verarbeitung zu einem unerwarteten Fehler kommen, greift der catch-Block in Zeile 12, der mit Statuscode \glqq 500 (Internal Server Error)\grqq{} eine serverseitige Fehlermeldung an den Client zurückliefert. Damit wird eine klare Trennung zwischen benutzerbedingten Fehlern und systembedingten Ausfällen sichergestellt.
+
+Durch diese strukturierte und fehlertolerante Umsetzung erfüllt der Endpunkt grundlegende Anforderungen an eine sichere Authentifizierungsschnittstelle im Backend eines webbasierten Systems.
+
+\newpage
+\textbf{Sicherstellung der Passwort-Ausblendung bei Benutzerabfragen}
+
+Neben der sicheren Speicherung ist es ebenso essenziell, dass Passwörter bei der Abfrage von Benutzerdaten nicht versehentlich mitgeliefert werden. Hierzu wurde ein Backend-Endpunkt implementiert, der beim Abruf aller Benutzer das Passwortfeld explizit ausblendet. Dies wird durch den Aufruf \glqq User.find({}, { password: 0 })\grqq{} erreicht, wie in \autoref{code:get_user_pm} dargestellt. Die Abfrage nutzt das sogenannte Projections-Feature von Mongoose, wobei { password: 0 } bedeutet, dass das Feld \glqq password\grqq{} nicht in das Resultat aufgenommen wird.
+\usecode{get_user_pm}
+
+Eine praktische Überprüfung erfolgte mittels einer GET-Anfrage über Postman. Die Rückgabe zeigte erwartungsgemäß nur die öffentlichen Felder der Benutzer – ohne Passwort (siehe \autoref{img:getUser_postman_pm}). Dies stellt sicher, dass selbst bei internen Abfragen keine sensiblen Informationen unbeabsichtigt preisgegeben werden und unterstützt somit die Prinzipien von Datensparsamkeit und Privacy-by-Design.
+\useimage{getUser_postman_pm}
+
+
+\newpage
+\section{Start-Seite des Process-Managers}
+Nach erfolgreichem Login gelangen Benutzer auf die Start-Seite des Process-Managers, die als zentrale Anlaufstelle für sämtliche Interaktionen innerhalb der Anwendung dient. Ein exemplarischer Screenshot dieser Home-Seite aus Sicht eines regulären Benutzers ist in \autoref{img:user_startPage_pm} dargestellt.
+
+Die Benutzeroberfläche ist klar strukturiert und enthält alle wesentlichen Funktionen, die zur Nutzung des Systems erforderlich sind. Im oberen Bereich befindet sich eine Navigationsleiste, über die alle Hauptfunktionen des Process-Managers direkt erreichbar sind. Diese Navigation umfasst unter anderem: \begin{itemize} \item den Namen des Systems (Process-Manager), \item benutzerspezifische oder administratorbezogene Funktionen, \item eine Benachrichtigungszentrale zur Anzeige wichtiger Systemmeldungen, \item Informationen zum aktuell angemeldeten Benutzer, \item sowie die Möglichkeit zum Logout. \end{itemize}
+Die Benutzerinformationen umfassen den Benutzernamen, die Rolle innerhalb des Systems sowie eine Übersicht der zugewiesenen Projekte. Neben der Logout-Funktion steht den Nutzern auch eine Option zur Verfügung, ihr Passwort zu ändern.
+
+\useimage{user_startPage_pm}
+
+Die genaue Ausgestaltung der Funktionen innerhalb der Navigationsleiste variiert in Abhängigkeit von der Rolle des angemeldeten Nutzers. 
+Reguläre Benutzer erhalten Zugriff auf Funktionen zum Verwalten und Ausführen von Prozessen, um ihre projektbezogenen Aufgaben effizient umzusetzen. Administratoren hingegen haben zusätzlich die Möglichkeit, Nutzer- und Projektverwaltung durchzuführen. Dadurch wird eine klare Trennung zwischen operativen Tätigkeiten und administrativen Aufgaben gewährleistet.
+
+Ein Vergleich der Start-Seite aus Sicht eines Administrators ist im Anhang in \autoref{img:admin_startPage_pm} dargestellt. Die detaillierte Beschreibung der jeweiligen Rollenrechte und Funktionsunterschiede erfolgt in nachfolgenden Kapiteln \ref{functions_admin} und \ref{functions_user}.
+
+\newpage
+\section{Funktionen des Admins} \label{functions_admin}
+In diesem Kapitel werden die Funktionen von Administratoren erläutert. Meldet sich ein Benutzer mit der Rolle „Admin“ an, wird eine spezifische Navigationsleiste angezeigt (siehe \autoref{img:navBar_admin_pm}), die ausschließlich Administratoren vorbehalten ist. 
+
+\useimage{navBar_admin_pm}
+
+Diese enthält Bereiche zur Verwaltung von Projekten und Benutzern innerhalb der Process-Manager-Umgebung. Die entsprechenden Seiten werden im Folgenden näher beschrieben.
+
+
+\subsection{Verwaltung der Projekte}
+Die Projektverwaltungsseite dient der systematischen Erfassung und Pflege projektbezogener Informationen. Sie ermöglicht es Administratoren, neue Projekte zu erstellen, bestehende Projekte übersichtlich darzustellen und deren Inhalte bei Bedarf anzupassen oder zu löschen. Ziel ist eine einfache, intuitive Verwaltung aller Projektstrukturen innerhalb der Anwendung. Alle Interaktionen erfolgen auf derselben Seite, ohne dass ein Seitenwechsel notwendig ist. Dadurch wird eine effiziente und konsistente Arbeitsweise unterstützt. Die gesamte Projektverwaltungs-Seite ist im Anhang zu sehen (siehe \autoref{img:full_projectManagementPage_pm}).
+
+\subsection*{Erstellen von Projekten}
+Im oberen Bereich der Projektverwaltungsseite befindet sich ein Formular zur Neuanlage von Projekten (siehe \autoref{img:createProject_field_pm}).
+
+Es umfasst zwei Eingabefelder: 
+\begin{itemize}
+    \item Projektnamen
+    \item Kurzbeschreibung
+  \end{itemize}
+
+\newpage
+\useimage{createProject_field_pm}
+
+Die Schaltfläche \glqq Create Project\grqq{} bleibt solange deaktiviert, bis beide Felder mit gültigen Werten ausgefüllt sind. Bei einem Versuch, das Formular mit unvollständigen Angaben abzusenden, erscheint eine Fehlermeldung mit dem Hinweis:
+
+\useimage{errorMessage_createProject_pm}
+
+Sobald beide Felder gültige Eingaben enthalten, wird die Schaltfläche aktiv. Ein Klick löst die Methode \texttt{handleCreateProject} (siehe \autoref{code:handleCreateProject}) aus, die die eingegebenen Daten validiert und anschließend einen \texttt{POST}-Request an die API sendet. Das neue Projekt wird daraufhin in der Datenbank gespeichert. Nach erfolgreichem Abschluss wird die Projektliste automatisch aktualisiert, das Formular zurückgesetzt und eine Bestätigungsmeldung angezeigt. Im Fehlerfall wird eine entsprechende Rückmeldung ausgegeben, wobei unerwartete Probleme im \texttt{catch}-Block behandelt werden.
+
+\usecode{handleCreateProject}
+
+
+\subsection*{Darstellung erstellter Projekte}
+Darunter folgt eine Liste aller bestehenden Projekte in einer Tabelle (siehe \autoref{img:existing_projects_list_pm}). \\
+Jeder Eintrag enthält:
+\begin{itemize}
+  \item \textbf{Name} (klickbar für Detailanzeige)
+  \item Drei Aktionsschaltflächen:
+    \begin{itemize}
+      \item \textbf{Info:} öffnet ein Modal mit der Projektbeschreibung
+      \item \textbf{Edit}: zeigt das Inline-Bearbeitungsformular
+      \item \textbf{Delete:} entfernt das Projekt nach Bestätigung
+    \end{itemize}
+\end{itemize}
+
+\useimage{existing_projects_list_pm}
+
+Diese Darstellung ermöglicht eine schnelle Übersicht und direkte Interaktion mit den einzelnen Projekten, ohne die Seite verlassen zu müssen.
+
+\subsection*{Verwalten erstellter Projekte}
+
+Zur Verwaltung bereits angelegter Projekte stehen in der Projektliste drei Aktionsschaltflächen zur Verfügung: Info, Edit und Delete (siehe \autoref{img:project_table_actions_pm}).
+
+\textbf{Projektinformationen anzeigen:}
+
+Über die Schaltfläche \texttt{Info} oder alternativ durch einen Klick auf den Projektnamen selbst kann ein modulares Informationsfenster geöffnet werden, das detaillierte Informationen zum Projekt bereithält. Während in der tabellarischen Übersicht ausschließlich der Projektname aufgeführt ist, zeigt dieses Fenster zusätzlich auch die zugehörige Projektbeschreibung an. So können auch umfassendere Inhalte zum Projektkontext komfortabel abgerufen werden, ohne die Übersicht zu verlassen (siehe \autoref{img:project_info_modal_pm}).
+
+\useimage{project_info_modal_pm}
+
+\textbf{Projekt bearbeiten:}\\
+Ein Klick auf \texttt{Edit} öffnet ein Inline-Bearbeitungsformular direkt oberhalb der Projekttabelle. Diese Darstellung fügt sich nahtlos in das bestehende Layout ein und bietet den Vorteil, dass der Nutzer weiterhin die Kontextinformationen aller anderen Projekte im Blick behalten kann. Zudem entfällt das Umschalten zwischen verschiedenen Ansichten, was den Bearbeitungsprozess beschleunigt und intuitiver macht (siehe \autoref{img:editProject_inlineForm_pm}).
+
+\useimage{editProject_inlineForm_pm}
+
+Das Formular enthält zwei Pflichtfelder: \texttt{Name} und \texttt{Description}. Solange eines dieser Felder leer ist, bleibt die Schaltfläche \texttt{Save Changes} ausgegraut. Ein Versuch, die Änderungen trotzdem zu speichern, führt zur Anzeige der Meldung wie in \autoref{img:errorMessage_createProject_pm}
+
+\newpage
+Erfolgt eine gültige Eingabe, wird über die Funktion \texttt{handleSaveProject} ein \texttt{PUT}-Request an die API gesendet, um die Änderungen direkt in der Datenbank zu speichern. Der entsprechende API-Aufruf lautet:
+
+\usecode{putProject}
+
+Im Vergleich zur Projektneuanlage, bei der ein \texttt{POST}-Request mit denselben Attributen verwendet wird, unterscheidet sich hier lediglich die HTTP-Methode und das Ziel der Anfrage: Statt ein neues Projekt anzulegen, wird ein bestehendes anhand seiner ID aktualisiert.
+
+\textbf{Projekt löschen:}\\
+Das Entfernen eines Projekts aus der Datenbank erfolgt über die \texttt{Delete}-Schaltfläche. Zur Sicherheit erscheint vor dem Löschvorgang ein Bestätigungsdialog, um unbeabsichtigte Aktionen zu vermeiden. Die genaue Darstellung des Löschdialogs ist im Anhang dokumentiert (siehe \autoref{img:delete_project_dialog_pm}).
+
+Alle drei Verwaltungsaktionen – Informationen einsehen, Bearbeiten und Löschen – greifen auf eine konsistente und reaktive Benutzeroberfläche zurück, die ohne Unterbrechung der Arbeitsumgebung eine vollständige Projektverwaltung erlaubt. Änderungen werden direkt in der Datenbank gespeichert und die Benutzeroberfläche automatisch aktualisiert, wodurch jederzeit eine aktuelle Übersicht über die Projekte innerhalb des Process-Managers gewährleistet ist.
+
+
+
+
+
+
+\newpage
+\subsection{Verwaltung der Benutzer}
+Die Benutzerverwaltungsseite stellt ein zentrales Werkzeug zur Administration von Systemnutzern dar. Sie vereint Funktionalitäten zur Erstellung neuer Benutzer, zur Darstellung und Interaktion mit bestehenden Benutzerkonten sowie zur Durchführung administrativer Aufgaben wie Passwortänderungen, Bearbeitungen und Löschvorgänge von bestehenden Benutzern. Die gesamte Benutzerverwaltungs-Seite ist im Anhang zu sehen (siehe \autoref{img:full_userManagementPage_pm}).
+
+\subsection*{Erstellen von Benutzern}
+
+Im oberen Bereich der Benutzerverwaltungsseite befindet sich ein Formular zur Erstellung neuer Benutzer (siehe \autoref{img:createUser_field_pm}).\\
+Dieses Formular besteht aus folgenden Eingabefeldern:
+\begin{itemize}
+  \item Benutzername
+  \item Passwort
+  \item Rolle (Dropdown-Auswahlfeld)
+  \item Projektzuweisung (Mehrfachauswahl)
+\end{itemize}
+
+\useimage{createUser_field_pm}
+
+Das Rollenfeld ist als Dropdown-Menü realisiert und ermöglicht die Auswahl aus allen im System vordefinierten Rollen, beispielsweise Admin, Manager oder Employee. Falls keine Rolle explizit ausgewählt wird, greift automatisch der Standardwert „Employee“, wodurch sichergestellt ist, dass jeder neue Benutzer eine gültige Rollenberechtigung erhält.
+
+Die Rolle ist ein zentraler Bestandteil der Benutzerverwaltung, da sie unmittelbar mit den Zugriffsrechten und Handlungsmöglichkeiten innerhalb des Systems verknüpft ist. So bestimmt die Rolle unter anderem, welche Benutzeroberflächen und Funktionen sichtbar sind, welche Aktionen im System durchgeführt werden dürfen und in welcher Form Entscheidungsprozesse innerhalb des Process-Managers ablaufen. Dies bietet somit eine differenzierte Rechtevergabe bereits zum Zeitpunkt der Benutzeranlage und erlaubt es, die Systemnutzung präzise auf die jeweiligen Verantwortlichkeiten und Aufgabenbereiche abzustimmen.
+Die Rolle ist somit nicht nur eine organisatorische Einteilung, sondern essentiell für die korrekte technische Ausführung des Process-Managers. Sie steuert sicherheitsrelevante Aspekte ebenso wie die Ausführung logischer Prozesspfade. Die Bedeutung dieser Rollensteuerung wird im weiteren Verlauf der Arbeit – insbesondere bei den Funktionen der Benutzer in \autoref{functions_user} – noch detaillierter deutlich.
+
+Die Interaktion mit dem Formular ist dynamisch: Die Schaltfläche \glqq Create User\grqq{} ist initial deaktiviert und wird nur aktiv, wenn alle Pflichtfelder gültig ausgefüllt sind – darunter zählen der Benutzername, das Password und die Auswahl von mindestens einem Projekt. Diese Validierungslogik wird auf der Client-Seite umgesetzt und bietet somit ein unmittelbares Feedback an den Benutzer.
+Besonders hervorzuheben ist das Verhalten bei inkorrektem Versuch, einen Benutzer zu erstellen: Sollte der Benutzer versuchen, auf die ausgegraute Schaltfläche zu klicken, wird eine explizite Fehlermeldung angezeigt:
+
+\useimage{errorMessage_createUser_pm}
+
+Diese Maßnahme dient der zusätzlichen Absicherung und Nutzerführung, selbst bei Umgehung der UI-Vorgaben.
+
+Die Validierung sowie die serverseitige Verarbeitung bei der Erstellung eines neuen Benutzers erfolgt durch die Funktion \texttt{handleCreateUser}, welche die gesamte Logik zur Prüfung und Übertragung der Eingabedaten implementiert:
+\newpage
+\usecode{handleCreateUser}
+
+Zu Beginn prüft die Funktion, ob alle notwendigen Eingabefelder (Benutzername, Passwort und mindestens ein Projekt) ausgefüllt wurden. Ist dies nicht der Fall, wird durch einen Aufruf der Methode \texttt{triggerAlert} eine Fehlermeldung generiert, wie sie in Abbildung \autoref{img:errorMessage_createUser_pm} dargestellt ist.
+
+Erst bei vollständiger Eingabe erfolgt die Übergabe der Daten mittels \texttt{POST}-Anfrage an die API-Schnittstelle zur serverseitigen Speicherung in der Datenbank (siehe \autoref{code:handleCreateUser} in Zeile 11). Nach erfolgreicher Erstellung wird die Benutzerliste aktualisiert, die Eingabemaske geleert und eine Bestätigungsmeldung angezeigt.
+
+Unerwartete Fehler im Übertragungsprozess – wie Netzwerkprobleme oder serverseitige Validierungsfehler – werden durch den \texttt{catch}-Block abgefangen und ebenfalls dem Benutzer über eine Meldung angezeigt. Damit wird sowohl eine robuste Fehlerbehandlung als auch ein konsistentes Feedback an den Benutzer sichergestellt.
+
+\subsection*{Darstellung erstellter Benutzer}
+
+Unterhalb des Benutzerformulars wird eine tabellarische Übersicht aller bereits angelegten Benutzer dargestellt. Die Tabelle bietet eine zentrale Verwaltungsansicht und zeigt folgende Informationen:
+
+\begin{itemize}
+  \item \textbf{Username:} Der Name des Benutzers.
+  \item \textbf{Role:} Die dem Benutzer zugewiesene Rolle (z.\ B.\ \texttt{Admin}, \texttt{Manager} oder \texttt{Employee}).
+  \item \textbf{Projects:} Die zugeordneten Projekte.
+  \item \textbf{Actions:} Schaltflächen zur Bearbeitung, Passwortänderung und zum Löschen.
+\end{itemize}
+
+\useimage{existing_users_table_pm}
+
+Diese kompakte Übersicht erlaubt eine schnelle Beurteilung und Verwaltung der Benutzerinformationen. Die Rollenanzeige hilft insbesondere dabei, die Aufgabenverteilung im System zu überblicken.
+
+\subsection*{Verwalten erstellter Benutzer}
+
+Neben jeder Benutzerzeile befinden sich drei Aktionsschaltflächen (siehe \autoref{img:existing_users_table_pm}): Bearbeiten, Password ändern und Löschen des Benutzers.
+
+\textbf{Bearbeiten:}\\
+Wird die \texttt{Edit}-Schaltfläche angeklickt, erscheint oberhalb der Benutzertabelle ein Bearbeitungsformular. Anders als bei der Neuanlage ist dieses nicht direkt in der Tabelle eingebettet, sondern als eigenständiger Block angeordnet (siehe \autoref{img:editUser_inlineForm_pm}).
+
+\useimage{editUser_inlineForm_pm}
+
+Im Formular können folgende Felder bearbeitet werden:
+
+\begin{itemize}
+  \item Benutzername (Textfeld)
+  \item Rolle (Dropdown-Menü)
+  \item Projekte (Mehrfachauswahl mit Checkboxen)
+\end{itemize}
+
+Nach dem Anpassen wird über die Schaltfläche \texttt{Update User} der aktualisierte Datensatz an den Server gesendet. Dazu wird die Funktion \texttt{handleUpdateUser} aufgerufen. Diese überprüft zunächst, ob mindestens ein Projekt ausgewählt wurde. Anschließend wird ein \texttt{PUT}-Request mit den aktualisierten Daten an die API gesendet, wodurch die Änderungen in der Datenbank gespeichert werden.
+Im Gegensatz zur Neuanlage (\texttt{handleCreateUser}, welche einen \texttt{POST}-Request verwendet), greift \texttt{handleUpdateUser} auf dieselbe Datenstruktur zurück, ersetzt jedoch lediglich vorhandene Werte – die Funktionalität bleibt in großen Teilen gleich.
+
+Besonderheit beim Bearbeiten: Es können alle Benutzerattribute geändert werden – inklusive Benutzername, Rolle und zugewiesene Projekte –, mit Ausnahme des Passworts. Letzteres liegt in einem eigenen Formularbereich, sodass es nicht bei jeder kleineren Änderung (z.,B. einer Projektzuweisung) erneut eingegeben werden muss. Das Bearbeiten aller Benutzer-Attribute funktioniert, da der Benutzer eindeutig über seine ID identifiziert wird. Auch der Benutzername kann dadurch ohne Probleme aktualisiert werden. Siehe hierzu den verwendeten PUT-Befehl im \autoref{code:putCommand}:
+\usecode{putCommand}
+
+\textbf{Passwort ändern:}\\
+Über die Schaltfläche \texttt{Change Password} kann ein neues Passwort vergeben werden. Dazu erscheint ein separates Eingabefeld für das neue Passwort (siehe \autoref{img:ChangePassword_admin_pm}). Diese Funktion ist bewusst ausgelagert und nicht Teil der allgemeinen Bearbeitungsmaske.
+
+\useimage{ChangePassword_admin_pm}
+
+\newpage
+\textbf{Löschen:}\\
+Beim Klick auf \texttt{Delete} wird der entsprechende Benutzer aus der Datenbank entfernt. Zum Schutz vor unbeabsichtigtem Löschen erfolgt vorab eine Sicherheitsabfrage (siehe \autoref{img:userDeletion_messages_pm}).
+
+Die dargestellten Funktionen ermöglichen eine vollständige Benutzerverwaltung direkt aus der Hauptansicht, ohne dass zusätzliche Navigationsschritte erforderlich sind.
+
+\section*{Fazit}
+Die Funktionen zur Projekt- und Benutzerverwaltung bilden das Rückgrat der administrativen Steuerung im Process-Manager. Sie sichern eine klare Struktur, rollenbasierte Rechtevergabe und effiziente Prozessabläufe im System.
+
+
+\newpage
+\section{Funktionen des Benutzers} \label{functions_user}
+In diesem Kapitel werden die Funktionen der Benutzer erläutert. Für Benutzer der Rolle \glqq Employee\grqq{} oder \glqq Manager\grqq{} sieht die Navigtionsleiste wie in \autoref{img:navBar_user_pm} aus. 
+
+\useimage{navBar_user_pm}
+
+Diese enthält Bereiche für das Erstellen und Verwalten von Prozessen, sowie dem Ausführen dieser Prozesse. Außerdem Benachrichtigungen der Benutzer und spezifische Benutzerinformationen. Die entsprechenden Seiten werden im Folgenden näher beschrieben.
+
+
+\subsection{Benutzerinformationen}
+Im oberen rechten Bereich der Navigationsleiste befindet sich ein Dropdown-Menü, welches dem angemeldeten Benutzer eine kompakte Übersicht über seine persönlichen Informationen bietet. Im Dropdown-Knopf selbst wird der Benutzername angezeigt. Nach dem Öffnen erscheinen zusätzlich die Rolle des Benutzers sowie eine Liste der ihm zugewiesenen Projekte. Dadurch erhält der Benutzer unmittelbaren Zugriff auf seine kontextbezogenen Systemberechtigungen.
+
+\useimage{userInfo_dropdown_pm}
+
+Zusätzlich enthält das Dropdown-Menü eine Option zur Passwortänderung (\glqq Change Password\grqq{}) sowie einen Logout-Button, um die Sitzung sicher zu beenden. Diese Funktionen verbessern nicht nur die Benutzerfreundlichkeit, sondern fördern auch die Sicherheit und Selbstverwaltung im System.
+
+\subsection*{Passwortänderung durch den Benutzer}
+Die Möglichkeit für Benutzer, ihr Passwort selbstständig zu ändern, stellt eine wichtige Funktion zur Erhöhung der Systemsicherheit und zur Reduktion administrativer Aufwände dar. Die Anwendung bietet dafür eine separate Oberfläche, auf der der Benutzer sein aktuelles Passwort eingeben und anschließend ein neues Passwort definieren sowie bestätigen kann. Visuelle Rückmeldungen in Form von Erfolgs- oder Fehlermeldungen geben dem Benutzer jederzeit Auskunft über den Status seiner Eingabe. Zusätzlich ermöglicht ein Rückkehr-Button die einfache Navigation zurück zur vorherigen Ansicht.
+
+\useimage{changePassword_user_pm}
+
+Die Funktion stellt sicher, dass Passwörter nicht nur geändert, sondern auch verifiziert werden. Dies geschieht insbesondere durch die Prüfung, ob das neu eingegebene Passwort mit der Bestätigung übereinstimmt oder ob das aktuell eingegebene Passwort korrekt ist. Entsprechende Fehlermeldungen (siehe \autoref{img:incorrectCurrentPassword_user_pm} und \autoref{img:newPasswordsNotMatching_user_pm}) verhindern dabei falsche oder inkonsistente Eingaben, bevor eine Kommunikation mit dem Server erfolgt.
+
+Die Validierung der Passwortänderung erfolgt auf Serverseite über folgende REST-Endpunkt-Definition:
+
+\usecode{passwordChange_put_pm}
+
+Die PUT-Methode erwartet in der Anfrage den aktuellen sowie den neuen Passwortwert. Anschließend wird versucht, den Benutzer über die angegebene ID aus der Datenbank zu laden. Wird der Benutzer nicht gefunden, wird mit einem Statuscode 404 reagiert.
+
+Im nächsten Schritt wird das aktuell angegebene Passwort mit dem in der Datenbank gespeicherten Passwort-Hash verglichen. Falls die Passwörter nicht übereinstimmen, erfolgt eine Rückmeldung mit einem Statuscode 400 und einer eindeutigen Fehlermeldung (siehe \autoref{img:incorrectCurrentPassword_user_pm}).
+
+Wurde das Passwort korrekt eingegeben, wird im nächsten Schritt das neue Passwort mithilfe von \texttt{bcrypt} gehasht  und in der Datenbank gespeichert. Der Benutzer erhält daraufhin eine Bestätigung, dass das Passwort erfolgreich geändert wurde (siehe \autoref{img:successfulPasswordChange_user_pm}).
+
+Sollten während dieses Prozesses unerwartete Fehler auftreten, etwa bei der Kommunikation mit der Datenbank, so werden diese serverseitig protokolliert und dem Benutzer wird eine generische Fehlermeldung mit Statuscode 500 zurückgegeben.
+
+Die Kombination aus nutzerfreundlichem Frontend und sicherem Backend gewährleistet eine effektive und gleichzeitig geschützte Passwortverwaltung innerhalb der Anwendung. Die konkrete Fehlerbehandlung – sowohl bei nicht übereinstimmenden neuen Passwörtern im Frontend als auch bei falschen aktuellen Passwörtern im Backend – erhöht zusätzlich die Robustheit der Funktion.
+
+\newpage
+\subsection{Benachrichtigungen}
+Ein zentraler Bestandteil der Funktionen „Manage Process“ und „Execute Process“ des Process Managers ist die Kommunikation zwischen den beteiligten Benutzerrollen, insbesondere zwischen Manager und Employee. Um diesen Informationsaustausch zu unterstützen, wurde ein integriertes Benachrichtigungssystem implementiert.
+
+Die Benutzeroberfläche der Benachrichtigungsfunktion ist übersichtlich gestaltet. Der Zugriff erfolgt über ein Glockensymbol in der Navigationsleiste (vgl. \autoref{img:navBar_user_pm}), welches zusätzlich die Anzahl Benachrichtigungen anzeigt.
+
+Im Mittelpunkt der Benachrichtigungsseite steht eine Liste mit allen Benachrichtigungen, die einem Benutzer zugewiesen sind. Ergänzt wird die Seite durch Interaktionselemente wie einen \enquote{Back}-Button zur Navigation sowie einen Button \enquote{Clear all Notifications}, mit dem sämtliche Einträge auf einmal entfernt werden können.
+
+\useimage{notifications_mainPage_pm}
+
+Es werden zwei Typen von Benachrichtigungen unterschieden:
+
+\begin{itemize}
+    \item \textbf{Anfragen:} Diese dienen primär der Information und leiten den Benutzer bei Auswahl direkt an die entsprechende Stelle im System weiter. Dort kann beispielsweise automatisch der relevante Prozess oder die zugehörige Instanz vorausgewählt sein, sodass unmittelbar mit der Bearbeitung begonnen werden kann. Eine separate Interaktion innerhalb der Benachrichtigung selbst ist nicht erforderlich. Nach Abschluss der zugehörigen Aktion wird die Benachrichtigung automatisch entfernt.
+\end{itemize}
+
+\useimage{notification_request_pm}
+
+\begin{itemize}
+    \item \textbf{Rückmeldungen:} Diese besitzen informativen Charakter und beinhalten eine Schaltfläche zum Löschen. Auch hier ist eine Weiterleitung durch Anklicken möglich, allerdings folgt daraus keine weitere verpflichtende Aktion im System.
+\end{itemize}
+
+\useimage{notification_response_pm}
+
+\subsection*{Struktur und Filtermechanismus der Benachrichtigungen}
+
+Die Zuweisung von Benachrichtigungen im Process Manager erfolgt gezielt anhand der Benutzerrolle sowie der Projektzugehörigkeit. Ein Benutzer erhält ausschließlich solche Benachrichtigungen, die sowohl für seine Rolle als auch für die ihm zugewiesenen Projekte bestimmt sind. Dieses Filterprinzip gewährleistet eine effektive Informationsverteilung an die relevanten Zielgruppen und verhindert zugleich eine unnötige Informationsflut. So kann beispielsweise durch eine Bestätigungsbenachrichtigung sichergestellt werden, dass alle betroffenen \textit{Employees} eines Projekts zeitnah über den aktuellen Prozessstatus informiert werden und ihre weiteren Arbeitsschritte entsprechend anpassen können.
+
+\subsubsection*{Benötigte Attribute einer Benachrichtigung}
+
+Zur Umsetzung dieses selektiven Benachrichtigungsmechanismus ist jede Benachrichtigung mit spezifischen Attributen versehen:
+
+\begin{itemize}
+    \item \textbf{message:} Der eigentliche Textinhalt der Benachrichtigung, der dem Benutzer angezeigt wird.
+    \item \textbf{timestamp:} Zeitstempel der Benachrichtigung. Dieser ist wichtig, um den Zeitpunkt des Ereignisses nachvollziehen und die Informationen zeitlich einordnen zu können.
+    \item \textbf{requestedBy:} Der Name oder die Identifikation des Benutzers, der die Benachrichtigung ausgelöst hat.
+    \item \textbf{requestedById:} Die eindeutige Benutzer-ID des sendenden Benutzers zur internen Referenzierung und Rückverfolgbarkeit.
+    \item \textbf{targetRole:} Die Zielrolle, für welche die Benachrichtigung bestimmt ist. Dies stellt sicher, dass nur berechtigte Benutzergruppen Zugriff auf die Information erhalten. Dadurch wird sowohl dem Datenschutz als auch der Übersichtlichkeit Rechnung getragen.
+    \item \textbf{project:} Das zugehörige Projekt, auf das sich die Benachrichtigung bezieht. Auf diese Weise erhalten ausschließlich Projektbeteiligte Zugriff auf die entsprechende Mitteilung.
+\end{itemize}
+
+\usecode{notification_schema}
+
+Zwar existieren weitere Attribute im zugrunde liegenden Datenbankschema (vgl. \autoref{code:notification_schema}), diese sind jedoch eher für spezifische Anwendungsfälle relevant und werden daher in späteren Kapiteln im Zusammenhang mit der konkreten Implementierung und Einbindung der Benachrichtigungsfunktion näher erläutert.
+
+\subsubsection*{Filterung und Sichtbarkeit}
+
+Die Zugriffskontrolle auf Benachrichtigungen erfolgt in zwei Stufen. Zunächst wird überprüft, ob die Zielrolle der Benachrichtigung mit der Rolle des aktuell angemeldeten Benutzers übereinstimmt. Anschließend erfolgt eine weitere Filterung basierend auf den Projekten, denen der Benutzer zugewiesen ist. Nur wenn beide Kriterien erfüllt sind, wird dem Benutzer die entsprechende Benachrichtigung angezeigt. Dieses Vorgehen stellt sicher, dass jede Benachrichtigung ausschließlich für die vorgesehenen Empfänger sichtbar und relevant ist.
+
+\subsubsection*{Fazit}
+
+Das Benachrichtigungssystem stellt eine zentrale Komponente des Process Managers dar. Es unterstützt das Zusammenspiel zwischen \textit{Manager} und \textit{Employee} und bildet damit eine wesentliche Grundlage für die effiziente Umsetzung der Prozess-Funktionen.
+
+\newpage
+\subsection{Prozesse verwalten} \label{Manage_Process}
+Die Komponente \texttt{ManageProcess} dient der ganzheitlichen Verwaltung von BPMN-Prozessen und verfolgt das Ziel, Anwendern eine intuitive Oberfläche für Erstellung, Anpassung und Löschung von Workflows zu bieten, bei gleichzeitiger Sicherstellung der Datenintegrität und rollenbasierten Freigabeprozesse.
+
+Die Benutzeroberfläche gliedert sich in zwei zentrale Bereiche: Rechts befindet sich der Diagrammeditor, der auf \texttt{bpmn-js} basiert. Links befindet sich eine einfache Liste aller gespeicherten Prozesse, die über Load- und Delete-Buttons bearbeitet werden kann.
+\useimage{fullOverview_manageProcess_pm}
+
+\subsection*{Bibliothek bpmn-js}
+Die im Rahmen dieses Projekts eingesetzte BPMN-Bibliothek \texttt{bpmn-js} bildet die technologische Grundlage für die modellgetriebene, Drag-and-Drop-basierte Erstellung von Geschäftsprozessen. Sie stellt eine deklarative Canvas-Oberfläche bereit, die sämtliche Standard-BPMN-Elemente unterstützt und eine benutzerfreundliche Steuerung mittels Drag-and-Drop ermöglicht. Darüber hinaus verfügt die Bibliothek über ein modulares Erweiterungssystem, das über das Konstrukt \texttt{additionalModules} implementiert ist. Dieses erlaubt die funktionale Erweiterung und Individualisierung der Bibliothek, was eine zentrale Voraussetzung für die effektive Integration in den entwickelten Process Manager darstellt.
+
+Ein weiterer wesentlicher Bestandteil der Bibliothek ist die EventBus-Integration, über die Änderungen am Modell in Echtzeit erkannt und verarbeitet werden können. Dies erfolgt beispielsweise durch das Ereignis \texttt{commandStack.changed}, das bei jeder Modelländerung ausgelöst wird und so eine dynamische Synchronisation mit anderen Systemkomponenten ermöglicht.
+
+Im vorliegenden Projekt werden zwei funktionale Erweiterungen über die Dateien \enquote{customRules} und \enquote{customExtensions} realisiert (siehe \autoref{code:customRules} und \autoref{code:customExtension}). Die erste Erweiterung betrifft die Modellkonsistenz: Das Start-Ereignis eines Prozesses kann nicht gelöscht werden. Dies stellt sicher, dass jedes Prozessmodell über einen eindeutig definierten Startpunkt verfügt – eine grundlegende Anforderung an jede BPMN-konforme Modellierung. Die zweite Erweiterung betrifft die semantische Anreicherung der Prozessmodelle. Hierzu werden zusätzliche benutzerdefinierte Attribute – namentlich \enquote{Rolle} und \enquote{Beschreibung} – für zentrale BPMN-Elemente (z.\,B. Events, Aktivitäten, Gateways) eingeführt. Die Bedeutung dieser zusätzlichen Informationen sowie deren Notwendigkeit im Kontext des Process Managers werden in einem späteren Abschnitt ausführlich erläutert.
+
+Zusammenfassend zeigt sich, dass die Verwendung von \texttt{bpmn-js} sowohl aus technischer als auch aus wirtschaftlicher Perspektive sinnvoll ist. Zum einen reduziert sich der Entwicklungsaufwand erheblich, da eine etablierte Bibliothek mit bestehender BPMN-Regelunterstützung genutzt wird. Zum anderen bleibt die Bibliothek trotz ihrer Standardfunktionalitäten offen für individuelle Erweiterungen, etwa zur Sicherstellung eines festen Start-Ereignisses oder zur Ergänzung zusätzlicher Attribute. Ein entscheidender Vorteil liegt dabei in den benutzerspezifischen Erweiterungsmöglichkeiten, die eine nachhaltige und zukunftssichere Lösung ermöglichen: Neue Anforderungen oder Funktionen können flexibel integriert werden, ohne in bestehende Strukturen einzugreifen. Die Weiterentwicklung des Systems wird dadurch nicht eingeschränkt, sondern im Gegenteil deutlich erleichtert. Darüber hinaus überzeugt \texttt{bpmn-js} durch eine hohe Performance und plattformübergreifende Kompatibilität. Diese Qualitäten werden durch eine große und aktive Entwicklergemeinschaft sowie eine umfassende Dokumentation gestützt. \texttt{bpmn-js} erweist sich somit als geeignete, leistungsfähige und anpassbare Grundlage für die langfristige Prozessmodellierung im Rahmen des entwickelten Process Managers.
+
+\newpage
+Wählt ein Benutzer einen Prozess aus der Liste aus und bestätigt dies über die Schaltfläche \enquote{Load}, wird die zugehörige BPMN-XML-Repräsentation in den Editor geladen (vgl. \autoref{img:bpmnEditor_pm}).
+
+\useimage{bpmnEditor_pm}
+
+Unterhalb des Editors befinden sich Eingabefelder zur Bearbeitung des Prozessnamens sowie zur Zuweisung zu einem Projekt. Die Schaltfläche \enquote{Save to Database} ruft die Methode \texttt{handleSaveToDatabase()} auf. Diese implementiert eine rollenbasierte Verzweigung: Für Nutzer mit der Rolle \enquote{Manager} erfolgt eine unmittelbare Persistierung des Prozesses in der Datenbank (siehe \autoref{img:processInfo_manager_pm}). Nutzer mit der Rolle \enquote{Employee} initiieren hingegen einen Genehmigungsworkflow, indem ein entsprechender Antrag erzeugt wird (vgl. \autoref{img:processInfo_employee_pm}).
+
+\useimage{processInfo_manager_pm}
+
+Die Funktion \texttt{handleCreateNewProcess()} ermöglicht die Erstellung eines neuen Prozesses, indem ein leeres Diagramm initialisiert und sämtliche Zustände der Anwendung zurückgesetzt werden.
+
+Ergänzend befindet sich unterhalb der Prozessinformationen ein weiteres Eingabefeld zur Zuweisung zusätzlicher Attribute für jedes BPMN-Element: Rolle und Beschreibung. Diese benutzerspezifischen Erweiterungen wurden, wie bereits zuvor beschrieben, in die Modellstruktur integriert und dienen der Vorbereitung auf eine rollenbasierte Ausführung der Prozesse. Bereits während der Modellierung muss für jedes Element eine Berechtigung in Form einer zugewiesenen Rolle hinterlegt werden. Dies stellt sicher, dass in der späteren Prozessausführung eine differenzierte und autorisierte Bearbeitung erfolgen kann. Die konkrete funktionale Bedeutung dieser Attribute wird im Kapitel \enquote{Prozesse ausführen} detaillierter erläutert. Die zugehörige Benutzeroberfläche ist in \autoref{img:roleDescribtion_manageProcess_pm} dargestellt.
+
+\useimage{roleDescribtion_manageProcess_pm}
+
+Dem Benutzer wird dabei stets das aktuell ausgewählte BPMN-Element angezeigt. Sofern dem Element bereits ein Name zugewiesen wurde, wird dieser zur Identifikation verwendet; andernfalls erfolgt die Anzeige über die interne ID des Elements. Über ein Dropdown-Menü kann dem Element eine spezifische Rolle zugewiesen sowie eine erläuternde Beschreibung hinterlegt werden.
+
+Zur Erkennung von Änderungen am Modell wird ein Command-Stack-Listener im Hintergrund ausgeführt. Dieser überprüft kontinuierlich, ob das aktuelle Modell von der ursprünglich geladenen Version abweicht. Nur bei tatsächlichen Änderungen werden die Speicherfunktionen (z.\,B. \enquote{Save to Database} oder \enquote{Request Save}) aktiviert (vgl. \autoref{img:processInfoChange_manager_pm}).
+
+Wird die Schaltfläche \enquote{Save to Database} oder \enquote{Request Save} betätigt, erfolgt zunächst eine Validierung der Benutzereingaben. Dabei wird überprüft, ob alle für die Persistierung notwendigen Informationen vollständig vorliegen. Zu den verpflichtend anzugebenden Daten zählen:
+
+\begin{itemize}
+    \item ein gültiger Prozessname,  
+    \item die Zuweisung des Prozesses zu einem Projekt,  
+    \item die Angabe einer Rolle für jedes im Modell enthaltene BPMN-Element,  
+    \item sowie eine erläuternde Beschreibung für jedes dieser Elemente.
+\end{itemize}
+
+Sollten eine oder mehrere dieser Angaben fehlen, wird der Benutzer durch eine gestaffelte Validierungslogik in absteigender Priorität auf die jeweiligen Unvollständigkeiten hingewiesen. Zunächst wird geprüft, ob ein Prozessname vergeben worden ist (vgl. \autoref{img:manageProcess_missingProcessName_pm}). Anschließend erfolgt die Überprüfung der Projektzuweisung (vgl. \autoref{img:manageProcess_missingProject_pm}). Zuletzt wird kontrolliert, ob für alle BPMN-Elemente sowohl eine Rolle als auch eine Beschreibung hinterlegt worden ist.
+
+Im Rahmen dieser Validierung wird dem Benutzer jedes betroffene Element eindeutig angezeigt – bevorzugt mit dem zugewiesenen Namen, sofern vorhanden, andernfalls mit der internen ID. Eine beispielhafte Fehlermeldung, in der sowohl eine Rollenzuweisung als auch eine Beschreibung fehlen, ist in \autoref{img:manageProcess_missingRoleandDescribtion} dargestellt.
+
+\useimage{manageProcess_missingRoleandDescribtion}
+
+Durch diese strukturierte Überprüfung wird sichergestellt, dass ausschließlich vollständig definierte Prozesse gespeichert oder zur Freigabe eingereicht werden können. Dies gewährleistet eine konsistente Datenbasis und trägt zu einem fehlerfreien Ablauf in der anschließenden Prozessausführung bei.
+
+
+\subsection*{Prozessänderungen verwalten und freigeben}
+Bei der Bearbeitung eines bereits existierenden Prozesses wird sowohl dem Manager als auch dem Benutzer eine detaillierte Übersicht der vorgenommenen Änderungen in einem separaten Modal angezeigt (vgl. \autoref{img:changesModal_pm}). In dieser Übersicht werden alle Änderungen zusammengefasst und zusätzlich in der zugrunde liegenden BPMN-XML durch Inline-Markierungen hervorgehoben. Dies ermöglicht es, alle geplanten Anpassungen auf einen Blick zu erkennen, bevor sie in der Datenbank gespeichert oder eine Anfrage an den jeweiligen Manager gesendet wird. Diese zusätzliche Validierungsstufe trägt dazu bei, unnötige Fehler frühzeitig zu identifizieren und zu vermeiden, wodurch die Prozessqualität und -genauigkeit nachhaltig verbessert werden.
+
+\useimage{changesModal_pm}
+
+Im Rahmen der Änderungen trägt der Manager selbst die Verantwortung, jede Änderung eigenständig zu prüfen und abschließend zu bestätigen, um die Änderungen in die Datenbank zu übernehmen. Der Employee hingegen kann keine direkte Speicherung vornehmen. Deshalb wird eine Benachrichtigung für den Änderungsantrag automatisch an einen zuständigen Manager gesendet. 
+
+\useimage{changesNotification_manager_pm}
+
+Klickt der Manager auf die Benachrichtigung, wird ihm der bearbeitete Prozess samt aller vorgenommenen Änderungen präsentiert. Zur besseren Nachvollziehbarkeit erhält der Manager eine detaillierte Liste der Änderungen. Diese Auflistung erleichtert den Überblick und ermöglicht eine präzise Bewertung der Anpassungen. Zudem hat der Manager die Möglichkeit, die XML-Datei einzublenden, wobei auch hier die Änderungen durch Inline-Markierungen kenntlich gemacht werden.
+
+\useimage{changesRequest_manager_pm}
+
+Handelt es sich bei der Anfrage nicht um die Änderung eines bestehenden Prozesses, sondern um die Erstellung eines neuen Prozesses, so wird dem zuständigen Manager anstelle einer Änderungsübersicht ein Hinweis angezeigt, der explizit auf die Neuerstellung hinweist. Dieser Hinweis dient der klaren Einordnung des Vorgangs und wird im Rahmen des Genehmigungsprozesses bereitgestellt.
+
+\useimage{newProcess_save_pm}
+
+Der Manager hat nun die Option, die Änderungen entweder anzunehmen oder abzulehnen. Wird der Antrag angenommen, werden die Änderungen dauerhaft in der Datenbank gespeichert. Sollte der Manager die Änderungen ablehnen, erfolgt keine Speicherung und der Prozess bleibt unverändert.
+
+Es ist darauf zu achten, dass Änderungen an Prozessen anhand ihrer eindeutigen \ac{ID} vorgenommen werden. Obwohl Namensduplikate technisch ausgeschlossen sind, würde eine Änderung des Prozessnamens in der Praxis dazu führen, dass der bestehende Prozess dupliziert und unter dem neuen Namen gespeichert wird. Um solche unerwünschten Duplizierungen zu vermeiden und eine konsistente sowie wartbare Systemstruktur sicherzustellen, ist es aus Gründen der Best Practice empfehlenswert, Prozessänderungen ausschließlich über die zugehörige Prozess-\ac{ID} durchzuführen.
+
+Unabhängig von der Entscheidung des Managers erhält der Employee, der die Anfrage gestellt hat, eine Benachrichtigung, die ihn über den aktuellen Status informiert. Diese Rückmeldung enthält die Information, ob die Änderungen angenommen (vgl. \autoref{img:changesRequest_approved}) oder abgelehnt (vgl. \autoref{img:changesRequest_denied}) wurden. Dieser Schritt gewährleistet eine transparente Kommunikation und stellt sicher, dass alle Beteiligten stets auf dem aktuellen Stand sind.
+
+\useimage{changesRequest_denied}
+
+\newpage
+\subsection*{Löschen von Prozessen}
+Ein wesentlicher Bestandteil der Prozessverwaltung ist die Möglichkeit, Prozesse dauerhaft aus dem System zu entfernen. Die Funktion zum Löschen von Prozessen ist dabei rollenbasiert umgesetzt und unterscheidet sich hinsichtlich ihrer Verfügbarkeit und Verantwortlichkeiten zwischen Managern und Employees. Diese Differenzierung trägt zur Sicherstellung einer kontrollierten und nachvollziehbaren Löschpraxis bei.
+
+Nutzer mit der Rolle Manager verfügen in der Prozessliste neben dem \enquote{Load}-Button über einen \enquote{Delete}-Button, mit dem ein Prozess direkt gelöscht werden kann. Eine exemplarische Darstellung der Prozessliste aus Sicht des Managers zeigt \autoref{img:ProzcessList_manager_pm}.
+
+\useimage{ProzcessList_manager_pm}
+
+Wird der \enquote{Delete}-Button betätigt, öffnet sich ein separates Bestätigungsfenster, in dem die Löschaktion nochmals explizit bestätigt werden muss (vgl. \autoref{img:deleteProcess_check_pm}). Dieses zusätzliche Dialogfeld dient der Vermeidung unbeabsichtigter Löschvorgänge. Die Verantwortung für die Durchführung und etwaige Konsequenzen des Löschvorgangs liegt dennoch ausschließlich beim Manager.
+
+\useimage{deleteProcess_check_pm}
+
+Im Gegensatz dazu besitzen Nutzer mit der Rolle Employee keine Berechtigung, Prozesse eigenständig zu löschen. Diese Einschränkung dient der Wahrung der Datenintegrität und stellt sicher, dass nur autorisierte Personen mit entsprechender Übersicht über die organisatorischen Abläufe über Löschvorgänge entscheiden können. Statt einer direkten Löschoption steht dem Employee in der Prozessliste ein Button mit der Bezeichnung \enquote{Request Deletion} zur Verfügung. Diese Funktion ermöglicht es, einen Löschwunsch formal an den zuständigen Manager zu übermitteln. Die Darstellung der Prozess-Liste eines Employees ist in \autoref{img:ProzcessList_user_pm} zu sehen.
+
+\newpage
+\useimage{ProzcessList_user_pm}
+
+Durch Auslösen dieser Option wird eine Löschanfrage als Benachrichtigung an den zuständigen Manager gesendet.
+
+\useimage{procesList_deletionRequest}
+
+\newpage
+Beim Öffnen dieser Benachrichtigung durch den Manager erscheint ein Modal, das zwei Handlungsoptionen bietet: Die Anfrage kann entweder angenommen oder abgelehnt werden. Diese Entscheidung obliegt allein dem Manager und sollte idealerweise auf einer inhaltlichen Prüfung des Prozesses basieren.
+
+\useimage{procesList_deletionRequestModal_pm}
+
+Zur Unterstützung dieser Entscheidung steht dem Manager zusätzlich der Button \enquote{Show Process} zur Verfügung. Durch Betätigung dieser Schaltfläche wird eine Detailansicht des betreffenden Prozesses angezeigt. Diese Ansicht ermöglicht eine gezielte Überprüfung der gespeicherten Informationen und erlaubt dem Manager, den Prozess vor einer Entscheidung umfassend zu evaluieren. Die Darstellung in diesem Fenster ähnelt derjenigen, die bei der Bearbeitung und Speicherung von Prozessen verwendet wird, wodurch eine konsistente Benutzererfahrung gewährleistet ist.
+
+\useimage{procesList_deletionRequestProcessInformation_pm}
+
+Entscheidet sich der Manager für die Annahme der Anfrage, wird der betreffende Prozess aus dem System entfernt. Anschließend wird die Prozessliste automatisch aktualisiert, sodass alle Benutzer sofort die aktualisierte Datenlage einsehen können. Dieser Schritt stellt sicher, dass keine veralteten Informationen mehr angezeigt werden und reduziert vermeidbare Fehlerquellen in der weiteren Bearbeitung.
+
+Nach Bearbeitung der Löschanfrage erhält der Employee, der den Antrag gestellt hat, eine Rückmeldung über den Status seiner Anfrage. Diese Rückmeldung kann entweder positiv (Anfrage wurde angenommen, vgl. \autoref{img:procesList_deletionRequestProcessInformation_positivResponse}) oder negativ (Anfrage wurde abgelehnt, vgl. \autoref{img:procesList_deletionRequestProcessInformation_negativResponse}) ausfallen. Auf diese Weise wird eine transparente Kommunikation zwischen den Rollen sichergestellt, und es besteht jederzeit Klarheit über den Stand der beantragten Änderungen.
+
+\useimage{procesList_deletionRequestProcessInformation_positivResponse}
+
+\newpage
+\subsection*{Fazit}
+Die Komponente \texttt{ManageProcess} stellt eine effiziente und benutzerfreundliche Lösung zur Verwaltung von BPMN-Prozessen dar. Durch die Verwendung der \texttt{bpmn-js}-Bibliothek wird eine solide technologische Grundlage geschaffen. Die Integration der Bibliothek ermöglicht eine skalierbare und erweiterbare Architektur, die den Anforderungen von Benutzern und Entwicklern gleichermaßen gerecht wird.
+Die Implementierung von benutzerspezifischen Erweiterungen bietet zusätzliche Flexibilität und unterstützt die langfristige Anpassbarkeit der Lösung.
+
+Die Benutzeroberfläche und die Validierungslogik tragen zur Sicherstellung einer fehlerfreien Prozessmodellierung bei. Die Möglichkeit, Änderungen zu validieren und in einem klar strukturierten Genehmigungsworkflow freizugeben, stellt sicher, dass nur vollständig definierte und überprüfte Prozesse in die Datenbank übernommen werden. Darüber hinaus können bestehende Prozesse gezielt gelöscht werden. Dies ermöglicht es autorisierten Benutzern, veraltete oder fehlerhafte Prozessmodelle aus dem System zu entfernen. Die Löschfunktion ist in die Benutzeroberfläche integriert und folgt den gleichen Berechtigungsmechanismen wie andere Bearbeitungsfunktionen, um eine konsistente Zugriffskontrolle zu gewährleisten. Dieser Workflow fördert die Qualität und Genauigkeit der modellierten Prozesse und ermöglicht eine effiziente Zusammenarbeit zwischen den verschiedenen Benutzerrollen.
+
+Insgesamt zeigt sich, dass die \texttt{ManageProcess}-Komponente eine robuste, skalierbare und benutzerfreundliche Lösung für die Verwaltung von BPMN-Prozessen bietet. Sie stellt sicher, dass die Modellierung, Bearbeitung und Freigabe von Prozessen sowohl technisch als auch organisatorisch gut unterstützt wird, und ermöglicht eine zukunftssichere Erweiterbarkeit zur Integration neuer Anforderungen.
+
+\newpage
+\subsection{Prozesse ausführen}
+Die Komponente \texttt{ExecuteProcess} ist für die Ausführung zuvor modellierter BPMN-Prozesse zuständig. Ziel dieser Komponente ist es, Benutzern eine intuitive und strukturierte Ausführung der Prozesse zu ermöglichen.
+
+Im linken Bereich der Benutzeroberfläche befindet sich eine Liste aller verfügbaren Prozesse, welche zuvor über die \texttt{ManageProcess}-Komponente erstellt worden sind (vgl. \autoref{Manage_Process}). Zusätzlich werden darunter die derzeit aktiven Instanzen dieser Prozesse angezeigt. Im rechten Bereich wird der Benutzer aufgefordert, einen Prozess oder eine Instanz auszuwählen, um die Ausführung zu starten.
+
+\useimage{executeProcess_full_pm}
+
+Wählt der Benutzer einen Prozess aus der Liste aus, wird das zugehörige Modell in einem schreibgeschützten BPMN-Viewer angezeigt. Im Gegensatz zur Komponente \texttt{ManageProcess} handelt es sich hierbei nicht um einen Editor, sodass keine Änderungen am Prozessmodell vorgenommen werden können. Dies stellt sicher, dass die Konsistenz des zugrundeliegenden Modells erhalten bleibt. Der Viewer dient ausschließlich der Visualisierung und ermöglicht dem Benutzer eine Vorschau des Prozesses vor dessen Ausführung.
+
+\newpage
+\useimage{executeProcess_clickedProcess}
+
+Nach Auswahl eines Prozesses erhält der Benutzer die Möglichkeit, eine aktive Instanz dieses Prozesses zu starten. Hierfür ist zunächst die Eingabe eines eindeutigen Instanznamens erforderlich. Erst nach Angabe dieses Namens und dem anschließenden Betätigen der Schaltfläche Start Instance wird die neue Instanz erzeugt, in die Liste der aktiven Instanzen aufgenommen und am linken Rand der Benutzeroberfläche angezeigt.
+
+Unter einer Instanz wird eine konkrete Ausführung des jeweiligen Prozesses verstanden. Jede erneute Ausführung führt zur Erzeugung einer separaten Instanz, die unabhängig gespeichert und verwaltet wird. Auf diese Weise lassen sich sowohl mehrere Ausführungen desselben Prozesses als auch unterschiedliche Prozesse parallel initiieren und steuern. Dadurch können beispielsweise verschiedene Teams denselben Prozess unabhängig voneinander ausführen oder ein einzelnes Team mehrere voneinander getrennte Prozessinstanzen verwalten. Die Möglichkeit zur parallelen Instanziierung stellt einen wesentlichen Aspekt für die effiziente und flexible Nutzung von Geschäftsprozessen dar.
+
+\useimage{executeProcess_clickedInstances}
+
+Wird eine Instanz aus der Liste aktiver Instanzen ausgewählt, wird sie für die Ausführung vorbereitet. Der Benutzer kann die Instanz nutzen, um den zugehörigen Prozess schrittweise zu durchlaufen. Die Darstellung erfolgt im bereits bekannten \textit{BPMN-Viewer}, der zuvor zur Prozessvorschau verwendet wurde. Ergänzt wird dieser nun durch ein zusätzliches Navigationsfenster auf der rechten Seite, das relevante Informationen zur ausgewählten Instanz bereitstellt.
+
+In der Kopfzeile dieses Bereichs befinden sich mehrere zentrale Attribute, die zur eindeutigen Identifikation der Instanz sowie zur Übersicht über deren Eigenschaften dienen:
+
+\begin{itemize}
+    \item \textbf{Instanzname}: Bezeichnung der Instanz zur leichteren Identifikation.
+    \item \textbf{Prozessname}: Gibt an, zu welchem Prozess die Instanz gehört bzw. welcher Prozess aktuell ausgeführt wird.
+    \item \textbf{Aktueller Status}: Zeigt den Status der Instanz an. Mögliche Zustände sind \textit{Running}, \textit{Finished} oder \textit{Canceled}. Diese Statusinformationen sind essenziell für die spätere Nachvollziehbarkeit, insbesondere zur Unterscheidung zwischen erfolgreich abgeschlossenen und abgebrochenen Prozessen.
+    \item \textbf{Zugewiesenes Projekt}: Dient der Filterung und Übersichtlichkeit, indem nur relevante Instanzen innerhalb eines bestimmten Projekts angezeigt werden.
+    \item \textbf{Erstellungsdatum}: Unterstützt die eindeutige Identifikation der Instanz und trägt zur besseren zeitlichen Einordnung sowie Nachverfolgbarkeit bei.
+\end{itemize}
+
+Während einige dieser Attribute primär der Übersicht und Benutzerorientierung dienen, besitzen andere auch funktionale Relevanz. So erlaubt beispielsweise das Attribut \textit{Projekt} die projektbasierte Filterung von Prozessen und Instanzen. Der \textit{Status} ist insbesondere für die spätere Archivierung und Prozessanalyse von Bedeutung. Das \textit{Erstellungsdatum} ist vor allem dann wichtig, wenn mehrere Instanzen denselben Namen tragen, was in bestimmten Anwendungsfällen ausdrücklich gewünscht ist. 
+
+Ein anschauliches Beispiel stammt aus dem Produktionsumfeld: Zwei Fahrzeuge desselben Modells sollen gleichzeitig durch denselben Fertigungsprozess geführt werden. Trotz identischer Prozessabläufe kann es zu zeitlichen Verschiebungen kommen. Eine identische Benennung der Instanzen ist in diesem Fall sinnvoll, da der Prozessinhalt gleich bleibt. Die eindeutige Unterscheidung erfolgt dann über das Erstellungsdatum, welches zusätzlich eine zeitliche Orientierung ermöglicht. Alternativ wäre auch eine Identifikation über eine interne Instanz-ID möglich. Das Erstellungsdatum bietet jedoch eine benutzerfreundlichere und zugleich funktional hilfreichere Darstellung für diesen Anwendungsfall.
+
+Unterhalb der Kopfzeile befindet sich ein weiterer Informationsbereich, der Details zum aktuell aktiven Bearbeitungsschritt enthält. Folgende Attribute werden hier angezeigt:
+
+\begin{itemize}
+    \item \textbf{Schrittname}: Bezeichnung des Prozessschritts zur klaren Identifikation.
+    \item \textbf{Zugewiesene Rolle}: Wesentlich für das Berechtigungsmanagement innerhalb des Prozesses.
+    \item \textbf{Beschreibung}: Erläuterung des Bearbeitungsschritts. Diese sollte so formuliert sein, dass auch fachfremde Benutzer die Aufgabe nachvollziehen und korrekt ausführen können.
+\end{itemize}
+
+Besondere Bedeutung kommt der \textit{Rolle} zu, da sie die Grundlage für das rollenbasierte Ausführungsmanagement bildet. Bestimmte Bearbeitungsschritte sind ausschließlich Benutzern mit einer entsprechend höheren Berechtigung, beispielsweise der \textit{Manager}-Rolle, vorbehalten. Die Zuweisung von Rollen zu den jeweiligen Schritten erfolgt bereits im Rahmen der Prozessverwaltung (vgl. \autoref{Manage_Process}).
+
+Während der Ausführung wird bei jedem Schritt überprüft, ob die Rolle des aktuellen Benutzers mit der für den jeweiligen Schritt definierten Rolle übereinstimmt. Ist dies der Fall, kann der Benutzer nach erfolgreicher Bearbeitung zum nächsten Schritt übergehen. Andernfalls wird der Zugriff verweigert. In diesem Fall muss eine Anfrage zur Freigabe an eine berechtigte Person – in der Regel einen Manager – gestellt werden. Diese Funktionalität ist in Abbildung~\ref{img:executeProcess_requestApproval} dargestellt.
+
+% Wird eine Instanz angeklickt, ist sie bereit für die Ausführung. Der Benutzer kann die Instanz verwenden, um sich durch den gewünschten Prozess zu navigieren und diesen durchzuführen. Dafür ist über dem BPMN-Viewer der bereits bei der Vorschau der Prozesse zum EInsatz gekommen ist, noch ein zusätzliches Navigationsfenster auf der rechten Seite. Dort sind einige wichitge Attribute in der Kopfzeile, um die Instanz eindeutig identifizieren zu können und dessen wichtigste Eigenschaften zu wissen:
+% - Instanznamen: Um die Instanz identifizieren und betiteln zu können
+% - Prozessnamen: Um zu wissen zu welchem Prozess die Instanz gehört, bzw. welcher Prozess gerade ausgeführt wird
+% - Aktueller Status: Um zu sehen wie der Status der Instanz ist. Ist eine Instanz in der Liste der aktiven Instanzen ist der Status immer "Running", aber eine Instanz kann auch den Status "Finished" oder "Canceled" annehmen. Dies ist essenziell, um später nachvollziehen zu können, ob ein Prozess erfolgreich abgeschlossen wurde oder abgebrochen.
+% - Zugewiesenes Projekt: Um nur relevante Prozesse und Instanzen anzuzeigen und den Überblick über die Projektzugehörigkeit zu behalten
+% - Erstellungs-Datum: Wichtig für die eindeutige Identifizierung der Instanzen und für die Nachvollziehbarkeit/Überschaubarkeit der Instanzen
+
+% Manche dieser Attribute spielen tendenziell eher eine Rolle, um die Übersicht über die Instanz zu erhalten. Aber es gibt auch funktionell ein paar wichitge Funktionen der Attribute.
+% Projekt: Filtern der Prozesse und Instanzen auf Benutzerprojekte
+% Status: Wichitg für archivierte Prozesse, wird später nochmals detailiert erläutert
+% Erstellungs-Datum: Um Instanzen eindeutig unterscheiden zu können. Instanzen können den exakt gleichen Namen besitzen, dies ist gewollt, da sie eventuell das gleiche Ziel und Durchführung haben und so genau die gleichen Instanzen sind, die dennoch zweimal gleichzeitig benötigt werden.
+
+% Einfach Beispiel aus der Produktion. Ein Auto des gleichen Modells benötigt zweimal zeitgleich die gleichen Fertigungsschritte, dabei können die Fertigungsprozesse etwas zeitverschoben sein. Den Fertigungsprozess gleich zubennen ist trotzdem sinnvoll und kann dann anhand des Erstellungs-Datum eindeutig identifiziert werden.
+
+% Das Beispiel soll anschaulich un vereinfacht zeigen, dass es sinnvoll ist den gleichen Isntanz-Namen zuzulassen, aber warum es dann wiederum auch wichtig ist ein eindeutiges Unterscheidungsmerkmal wie das Erstellungs-Datum anzuzeigen. 
+% Ein weiteres mögliches Merkmal wäre natürlich die ID der Instanz, allerdings deckt das Erstellungs-Datum noch weitere Orientierungszwecke ab, und ist so noch besser geeignet für diesen Anwendungsfall.
+
+% Unter der Kopfzeile gibt es ein weiters Fenster innerhalb des gleichen Bereichs für die Informationen zum aktuellen Schritt des Prozesses. Dabei gibt es auch hier einige wichtige Attribute die zu jedem Schritt angezeigt werden:
+% - Schrittname: Um den Schritt zu identifizieren 
+% - Zugewiesene Rolle: Wichtig für das Zugriffs- und Berechtigungsmanagement innerhalb der Instanz. 
+% - Beschreibung: Hier wird der Schritt beschrieben, optimalerweise ist die Beschreibung detailiert aber zielführend beschrieben, sodass auch ein unwissender Benutzer, den Bearbeitungsschritt ausführen kann.
+
+% Die Rolle spielt hier nochmal eine besondere Rolle. Sie ist besonders wichtig, um die Ausführung rollenbasiert zu kontrollieren. Dabei werden wichtige Bearbeitungsschritte nur Benutzer mit Manager Rolle möglich gemacht auszuführen. Die Zuweisung der Rollen zu den einzelnen Bearbietungsschritten ist bereits im Bereich Manage Process durchgeführt worden (vgl. Kapitel Verwalten der Prozesse).
+% Bei jedem Bearbeitungsschritt wird nun geprüft, ob die benötigte Rolle für den Schritt mit der Rolle des aktuellen Benutzers übereinstimmt. Ist das der Fall, kann der Benutzer einfach zum nächsten Schritt fortfahren, sobald der aktuelle Bearbeitungsschritt erfolgreich abgeschlossen worden ist. Hat der Benutzer nicht die notwendige Rolle, um forzufahren wird das erkannt und dem Benutzer wird das Fortfahren verwehrt. In diesem Fall muss der Benutzer, dann eine Anfrage an den zugehörigen Manager stellen, um zum nächsten Schritt fortfahren zu können. Diese Ansicht ist in \autoref{img:executeProcess_requestApproval} zu sehen.
+
+\newpage
+\useimage{executeProcess_requestApproval}
+
+Dadurch wird gewährleistet, dass die Bearbeitungsschritte des Prozesses während der Ausführung regelmäßig überprüft werden, um eine hohe Qualität sicherzustellen. Der Manager wird benachrichtigt und ist dazu angehalten, den aktuellen Bearbeitungsschritt sowie idealerweise die vorausgegangenen Schritte zu prüfen und anschließend zu genehmigen. Die entsprechende Beanchrichtigung ist in \autoref{img:executeProcess_requestApprovalNotification} dargestellt.
+
+\useimage{executeProcess_requestApprovalNotification}
+
+Erachtet der Manager die Ausführung der bisherigen Bearbeitungsschritte als angemessen und zufriedenstellend, kann er den nächsten Prozessschritt freigeben. In diesem Fall wird die Instanz zur weiteren Bearbeitung an den ursprünglichen Benutzer zurückgegeben, der den Prozess an der freigegebenen Stelle fortsetzen kann. Erkennt der Manager hingegen Mängel oder fehlerhafte Ausführungen, hat er die Möglichkeit, die Freigabe zu verweigern. Dadurch erhält der Benutzer eine Rückmeldung, dass der Bearbeitungsschritt nicht den geforderten Qualitätsstandards entspricht und eine Überarbeitung erforderlich ist.
+
+Die Verantwortung für die inhaltliche Prüfung liegt in diesem Fall beim Manager, der die Freigabeentscheidung eigenständig trifft. Der Benutzer selbst kann damit die Verantwortung für die Bewertung des Bearbeitungsschritts an den Manager übergeben. Dies ermöglicht eine klare Trennung zwischen Durchführung und Freigabe einzelner Prozessschritte, was insbesondere in sicherheits- oder qualitätskritischen Anwendungen von Bedeutung ist.
+
+Wie die Benutzeroberfläche für den Manager zur Entscheidung über die Freigabe aussieht, ist in \autoref{img:executeProcess_approvalDecision} dargestellt. Anstelle des üblichen Schalters \enquote{Continue to next Step} stehen dem Manager dort zwei Optionen zur Verfügung: \enquote{Accept Request \& Continue to next Step} oder \enquote{Deny Request}. Dadurch wird dem Manager eine gezielte Entscheidungsmöglichkeit über den weiteren Verlauf der Instanz geboten.
+
+\useimage{executeProcess_approvalDecision}
+
+Unabhängig vom Ergebnis der Freigabeentscheidung durch den Manager erhält der Benutzer im Anschluss eine entsprechende Rückmeldung. Diese Benachrichtigung kann im Fall einer erfolgreichen Freigabe positiv ausfallen, wie in \autoref{img:executeProcess_notificationAnswer} dargestellt. Wird die Freigabe hingegen verweigert, erhält der Benutzer eine ablehnende Benachrichtigung, wie in Abbildung gezeigt.
+
+
+\useimage{executeProcess_notificationAnswer}
+
+Der Benutzer kann auf die Benachrichtigung klicken und wird zur betreffenden Instanz weitergeleitet, dort kann er entweder direkt weiter arbeiten oder sich nochmal einen Überblick über den Prozess verschaffen und die damit möglicherweise mangelhafte Umsetzung der Bearbeitungsschritte.
+
+Diese Art der Sicherstellung durch den Manager ist auch sehr gut geeignet, um zu entscheiden und sicherstellen, welchen Weg man nach einem Gateway im BPMN-Prozess gehen möchte. 
+Dafür gibt es die Möglichkeit, wenn man eine Instanz ausgewählt hat, ein beliebiges Element anzuklicken und alle notwendigen Informationen des gewählten Element zu sehen. Dafür erscheint ein weiteres Fenster zwischen dem Navigationsfenster und dem BPMN-Viewer. Dieses enthält alle Informationen über das gewählte Element, genau wie im Navigationsfenster auch. Vorteil ist hier nur es ist nicht das nächste, sondern man kann sich so über jedes Element im Prozess einen Überblick verschaffen, bevor man beispielsweise bei einem Gateway eine Entscheidung treffen muss.
+
+\useimage{executeProcess_elementField}
+
+Unter der Liste der aktuellen verfügbaren Prozesse und den aktiven Instanzen ist noch ein Knopf "View Archived Instances" (vgl. Abbildung 43 unten links). Dieser bringt den Benutzer auf eine neue Seite, auf der alle archivierten Instanzen gespeichert und angezeigt werden. So kann jeder Benutzer vergangene Prozesse nachvollziehen und potentiell Schlüße für die aktuelle Instanz ziehen oder auch im Falle eines Fehlers die Fehlerquelle besser identifizieren. 
+Die vollständige Seite der archivierten Instanzen ist in Abbildung 45 zu sehen.
+
+\useimage{executeProcess_archivedInstances}
+
+Um einen ÜBerblick über alle möglichen Instanzen behalten zu können, ist in der Kopfzeile der Liste eine Filterfunktion integriert. So kann der Benutzer die vielen Instanzen filtern und so schneller die gewünschte Instanz finden oder anhand der Filter-Parameter identifizieren.
+Dabei stehen folgende Attribute für die Filterung zur Auswahl:
+- Projekte
+- Prozesse
+- Status
+- Erstellungsdatum
+- Abschließungsdatum
+
+Dabei haben alle Attribute eine innovative Darstellung, um den Benutzer die Nutzung so leicht und angenehm wie möglich zu machen. Beispielweise haben Projekte, Prozesse und Status ein Dropdown-Menü mit allen möglichen Eingabemöglichekeiten. Das Datum hingegen lässt sich aus einem sich öffneten Mini-Kalender auswählen (vgl. Abbildung Mini-Kalender).
+
+\useimage{executeProcess_miniCalender}
+
+Hat der Benutzer alle Filter-Attribute gewählt kann er mit dem Knopf Apply Filters seine Auswahl bestätigen und den Filter anwenden. Dabei wird in der Kopfzeile am Symbol für den Filter, die Anzahl aktiver Filter angezeigt, um dem Benutzer die Benutzung zu vereinfachen.
+
+\useimage{executeProcess_activeFilter}
+
+Dabei reduziert sich die Liste immer weiter auf die angegebenen Filter-Attribute bis keine passende Instanz mehr vorhanden ist, dann wird anstatt der Liste ein Hinweis angezeigt, der den Benutzer darauf hinweist, dass keine passende Instanz mit diesen Filter-Attributen gefunden werden konnte.
+
+\useimage{executeProcess_noMatchingProcesses}
+\todo{Umformulieren und richitg anordnen}
+
+\subsection*{Fazit}
+Die ExecuteProcess-Komponente stellt eine benutzerfreundliche, flexible und technisch robuste Lösung zur Die Komponente ExecuteProcess erfüllt eine zentrale Rolle innerhalb des Process-Managers, da sie die interaktive und nachvollziehbare Ausführung modellierter BPMN-Prozesse ermöglicht. Dabei ist besonderes Augenmerk auf eine klare Trennung zwischen Modellierung und Ausführung gelegt worden: Die Prozesse werden in einem ausschließlich lesbaren Viewer dargestellt, wodurch eine unbeabsichtigte Veränderung des Modells während der Ausführung ausgeschlossen wird. Dies stellt sicher, dass ausschließlich validierte Prozessmodelle zur Anwendung kommen.
+
+Ein wesentliches Merkmal der Komponente ist das Instanzkonzept. Für jeden Durchlauf eines Prozesses wird eine eigene Prozessinstanz erzeugt und separat verwaltet. Diese Herangehensweise erlaubt die gleichzeitige Ausführung mehrerer Instanzen desselben oder unterschiedlicher Prozesse. Dadurch wird nicht nur die parallele Bearbeitung ermöglicht, sondern auch die Nachvollziehbarkeit einzelner Abläufe erheblich verbessert.
+
+Zusammenfassend kann festgestellt werden, dass die ExecuteProcess-Komponente die Anforderungen an eine benutzerfreundliche, parallele und transparente Prozessausführung erfüllt. Sie bietet eine robuste Grundlage für den praktischen Einsatz in geschäftlichen Anwendungsszenarien und stärkt die Trennung zwischen Design und Laufzeitumgebung – ein zentrales Prinzip moderner Prozessmanagementsysteme.
+
+
+
+\newpage
+\subsection{Docker-Bereitstellung der Projekt-Komponenten} \label{docker}
+Zur Bereitstellung der entwickelten Anwendungskomponenten wird Docker als Containerplattform eingesetzt. Nähere Informationen zu Docker sind im Glossareintrag \gls{Docker} zu finden. Ziel ist die Schaffung einer konsistenten und reproduzierbaren Ausführungsumgebung für Frontend, Backend und Datenbank, die unabhängig vom Zielsystem zuverlässig betrieben werden kann. Docker ermöglicht die Kapselung von Anwendungen samt aller Abhängigkeiten in isolierten Containern. Dadurch werden potenzielle Kompatibilitätsprobleme reduziert und manuelle Konfigurationsaufwände minimiert. Der Einsatz von Docker erweist sich insbesondere im Kontext von Entwicklung, Test und Deployment als vorteilhaft.
+
+Die eingesetzte Architektur besteht aus drei logisch getrennten Containern (vgl. \autoref{img:project_structure_pm}): einem Container für die MongoDB-Datenbank, einem für das Node.js-Backend sowie einem weiteren für das statisch gebaute Frontend, das über einen Webserver ausgeliefert wird. Die Orchestrierung dieser Komponenten erfolgt mittels Docker Compose, wodurch der gesamte Containerverbund über einen einzigen Befehl gestartet, gestoppt oder aktualisiert werden kann. Dies bringt insbesondere im lokalen Entwicklungskontext sowie bei der Integration in CI/CD-Pipelines erhebliche Vorteile.
+
+Die Datenbank wird auf Basis des offiziellen MongoDB-Images in der Version 4.4 in einem eigenen Container betrieben. Beim Start des Containers wird über ein Initialisierungsskript automatisch ein Benutzer mit dem Benutzernamen admin und dem Passwort admin angelegt. Dieser verfügt über alle notwendigen Rechte, um innerhalb des Process Managers neue Benutzer, Projekte und Entitäten anzulegen. Damit ist die Anwendung unmittelbar nach dem Start einsatzbereit, ohne dass zusätzliche manuelle Konfigurationen erforderlich sind. Diese automatisierte Initialisierung unterstützt insbesondere den Entwicklungsprozess, da beim Stoppen und Neustarten des Containers sämtliche Daten verloren gehen. Die Konfiguration ist bewusst so gewählt, da in der betrachteten Entwicklungsphase keine Persistenz im produktiven Sinne erforderlich ist. Für den späteren produktiven Einsatz ist jedoch eine dauerhafte Speicherung der Daten unabdingbar – dieser Aspekt wird im Ausblick erneut thematisiert.
+
+Das Backend wird direkt aus dem lokalen Quellcodeverzeichnis erstellt und in einem dedizierten Container ausgeführt. Die Verbindung zur Datenbank erfolgt über definierte Umgebungsvariablen unter Nutzung der zuvor genannten Zugangsdaten. Durch die Abhängigkeitsdefinitionen in Docker Compose wird sichergestellt, dass das Backend erst nach vollständiger Verfügbarkeit der Datenbank startet.
+
+Das Frontend wird auf Grundlage eines zuvor erstellten statischen Builds in einem separaten Container über einen Webserver bereitgestellt. Die Orchestrierung über Docker Compose stellt sicher, dass der Start des Frontend-Containers erst erfolgt, nachdem das Backend erfolgreich gestartet wurde. Dadurch wird die korrekte Initialisierungsreihenfolge der Systemkomponenten gewährleistet.
+
+Die gewählte Containerstruktur erhöht die Wartbarkeit und Skalierbarkeit der Anwendung. Änderungen an einzelnen Komponenten können unabhängig voneinander vorgenommen werden, ohne das Gesamtsystem direkt zu beeinflussen. Der deklarative Aufbau erlaubt zudem eine schnelle und konsistente Reproduktion der Umgebung auf unterschiedlichen Zielsystemen – sei es für Entwicklungs-, Test- oder Produktivzwecke. Insgesamt leistet die gewählte Konfiguration einen wesentlichen Beitrag zur Stabilität, Wiederverwendbarkeit und Betriebssicherheit der Anwendung.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\iffalse
+
+\section{Systemarchitektur und Code-Struktur}
+
+
+\section{Implmentierung des Frontends}
+\subsection{BPMN-Bibliothek bpmn.io}
+
+
+\section{Implmentierung des Backends}
+
+
+\section{Integration und Kommunikation zwischen Frontend und Backend}
+
+\section{Implementierung der Datenbank}
+\subsection{Cloud-Datenbank}
+Für Persistierung der Daten => Ausblick dazu mehr
+
+
+
+
+\section{Herausforderungen}
+
+\section{Zusammenfassung}
+
+\section{Ausblick}
+\subsection{Prozess-Erstellung und -Ausführung}
+\textbf{XML laden => Prozess hinzufügen}\\
+\textbf{Prozess-Fenster zum Erstellen Vollbild-Option}
+\subsection{Cloud-Datenbank}
+
+
+\fi

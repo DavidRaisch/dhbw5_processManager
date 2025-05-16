@@ -1,0 +1,44 @@
+%!TEX root = ../../document/document.tex
+
+
+%%%%%%%%%% Settings %%%%%%%%%%
+
+% Adds the path to the images
+\graphicspath{{../content/non_tex_files/images}}
+
+
+%%%%%%%%%% Create new save command %%%%%%%%%%
+
+\makeatletter
+
+% \saveimage[OPTIONAL: <linewidth=0px, padding=0mm>]{<ID>}{<figure_position>}{<graphic_settings>}{<description>}{<file_name>}
+
+% -> OPTIONAL to add a frame around the image (see https://ctan.joethei.xyz/macros/latex/contrib/gradientframe/gradientframe.pdf)
+% figure_position: where to position the figure e.g. ht (here, top)
+% graphic_settings: any settings for \includegraphics e.g. width=0.7\textwidth
+% description: caption to show below the image
+% file_name: in the folder /content/non_tex_files/images
+\newcommand\saveimage[6][]{%
+    \@namedef{img@#2}{
+        \begin{figure}[#3]
+            \centering
+            \ifthenelse{\isempty{#1}}
+                {\includegraphics[#4]{#6}}%True
+                {\gradientframe[#1]{\includegraphics[#4]{#6}}}%False
+            \caption{#5}
+            \label{img:#2}
+        \end{figure}
+    }
+}
+
+% \useimage{<ID>}
+\newcommand\useimage[1]{%
+    \@nameuse{img@#1}
+}
+
+\makeatother
+
+
+%%%%%%%%%% Content %%%%%%%%%%
+
+\input{../content/additionals/images.tex}

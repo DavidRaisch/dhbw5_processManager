@@ -1,0 +1,46 @@
+%!TEX root = ../../document/document.tex
+
+%%%%%%%%%% Settings %%%%%%%%%%
+
+% Start the appendix and change the pagestyle
+\appendix
+\setpagestyleappendix
+
+% Add an 'A' before the figure, table, listing and equation numbers in the appendix
+\renewcommand{\thefigure}{A\arabic{figure}}
+\renewcommand{\thelstlisting}{A\arabic{lstlisting}}
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\theequation}{A\arabic{equation}}
+
+
+%%%%%%%%%% Content %%%%%%%%%%
+
+% If set, include the bibliography
+\ifsources
+    % Force line breaking in the bibliography
+    \begin{sloppypar}
+        % Print the used sources
+        \printbibliography[
+            category=cited,
+            heading=bibintoc,
+            title=\langsources]
+
+        % Print the unused sources
+        \nocite{*}
+        \printbibliography[
+            notcategory=cited,
+            title=\langfurthersources]
+    \end{sloppypar}
+\fi
+
+% If set, include the appendix (extra content)
+\ifappendix
+    \addchap{\langappendix}
+    \input{../content/additionals/appendix.tex}
+\fi
+
+% If set, include the glossary
+\ifglossary
+    \input{../content/additionals/glossary.tex}
+    \printglossary[style=altlist, title=\langglossary]
+\fi
