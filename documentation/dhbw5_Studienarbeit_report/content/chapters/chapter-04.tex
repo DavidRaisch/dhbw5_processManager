@@ -7,7 +7,39 @@
 \chapter{Fazit und Ausblick}
 \section*{Fazit}
 \todo{Kapitel Fazit schreiben}
-% Die Arbeit zeigt, dass moderne IT-Infrastrukturen unter Einsatz von Technologien wie Docker, Terraform und Ansible effizient konzipiert und automatisiert bereitgestellt werden können. Die containerisierte Web-Applikation wird über standardisierte APIs mit externen Diensten, wie etwa dem Translator, verbunden und demonstriert so, dass eine modulare Integration von \ac{SaaS}- und \ac{PaaS}-Komponenten in eine Cloud-Umgebung gelingen kann. Die Verwendung von \ac{IaC} ermöglicht es, die gesamte Infrastruktur reproduzierbar und skalierbar zu realisieren. Durch die Automatisierung von Bereitstellungsprozessen werden manuelle Eingriffe minimiert und die Zuverlässigkeit der Systeme gesteigert. Insgesamt belegt das Projekt, dass eine systematische Herangehensweise an die Komplexität moderner IT-Systeme zu einer effizienten und wartungsfreundlichen Lösung führt.
+% Die entwickelte Process-Manager‑App schließt die definierten Muss‑Anforderungen (Erstellung, Bearbeitung, Löschung, Anzeige und Ausführung von Prozessen sowie rollenbasierte Zugriffssteuerung und Benachrichtigungen) vollständig ab und erfüllt die Soll‑Anforderungen (Filter, Prozessvorschau, Benutzer‑ und Rollenverwaltung) in vollem Umfang. Besonders die Anforderungen an das Rollenmanagement mit Benachrichtigungssystem übersteigt bereits die definierten Anforderungen.
+
+% Insgesamt liefert die Arbeit eine Anwendung für das Management und die Ausführung von Geschäftsprozessen. Das Herzstück bilden der intuitive BPMN‑Editor mit Drag‑\&‑Drop‑Funktionalität und das robuste RBAC‑System. Architekturentscheidungen mit React‑Frontend, Node.js‑Backend und containerisierter Bereitstellung gewährleisten hohe Performance und Skalierbarkeit.
+
+Der entwickelte \textbf{Process‑Manager} schließt die definierten \textbf{Muss‑Anforderungen} (Erstellung, Bearbeitung, Löschung, Anzeige und Ausführung von Prozessen sowie rollenbasierte Zugriffssteuerung und Benachrichtigungen) vollständig ab und erfüllt die \textbf{Soll‑Anforderungen} (Filter in archivierten Instanzen, Prozessvorschau, Benutzer‑ und Rollenverwaltung) in vollem Umfang. Besonders das Rollenmanagement mit seinem fein granulierten Berechtigungskonzept und dem Echtzeit‑Benachrichtigungssystem übertrifft dabei bereits die ursprünglichen Vorgaben.
+
+Das intuitive Zusammenspiel folgender \textbf{Kernkomponenten} macht dies möglich:
+
+\begin{itemize}
+  \item \textbf{BPMN‑Editor mit Drag‑\&‑Drop:} Erstellen und Anpassen von Prozessmodellen in wenigen Klicks, inklusive Live‑Vorschau und Validierungsfeedback vor dem Speichern.
+  \item \textbf{Archivierte Instanzen mit detaillierten Filtern:} Filtermöglichkeiten über Status, Projekt, Prozess, Ersteller oder Datum erlauben zielgerichtetes Auffinden historischer Prozessdaten.
+  \item \textbf{Robustes RBAC‑System:} Rollen lassen sich flexibel definieren, Rechte bis auf Feldebene zuweisen. Automatisierte Benachrichtigungen informieren betroffene Nutzer sofort bei neuen Aufgaben oder Statusänderungen.
+  \item \textbf{Performante und skalierbare Architektur:} React‑Frontend und Node.js‑Backend kommunizieren über REST‑APIs; Containerisierung via Docker ermöglicht horizontale Skalierung. MongoDB als NoSQL‑Datenbank garantiert kurze Antwortzeiten auch unter hoher Last.
+\end{itemize}
+
+\newpage
+\subsection*{Kurzfassung der Analyse der Anforderungen}
+\textbf{Muss‑Anforderungen:}
+\begin{itemize}
+  \item Vollständige Prozessmodellierung (Erstellen, Bearbeiten, Löschen) mit Bestätigungsdialog und Schutz aktiver Instanzen.
+  \item Darstellung und Steuerung von Prozessinstanzen in Echtzeit.
+  \item Rollenbasierte Zugriffskontrolle (Anlegen, Zuweisen, Entziehen) und automatisierte, konfigurierbare Benachrichtigungen.
+\end{itemize}
+
+\textbf{Soll‑Anforderungen:}
+\begin{itemize}
+  \item Filter in archivierten Instanzen nach Status, Projekt, Prozess, Ersteller und Datum.
+  \item Interaktive Prozessvorschau vor Ausführung.
+  \item Administrationsoberfläche für Benutzer‑ und Rollenmanagement
+\end{itemize}
+
+Damit bietet die Arbeit eine leistungsfähige Plattform für das ganzheitliche Management und die Ausführung von Geschäftsprozessen.
+
 
 \newpage
 \section*{Ausblick}

@@ -567,44 +567,50 @@ Wie die Benutzeroberfläche für den Manager zur Entscheidung über die Freigabe
 
 \useimage{executeProcess_approvalDecision}
 
-Unabhängig vom Ergebnis der Freigabeentscheidung durch den Manager erhält der Benutzer im Anschluss eine entsprechende Rückmeldung. Diese Benachrichtigung kann im Fall einer erfolgreichen Freigabe positiv ausfallen, wie in \autoref{img:executeProcess_notificationAnswer} dargestellt. Wird die Freigabe hingegen verweigert, erhält der Benutzer eine ablehnende Benachrichtigung, wie in Abbildung gezeigt.
+Unabhängig vom Ergebnis der Freigabeentscheidung durch den Manager erhält der Benutzer im Anschluss eine entsprechende Rückmeldung. Diese Benachrichtigung kann im Fall einer erfolgreichen Freigabe positiv ausfallen, wie in \autoref{img:executeProcess_notificationAnswer} dargestellt. Wird die Freigabe hingegen verweigert, erhält der Benutzer eine ablehnende Benachrichtigung, wie in \autoref{img:executeProcess_notificationAnswer_negativ} gezeigt.
 
 
 \useimage{executeProcess_notificationAnswer}
 
-Der Benutzer kann auf die Benachrichtigung klicken und wird zur betreffenden Instanz weitergeleitet, dort kann er entweder direkt weiter arbeiten oder sich nochmal einen Überblick über den Prozess verschaffen und die damit möglicherweise mangelhafte Umsetzung der Bearbeitungsschritte.
+Der Benutzer hat die Möglichkeit, über die Benachrichtigung direkt zur betreffenden Instanz weitergeleitet zu werden. Dort kann er entweder unmittelbar mit der Bearbeitung fortfahren oder sich zunächst einen Überblick über den bisherigen Verlauf des Prozesses verschaffen, insbesondere im Hinblick auf möglicherweise unzureichend umgesetzte Bearbeitungsschritte.
 
-Diese Art der Sicherstellung durch den Manager ist auch sehr gut geeignet, um zu entscheiden und sicherstellen, welchen Weg man nach einem Gateway im BPMN-Prozess gehen möchte. 
-Dafür gibt es die Möglichkeit, wenn man eine Instanz ausgewählt hat, ein beliebiges Element anzuklicken und alle notwendigen Informationen des gewählten Element zu sehen. Dafür erscheint ein weiteres Fenster zwischen dem Navigationsfenster und dem BPMN-Viewer. Dieses enthält alle Informationen über das gewählte Element, genau wie im Navigationsfenster auch. Vorteil ist hier nur es ist nicht das nächste, sondern man kann sich so über jedes Element im Prozess einen Überblick verschaffen, bevor man beispielsweise bei einem Gateway eine Entscheidung treffen muss.
+Die Freigabefunktion durch den Manager eignet sich zudem besonders gut zur Steuerung von Entscheidungen an Gateways innerhalb des BPMN-Prozesses. Sobald eine Instanz ausgewählt wurde, kann der Benutzer ein beliebiges Element im Prozessdiagramm anklicken, um detaillierte Informationen zu diesem Element einzusehen. Hierfür erscheint ein zusätzliches Informationsfenster zwischen dem Navigationsbereich und dem BPMN-Viewer. Dieses Fenster enthält, analog zum Navigationsbereich, alle relevanten Informationen zum ausgewählten Prozesselement. Der wesentliche Unterschied besteht darin, dass nicht nur Informationen zum jeweils nächsten Schritt angezeigt werden, sondern gezielt jedes Element im Prozess untersucht werden kann. Dadurch wird es dem Benutzer erleichtert, fundierte Entscheidungen zu treffen, insbesondere an Entscheidungsstellen wie Gateways.
+
 
 \useimage{executeProcess_elementField}
 
-Unter der Liste der aktuellen verfügbaren Prozesse und den aktiven Instanzen ist noch ein Knopf "View Archived Instances" (vgl. Abbildung 43 unten links). Dieser bringt den Benutzer auf eine neue Seite, auf der alle archivierten Instanzen gespeichert und angezeigt werden. So kann jeder Benutzer vergangene Prozesse nachvollziehen und potentiell Schlüße für die aktuelle Instanz ziehen oder auch im Falle eines Fehlers die Fehlerquelle besser identifizieren. 
-Die vollständige Seite der archivierten Instanzen ist in Abbildung 45 zu sehen.
+Unterhalb der Liste der aktuell verfügbaren Prozesse sowie der aktiven Instanzen befindet sich ein Button mit der Beschriftung \enquote{View Archived Instances} (vgl. \autoref{img:executeProcess_full_pm}, unten links). Durch Betätigung dieses Buttons wird der Benutzer auf eine separate Seite weitergeleitet, auf der sämtliche archivierten Instanzen gespeichert und dargestellt werden. 
+
+Diese Funktion ermöglicht es den Benutzern, abgeschlossene oder abgebrochene Prozessinstanzen nachzuvollziehen. Dadurch können beispielsweise Rückschlüsse auf den Verlauf aktueller Instanzen gezogen oder – im Falle eines Fehlers – potenzielle Ursachen leichter identifiziert werden. Die vollständige Ansicht der Seite mit den archivierten Instanzen ist in \autoref{img:executeProcess_archivedInstances} dargestellt.
+
 
 \useimage{executeProcess_archivedInstances}
 
-Um einen ÜBerblick über alle möglichen Instanzen behalten zu können, ist in der Kopfzeile der Liste eine Filterfunktion integriert. So kann der Benutzer die vielen Instanzen filtern und so schneller die gewünschte Instanz finden oder anhand der Filter-Parameter identifizieren.
-Dabei stehen folgende Attribute für die Filterung zur Auswahl:
-- Projekte
-- Prozesse
-- Status
-- Erstellungsdatum
-- Abschließungsdatum
+Zur besseren Übersicht über alle verfügbaren Instanzen ist in der Kopfzeile der Liste eine Filterfunktion integriert. Diese ermöglicht es dem Benutzer, eine Vielzahl an Instanzen gezielt einzugrenzen und somit effizient nach einer bestimmten Instanz zu suchen oder diese anhand spezifischer Filterkriterien zu identifizieren.
 
-Dabei haben alle Attribute eine innovative Darstellung, um den Benutzer die Nutzung so leicht und angenehm wie möglich zu machen. Beispielweise haben Projekte, Prozesse und Status ein Dropdown-Menü mit allen möglichen Eingabemöglichekeiten. Das Datum hingegen lässt sich aus einem sich öffneten Mini-Kalender auswählen (vgl. Abbildung Mini-Kalender).
+Für die Filterung stehen folgende Attribute zur Verfügung:
+\begin{itemize}
+  \item Zugehöriges Projekt
+  \item Prozessbezeichnung
+  \item Status der Instanz
+  \item Erstellungsdatum
+  \item Abschließungsdatum
+\end{itemize}
+
+Die Benutzeroberfläche der Filterelemente ist benutzerfreundlich und funktional gestaltet. Attribute wie \enquote{Projekt}, \enquote{Prozess} und \enquote{Status} werden über Dropdown-Menüs mit vordefinierten Auswahlmöglichkeiten bereitgestellt. Für die Auswahl von Datumswerten – sowohl für das Erstellungs- als auch für das Abschließungsdatum – steht ein eingeblendeter Mini-Kalender zur Verfügung, der eine intuitive Eingabe unterstützt (vgl. \autoref{img:executeProcess_miniCalender}).
+
 
 \useimage{executeProcess_miniCalender}
 
-Hat der Benutzer alle Filter-Attribute gewählt kann er mit dem Knopf Apply Filters seine Auswahl bestätigen und den Filter anwenden. Dabei wird in der Kopfzeile am Symbol für den Filter, die Anzahl aktiver Filter angezeigt, um dem Benutzer die Benutzung zu vereinfachen.
+Nachdem der Benutzer die gewünschten Filterattribute ausgewählt hat, kann er die Filterung durch Betätigen der Schaltfläche \enquote{Apply Filters} anwenden. Zur Unterstützung der Benutzerfreundlichkeit wird in der Kopfzeile – direkt am Filtersymbol – die Anzahl der aktuell aktiven Filter eingeblendet. Dies ermöglicht dem Benutzer jederzeit eine transparente und nachvollziehbare Übersicht über den angewendeten Filterstatus.
 
 \useimage{executeProcess_activeFilter}
 
-Dabei reduziert sich die Liste immer weiter auf die angegebenen Filter-Attribute bis keine passende Instanz mehr vorhanden ist, dann wird anstatt der Liste ein Hinweis angezeigt, der den Benutzer darauf hinweist, dass keine passende Instanz mit diesen Filter-Attributen gefunden werden konnte.
+Die Liste der Instanzen wird entsprechend der gesetzten Filterattribute schrittweise eingeschränkt. Sollten die gewählten Filterkriterien zu keinem Treffer führen, wird anstelle der Instanzliste ein Hinweis eingeblendet. Dieser informiert den Benutzer darüber, dass keine Instanz mit den angegebenen Filterattributen gefunden werden konnte.
 
 \useimage{executeProcess_noMatchingProcesses}
-\todo{Umformulieren und richitg anordnen}
 
+\newpage
 \subsection*{Fazit}
 Die ExecuteProcess-Komponente stellt eine benutzerfreundliche, flexible und technisch robuste Lösung zur Die Komponente ExecuteProcess erfüllt eine zentrale Rolle innerhalb des Process-Managers, da sie die interaktive und nachvollziehbare Ausführung modellierter BPMN-Prozesse ermöglicht. Dabei ist besonderes Augenmerk auf eine klare Trennung zwischen Modellierung und Ausführung gelegt worden: Die Prozesse werden in einem ausschließlich lesbaren Viewer dargestellt, wodurch eine unbeabsichtigte Veränderung des Modells während der Ausführung ausgeschlossen wird. Dies stellt sicher, dass ausschließlich validierte Prozessmodelle zur Anwendung kommen.
 

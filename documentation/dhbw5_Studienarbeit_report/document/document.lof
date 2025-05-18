@@ -65,7 +65,7 @@
 \contentsline {figure}{\numberline {4.47}{\ignorespaces Die Seite mit allen archivierten Instanzen}}{80}{figure.4.47}%
 \contentsline {figure}{\numberline {4.48}{\ignorespaces Der Mini-Kalender zur Datum-Auswahl}}{81}{figure.4.48}%
 \contentsline {figure}{\numberline {4.49}{\ignorespaces Hinweis auf aktive Instanzen am Filter-Symbol}}{81}{figure.4.49}%
-\contentsline {figure}{\numberline {4.50}{\ignorespaces Hinweis auf keine passende Instanzen mit den gewählten Filter}}{82}{figure.4.50}%
+\contentsline {figure}{\numberline {4.50}{\ignorespaces Hinweis auf keine passende Instanzen mit den gewählten Filter}}{81}{figure.4.50}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {A1}{\ignorespaces Fehlernachricht beim Login -- leeres Login-Feld}}{A}{figure.Alph0.1}%
@@ -84,4 +84,5 @@
 \contentsline {figure}{\numberline {A14}{\ignorespaces Die Fehlernachricht bei fehlendem Projekt}}{N}{figure.Alph0.14}%
 \contentsline {figure}{\numberline {A15}{\ignorespaces Die positive Rückmeldung des Änderungsantrags}}{N}{figure.Alph0.15}%
 \contentsline {figure}{\numberline {A16}{\ignorespaces Die negative Rückmeldung nach Anfrage zum Löschen}}{N}{figure.Alph0.16}%
+\contentsline {figure}{\numberline {A17}{\ignorespaces Die negative Rückmeldung auf die Genehmigungsanfrage}}{O}{figure.Alph0.17}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
