@@ -1266,6 +1266,19 @@ INPUT ../content/non_tex_files/images/dhbw_de.png
 INPUT ../config/additionals/appendix.tex
 INPUT ../config/additionals/appendix.tex
 INPUT ../config/additionals/appendix.tex
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/lm/ec-lmcsc10.tfm
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
+INPUT ../content/non_tex_files/images/dhbw_de.png
 INPUT ../content/additionals/appendix.tex
 INPUT ../content/additionals/appendix.tex
 INPUT ../content/additionals/appendix.tex
@@ -1408,6 +1421,7 @@ INPUT document.aux
 INPUT document.run.xml
 OUTPUT document.run.xml
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri12.pfb

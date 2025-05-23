@@ -16,5 +16,951 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{IEEE}{book}{}{}
+      \list{publisher}{2}{%
+        {IEEE / Institute of Electrical}%
+        {Electronics Engineers Incorporated}%
+      }
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9780738147239}
+      \field{note}{Electronic resource type: Report}
+      \field{title}{830-1993 IEEE Recommended Practice for Software Requirements Specifications}
+    \endentry
+    \entry{Sommerville}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=70341b3bfcce7026902f4eb1e4111b58}{%
+           family={Sommerville},
+           familyi={S\bibinitperiod},
+           given={Ian},
+           giveni={I\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Pearson}%
+      }
+      \strng{namehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{fullhash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{fullhashraw}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{bibnamehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authorbibnamehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authornamehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authorfullhash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authorfullhashraw}{70341b3bfcce7026902f4eb1e4111b58}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9780137035151}
+      \field{title}{Software engineering}
+      \field{year}{2011}
+      \field{pages}{792}
+      \range{pages}{1}
+    \endentry
+    \entry{Kleuker}{book}{}{}
+      \name{editor}{1}{}{%
+        {{hash=9af4f54b4ad5717a00e51e40db399b4a}{%
+           family={Kleuker},
+           familyi={K\bibinitperiod},
+           given={Stephan},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Wiesbaden}%
+      }
+      \list{publisher}{1}{%
+        {Vieweg+Teubner}%
+      }
+      \strng{namehash}{9af4f54b4ad5717a00e51e40db399b4a}
+      \strng{fullhash}{9af4f54b4ad5717a00e51e40db399b4a}
+      \strng{fullhashraw}{9af4f54b4ad5717a00e51e40db399b4a}
+      \strng{bibnamehash}{9af4f54b4ad5717a00e51e40db399b4a}
+      \strng{editorbibnamehash}{9af4f54b4ad5717a00e51e40db399b4a}
+      \strng{editornamehash}{9af4f54b4ad5717a00e51e40db399b4a}
+      \strng{editorfullhash}{9af4f54b4ad5717a00e51e40db399b4a}
+      \strng{editorfullhashraw}{9af4f54b4ad5717a00e51e40db399b4a}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{editor}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Grundkurs Software-Engineering mit UML}
+      \field{isbn}{9783834892355}
+      \field{series}{SpringerLink}
+      \field{subtitle}{Der pragmatische Weg zu erfolgreichen Softwareprojekten}
+      \field{title}{Grundkurs Software-Engineering mit UML}
+      \field{year}{2009}
+      \verb{doi}
+      \verb 10.1007/978-3-8348-9235-5_4
+      \endverb
+    \endentry
+    \entry{Herrmann}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=43383c946f68bdb4ded2161345c6d037}{%
+           family={Herrmann},
+           familyi={H\bibinitperiod},
+           given={Andrea},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Wiesbaden}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{43383c946f68bdb4ded2161345c6d037}
+      \strng{fullhash}{43383c946f68bdb4ded2161345c6d037}
+      \strng{fullhashraw}{43383c946f68bdb4ded2161345c6d037}
+      \strng{bibnamehash}{43383c946f68bdb4ded2161345c6d037}
+      \strng{authorbibnamehash}{43383c946f68bdb4ded2161345c6d037}
+      \strng{authornamehash}{43383c946f68bdb4ded2161345c6d037}
+      \strng{authorfullhash}{43383c946f68bdb4ded2161345c6d037}
+      \strng{authorfullhashraw}{43383c946f68bdb4ded2161345c6d037}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9783658354602}
+      \field{pagetotal}{142012139}
+      \field{series}{Springer eBook Collection}
+      \field{subtitle}{Standardkonformes Requirements Engineering}
+      \field{title}{Grundlagen der Anforderungsanalyse}
+      \field{year}{2022}
+    \endentry
+    \entry{Meyer}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=7833218c9c8ce508ce4d4482308c9da5}{%
+           family={Meyer},
+           familyi={M\bibinitperiod},
+           given={Bertrand},
+           giveni={B\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{7833218c9c8ce508ce4d4482308c9da5}
+      \strng{fullhash}{7833218c9c8ce508ce4d4482308c9da5}
+      \strng{fullhashraw}{7833218c9c8ce508ce4d4482308c9da5}
+      \strng{bibnamehash}{7833218c9c8ce508ce4d4482308c9da5}
+      \strng{authorbibnamehash}{7833218c9c8ce508ce4d4482308c9da5}
+      \strng{authornamehash}{7833218c9c8ce508ce4d4482308c9da5}
+      \strng{authorfullhash}{7833218c9c8ce508ce4d4482308c9da5}
+      \strng{authorfullhashraw}{7833218c9c8ce508ce4d4482308c9da5}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-3-031-06739-6}
+      \field{title}{Handbook of requirements and business analysis}
+      \field{year}{2022}
+    \endentry
+    \entry{EPKProcess}{online}{}{}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labeltitlesource}{title}
+      \field{title}{Wie gelingt der Übergang von EPK zur BPMN 2.0?}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://blog.mi-nautics.com/wie-gelingt-der-uebergang-von-epk-zur-bpmn-2-0/
+      \endverb
+      \verb{url}
+      \verb https://blog.mi-nautics.com/wie-gelingt-der-uebergang-von-epk-zur-bpmn-2-0/
+      \endverb
+    \endentry
+    \entry{Gadatsch}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=9275409be595e9a1805fbdb65ceb0dee}{%
+           family={Gadatsch},
+           familyi={G\bibinitperiod},
+           given={Andreas},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Wiesbaden}%
+      }
+      \list{publisher}{1}{%
+        {Vieweg+Teubner}%
+      }
+      \strng{namehash}{9275409be595e9a1805fbdb65ceb0dee}
+      \strng{fullhash}{9275409be595e9a1805fbdb65ceb0dee}
+      \strng{fullhashraw}{9275409be595e9a1805fbdb65ceb0dee}
+      \strng{bibnamehash}{9275409be595e9a1805fbdb65ceb0dee}
+      \strng{authorbibnamehash}{9275409be595e9a1805fbdb65ceb0dee}
+      \strng{authornamehash}{9275409be595e9a1805fbdb65ceb0dee}
+      \strng{authorfullhash}{9275409be595e9a1805fbdb65ceb0dee}
+      \strng{authorfullhashraw}{9275409be595e9a1805fbdb65ceb0dee}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{6., aktualisierte Auflage}
+      \field{isbn}{9783834893468}
+      \field{pagetotal}{448351}
+      \field{series}{SpringerLink}
+      \field{subtitle}{Methoden und Werkzeuge für die IT-Praxis: Eine Einführung für Studenten und Praktiker}
+      \field{title}{Grundkurs Geschäftsprozess-Management}
+      \field{year}{2010}
+    \endentry
+    \entry{Scheer}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=2383f3c7bda3e362ca00559c11ac2fcf}{%
+           family={Scheer},
+           familyi={S\bibinitperiod},
+           given={August-Wilhelm},
+           giveni={A\bibinithyphendelim W\bibinitperiod}}}%
+      }
+      \strng{namehash}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \strng{fullhash}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \strng{fullhashraw}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \strng{bibnamehash}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \strng{authorbibnamehash}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \strng{authornamehash}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \strng{authorfullhash}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \strng{authorfullhashraw}{2383f3c7bda3e362ca00559c11ac2fcf}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Institut für Wirtschaftsinformatik}
+      \field{title}{Interorganisationales Geschäftsprozessmanagement durch Modelltransformation}
+      \field{year}{2005}
+      \verb{urlraw}
+      \verb https://www.uni-saarland.de/fileadmin/upload/lehrstuhl/loos/ALT/IWi-Hefte/IWi_Heft_182.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.uni-saarland.de/fileadmin/upload/lehrstuhl/loos/ALT/IWi-Hefte/IWi_Heft_182.pdf
+      \endverb
+    \endentry
+    \entry{Durst}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=079fd267a73e939c2813383eb76b9c65}{%
+           family={Durst},
+           familyi={D\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{079fd267a73e939c2813383eb76b9c65}
+      \strng{fullhash}{079fd267a73e939c2813383eb76b9c65}
+      \strng{fullhashraw}{079fd267a73e939c2813383eb76b9c65}
+      \strng{bibnamehash}{079fd267a73e939c2813383eb76b9c65}
+      \strng{authorbibnamehash}{079fd267a73e939c2813383eb76b9c65}
+      \strng{authornamehash}{079fd267a73e939c2813383eb76b9c65}
+      \strng{authorfullhash}{079fd267a73e939c2813383eb76b9c65}
+      \strng{authorfullhashraw}{079fd267a73e939c2813383eb76b9c65}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{4}
+      \field{title}{Ereignisgesteuerte Prozesskette (EPK) – einfach erklärt}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://der-prozessmanager.de/aktuell/wissensdatenbank/ereignisgesteuerte-prozesskette
+      \endverb
+      \verb{url}
+      \verb https://der-prozessmanager.de/aktuell/wissensdatenbank/ereignisgesteuerte-prozesskette
+      \endverb
+    \endentry
+    \entry{OMG}{article}{}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Object Management Groupm (OMG)}
+      \field{title}{Buisness Process Model and Notation (BPMN)}
+      \field{year}{2011}
+    \endentry
+    \entry{Lindenbach}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=71688291bf0e7cf6155ccb9a4ce36393}{%
+           family={Lindenbach},
+           familyi={L\bibinitperiod},
+           given={Heidi},
+           giveni={H\bibinitperiod}}}%
+      }
+      \name{editor}{1}{}{%
+        {{hash=f07492847dbefbffd084ff3c238b5404}{%
+           family={Göpfert},
+           familyi={G\bibinitperiod},
+           given={Jochen},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {München}%
+      }
+      \list{publisher}{1}{%
+        {Oldenbourg Verlag}%
+      }
+      \strng{namehash}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{fullhash}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{fullhashraw}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{bibnamehash}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{authorbibnamehash}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{authornamehash}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{authorfullhash}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{authorfullhashraw}{71688291bf0e7cf6155ccb9a4ce36393}
+      \strng{editorbibnamehash}{f07492847dbefbffd084ff3c238b5404}
+      \strng{editornamehash}{f07492847dbefbffd084ff3c238b5404}
+      \strng{editorfullhash}{f07492847dbefbffd084ff3c238b5404}
+      \strng{editorfullhashraw}{f07492847dbefbffd084ff3c238b5404}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-3-486-71805-8}
+      \field{pagetotal}{1202}
+      \field{subtitle}{Business Process Model and Notation}
+      \field{title}{Geschäftsprozessmodellierung mit BPMN 2.0}
+      \field{year}{2013}
+    \endentry
+    \entry{Freund}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=241bf3c0f5a9743132d6b4bc0318b9aa}{%
+           family={Freund},
+           familyi={F\bibinitperiod},
+           given={Jakob},
+           giveni={J\bibinitperiod}}}%
+      }
+      \name{editor}{1}{}{%
+        {{hash=3b4f672d2d111699a99b2a3bea34f0e4}{%
+           family={Rücker},
+           familyi={R\bibinitperiod},
+           given={Bernd},
+           giveni={B\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {München}%
+      }
+      \list{publisher}{1}{%
+        {Carl Hanser Verlag}%
+      }
+      \strng{namehash}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{fullhash}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{fullhashraw}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{bibnamehash}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{authorbibnamehash}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{authornamehash}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{authorfullhash}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{authorfullhashraw}{241bf3c0f5a9743132d6b4bc0318b9aa}
+      \strng{editorbibnamehash}{3b4f672d2d111699a99b2a3bea34f0e4}
+      \strng{editornamehash}{3b4f672d2d111699a99b2a3bea34f0e4}
+      \strng{editorfullhash}{3b4f672d2d111699a99b2a3bea34f0e4}
+      \strng{editorfullhashraw}{3b4f672d2d111699a99b2a3bea34f0e4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{5. akt. Auflage}
+      \field{isbn}{978-3-446-45054-7}
+      \field{pagetotal}{282}
+      \field{subtitle}{Mit Einführung in CMMN und DMN}
+      \field{title}{Praxishandbuch BPMN}
+      \field{year}{2017}
+    \endentry
+    \entry{BPMNProcess}{online}{}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{title}{Business Process Model and Notation (BPMN)}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://sparxsystems.com/enterprise_architect_user_guide/17.0/modeling_languages/bpmn_1_4.html
+      \endverb
+      \verb{url}
+      \verb https://sparxsystems.com/enterprise_architect_user_guide/17.0/modeling_languages/bpmn_1_4.html
+      \endverb
+    \endentry
+    \entry{Sandhu1998}{inbook}{}{}
+      \name{author}{1}{}{%
+        {{hash=f3b7d57399ba1dbf13fcbf28b2ad7555}{%
+           family={Sandhu},
+           familyi={S\bibinitperiod},
+           given={Ravi\bibnamedelima S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{fullhash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{fullhashraw}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{bibnamehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authorbibnamehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authornamehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authorfullhash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authorfullhashraw}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \field{extraname}{1}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Computers}
+      \field{issn}{0065-2458}
+      \field{title}{Role-based Access Control}
+      \field{year}{1998}
+      \verb{doi}
+      \verb 10.1016/s0065-2458(08)60206-5
+      \endverb
+    \endentry
+    \entry{Sandhu}{inbook}{}{}
+      \name{author}{1}{}{%
+        {{hash=f3b7d57399ba1dbf13fcbf28b2ad7555}{%
+           family={Sandhu},
+           familyi={S\bibinitperiod},
+           given={Ravi\bibnamedelima S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \strng{namehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{fullhash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{fullhashraw}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{bibnamehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authorbibnamehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authornamehash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authorfullhash}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \strng{authorfullhashraw}{f3b7d57399ba1dbf13fcbf28b2ad7555}
+      \field{extraname}{2}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0065-2458}
+      \field{title}{The NIST Model for Role-Based Access Control: Towards A Unified Standard}
+    \endentry
+    \entry{RedHat}{online}{}{}
+      \list{organization}{1}{%
+        {Red Hat}%
+      }
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labeltitlesource}{title}
+      \field{title}{What is role-based access control (RBAC)?}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.redhat.com/en/topics/security/what-is-role-based-access-control
+      \endverb
+      \verb{url}
+      \verb https://www.redhat.com/en/topics/security/what-is-role-based-access-control
+      \endverb
+    \endentry
+    \entry{ISO27001}{online}{}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{ISO 27001 - Annex A.9 - Access control}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://iso-docs.com/blogs/iso-27001-standard/iso-27001-annex-a-9-access-control?srsltid=AfmBOopinLZ5lkl5eVNB_XyqSNt2gydYeW_5xOSuVmxJaU3KVEa-N3kv#:~:text=3. Role,on roles, authorizations, and permissions
+      \endverb
+      \verb{url}
+      \verb https://iso-docs.com/blogs/iso-27001-standard/iso-27001-annex-a-9-access-control?srsltid=AfmBOopinLZ5lkl5eVNB_XyqSNt2gydYeW_5xOSuVmxJaU3KVEa-N3kv#:~:text=3.%20Role,on%20roles,%20authorizations,%20and%20permissions
+      \endverb
+    \endentry
+    \entry{Magicbell}{online}{}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{Can you build a complete notification system without breaking a sweat?}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.magicbell.com/blog/building-a-user-notification-system
+      \endverb
+      \verb{url}
+      \verb https://www.magicbell.com/blog/building-a-user-notification-system
+      \endverb
+    \endentry
+    \entry{Skillable}{online}{}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{Creating User Role Assignment Notification}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://docs.skillable.com/docs/user-role-notification
+      \endverb
+      \verb{url}
+      \verb https://docs.skillable.com/docs/user-role-notification
+      \endverb
+    \endentry
+    \entry{Mika}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=1c5720e7c079f0580a34199f22291b99}{%
+           family={Mika},
+           familyi={M\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{1c5720e7c079f0580a34199f22291b99}
+      \strng{fullhash}{1c5720e7c079f0580a34199f22291b99}
+      \strng{fullhashraw}{1c5720e7c079f0580a34199f22291b99}
+      \strng{bibnamehash}{1c5720e7c079f0580a34199f22291b99}
+      \strng{authorbibnamehash}{1c5720e7c079f0580a34199f22291b99}
+      \strng{authornamehash}{1c5720e7c079f0580a34199f22291b99}
+      \strng{authorfullhash}{1c5720e7c079f0580a34199f22291b99}
+      \strng{authorfullhashraw}{1c5720e7c079f0580a34199f22291b99}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Web Application vs. Desktop Application: A Comparative Guide}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.ramotion.com/blog/web-application-vs-desktop-application/#:~:text=accessed via a web browser,installations on the client side
+      \endverb
+      \verb{url}
+      \verb https://www.ramotion.com/blog/web-application-vs-desktop-application/#:~:text=accessed%20via%20a%20web%20browser,installations%20on%20the%20client%20side
+      \endverb
+    \endentry
+    \entry{Medium}{online}{}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{Web vs Desktop Applications: Key Differences Explained}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://medium.com/theymakedesign/web-app-vs-desktop-app-3841e8cb3996
+      \endverb
+      \verb{url}
+      \verb https://medium.com/theymakedesign/web-app-vs-desktop-app-3841e8cb3996
+      \endverb
+    \endentry
+    \entry{iFour}{online}{}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{Web App vs Desktop App: Essentials Explained}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.ifourtechnolab.com/blog/web-app-vs-desktop-app
+      \endverb
+      \verb{url}
+      \verb https://www.ifourtechnolab.com/blog/web-app-vs-desktop-app
+      \endverb
+    \endentry
+    \entry{Springer}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=00a93039a813d6985068fb1d9407cbbc}{%
+           family={Springer},
+           familyi={S\bibinitperiod},
+           given={Sebastian},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Boston (MA)}%
+      }
+      \list{publisher}{1}{%
+        {Rheinwerk Publishing Inc.}%
+      }
+      \strng{namehash}{00a93039a813d6985068fb1d9407cbbc}
+      \strng{fullhash}{00a93039a813d6985068fb1d9407cbbc}
+      \strng{fullhashraw}{00a93039a813d6985068fb1d9407cbbc}
+      \strng{bibnamehash}{00a93039a813d6985068fb1d9407cbbc}
+      \strng{authorbibnamehash}{00a93039a813d6985068fb1d9407cbbc}
+      \strng{authornamehash}{00a93039a813d6985068fb1d9407cbbc}
+      \strng{authorfullhash}{00a93039a813d6985068fb1d9407cbbc}
+      \strng{authorfullhashraw}{00a93039a813d6985068fb1d9407cbbc}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{1st edition}
+      \field{isbn}{978-1-4932-2440-1}
+      \field{note}{Description based on publisher supplied metadata and other sources.}
+      \field{pagetotal}{11050}
+      \field{subtitle}{The comprehensive guide}
+      \field{title}{React}
+      \field{year}{2024}
+    \endentry
+    \entry{React}{online}{}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{ReactA JavaScript library for building user interface}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://legacy.reactjs.org
+      \endverb
+      \verb{url}
+      \verb https://legacy.reactjs.org
+      \endverb
+    \endentry
+    \entry{Thomas}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=b4da9965fd074aac5348b8d8f6e5ab05}{%
+           family={Thomas},
+           familyi={T\bibinitperiod},
+           given={Mark},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {New York}%
+      }
+      \list{publisher}{1}{%
+        {Manning Publications Co. LLC}%
+      }
+      \strng{namehash}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \strng{fullhash}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \strng{fullhashraw}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \strng{bibnamehash}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \strng{authorbibnamehash}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \strng{authornamehash}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \strng{authorfullhash}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \strng{authorfullhashraw}{b4da9965fd074aac5348b8d8f6e5ab05}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9781617293856}
+      \field{note}{Description based on publisher supplied metadata and other sources.}
+      \field{pagetotal}{1331}
+      \field{title}{React in Action}
+      \field{year}{2018}
+    \endentry
+    \entry{Murray}{book}{}{}
+      \name{author}{4}{}{%
+        {{hash=f27ee3334dc951238db1a2ea0034e55a}{%
+           family={Murray},
+           familyi={M\bibinitperiod},
+           given={Nathan},
+           giveni={N\bibinitperiod}}}%
+        {{hash=38835374a860eb5cf0e5e3d8ef95dbcb}{%
+           family={Coury},
+           familyi={C\bibinitperiod},
+           given={Felipe},
+           giveni={F\bibinitperiod}}}%
+        {{hash=25d50cadbd57d6767ca6fa2de6e2de84}{%
+           family={Lerner},
+           familyi={L\bibinitperiod},
+           given={Ari},
+           giveni={A\bibinitperiod}}}%
+        {{hash=73df6ad75245cc9bb5e1f281f2ec90eb}{%
+           family={Taborda},
+           familyi={T\bibinitperiod},
+           given={Carlos},
+           giveni={C\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {CreateSpace Independent Publishing Platform}%
+      }
+      \strng{namehash}{47f41b08655a4ca0d1d6542582f8fe98}
+      \strng{fullhash}{28dae04c57228790abbfbf4fa59ed26d}
+      \strng{fullhashraw}{28dae04c57228790abbfbf4fa59ed26d}
+      \strng{bibnamehash}{28dae04c57228790abbfbf4fa59ed26d}
+      \strng{authorbibnamehash}{28dae04c57228790abbfbf4fa59ed26d}
+      \strng{authornamehash}{47f41b08655a4ca0d1d6542582f8fe98}
+      \strng{authorfullhash}{28dae04c57228790abbfbf4fa59ed26d}
+      \strng{authorfullhashraw}{28dae04c57228790abbfbf4fa59ed26d}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9781985170285}
+      \field{title}{ng-book: The Complete Guide to Angular}
+    \endentry
+    \entry{Wilken}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=c916c834202c94bd10d7188408f3f89a}{%
+           family={Wilken},
+           familyi={W\bibinitperiod},
+           given={Jeremy},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {New York}%
+      }
+      \list{publisher}{1}{%
+        {Manning Publications Co. LLC}%
+      }
+      \strng{namehash}{c916c834202c94bd10d7188408f3f89a}
+      \strng{fullhash}{c916c834202c94bd10d7188408f3f89a}
+      \strng{fullhashraw}{c916c834202c94bd10d7188408f3f89a}
+      \strng{bibnamehash}{c916c834202c94bd10d7188408f3f89a}
+      \strng{authorbibnamehash}{c916c834202c94bd10d7188408f3f89a}
+      \strng{authornamehash}{c916c834202c94bd10d7188408f3f89a}
+      \strng{authorfullhash}{c916c834202c94bd10d7188408f3f89a}
+      \strng{authorfullhashraw}{c916c834202c94bd10d7188408f3f89a}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9781617293313}
+      \field{note}{Description based on publisher supplied metadata and other sources.}
+      \field{pagetotal}{1298}
+      \field{title}{Angular in Action}
+      \field{year}{2018}
+    \endentry
+    \entry{Angular}{online}{}{}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labeltitlesource}{title}
+      \field{title}{What is Angular?}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://angular.dev/overview
+      \endverb
+      \verb{url}
+      \verb https://angular.dev/overview
+      \endverb
+    \endentry
+    \entry{Holmes}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=8538973a123d95e03416655d0912002f}{%
+           family={Holmes},
+           familyi={H\bibinitperiod},
+           given={Simon},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Shelter Island, NY}%
+      }
+      \list{publisher}{1}{%
+        {Manning}%
+      }
+      \strng{namehash}{8538973a123d95e03416655d0912002f}
+      \strng{fullhash}{8538973a123d95e03416655d0912002f}
+      \strng{fullhashraw}{8538973a123d95e03416655d0912002f}
+      \strng{bibnamehash}{8538973a123d95e03416655d0912002f}
+      \strng{authorbibnamehash}{8538973a123d95e03416655d0912002f}
+      \strng{authornamehash}{8538973a123d95e03416655d0912002f}
+      \strng{authorfullhash}{8538973a123d95e03416655d0912002f}
+      \strng{authorfullhashraw}{8538973a123d95e03416655d0912002f}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9781617292033}
+      \field{note}{Includes index}
+      \field{pagetotal}{416}
+      \field{title}{Getting MEAN with Mongo, Express, Angular, and Node}
+      \field{year}{2016}
+    \endentry
+    \entry{Vue}{online}{}{}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labeltitlesource}{title}
+      \field{title}{What is Vue.js?}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://vuejs.org/guide/introduction.html
+      \endverb
+      \verb{url}
+      \verb https://vuejs.org/guide/introduction.html
+      \endverb
+    \endentry
+    \entry{Node}{online}{}{}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labeltitlesource}{title}
+      \field{title}{Introduction to Node.js}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://nodejs.org/en/learn/getting-started/introduction-to-nodejs
+      \endverb
+      \verb{url}
+      \verb https://nodejs.org/en/learn/getting-started/introduction-to-nodejs
+      \endverb
+    \endentry
+    \entry{Syed}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=0f7c313def75394c33e8e231413eb5d1}{%
+           family={Syed},
+           familyi={S\bibinitperiod},
+           given={Basarat\bibnamedelima Ali},
+           giveni={B\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {[Berkeley, Calif.]}%
+      }
+      \list{publisher}{1}{%
+        {Apress}%
+      }
+      \strng{namehash}{0f7c313def75394c33e8e231413eb5d1}
+      \strng{fullhash}{0f7c313def75394c33e8e231413eb5d1}
+      \strng{fullhashraw}{0f7c313def75394c33e8e231413eb5d1}
+      \strng{bibnamehash}{0f7c313def75394c33e8e231413eb5d1}
+      \strng{authorbibnamehash}{0f7c313def75394c33e8e231413eb5d1}
+      \strng{authornamehash}{0f7c313def75394c33e8e231413eb5d1}
+      \strng{authorfullhash}{0f7c313def75394c33e8e231413eb5d1}
+      \strng{authorfullhashraw}{0f7c313def75394c33e8e231413eb5d1}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9781484201886}
+      \field{pagetotal}{30892}
+      \field{series}{SpringerLink}
+      \field{title}{Beginning Node.js}
+      \field{year}{2014}
+    \endentry
+    \entry{SpringBoot}{online}{}{}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labeltitlesource}{title}
+      \field{title}{Spring Boot}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://docs.spring.io/spring-boot/index.html
+      \endverb
+      \verb{url}
+      \verb https://docs.spring.io/spring-boot/index.html
+      \endverb
+    \endentry
+    \entry{Microsoft}{online}{}{}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labeltitlesource}{title}
+      \field{title}{Was ist Spring Boot?}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://azure.microsoft.com/de-de/resources/cloud-computing-dictionary/what-is-java-spring-boot
+      \endverb
+      \verb{url}
+      \verb https://azure.microsoft.com/de-de/resources/cloud-computing-dictionary/what-is-java-spring-boot
+      \endverb
+    \endentry
+    \entry{Django}{online}{}{}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labeltitlesource}{title}
+      \field{title}{Django Documentation}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://docs.djangoproject.com/en/5.2/
+      \endverb
+      \verb{url}
+      \verb https://docs.djangoproject.com/en/5.2/
+      \endverb
+    \endentry
+    \entry{Mongo}{online}{}{}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labeltitlesource}{title}
+      \field{title}{MongoDB Documentation}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.mongodb.com/docs/
+      \endverb
+      \verb{url}
+      \verb https://www.mongodb.com/docs/
+      \endverb
+    \endentry
+    \entry{Trelle}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=434fdb3ff12412db6589b98af070928c}{%
+           family={Trelle},
+           familyi={T\bibinitperiod},
+           given={Tobias},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Heidelberg}%
+      }
+      \list{publisher}{1}{%
+        {dpunkt.verlag}%
+      }
+      \strng{namehash}{434fdb3ff12412db6589b98af070928c}
+      \strng{fullhash}{434fdb3ff12412db6589b98af070928c}
+      \strng{fullhashraw}{434fdb3ff12412db6589b98af070928c}
+      \strng{bibnamehash}{434fdb3ff12412db6589b98af070928c}
+      \strng{authorbibnamehash}{434fdb3ff12412db6589b98af070928c}
+      \strng{authornamehash}{434fdb3ff12412db6589b98af070928c}
+      \strng{authorfullhash}{434fdb3ff12412db6589b98af070928c}
+      \strng{authorfullhashraw}{434fdb3ff12412db6589b98af070928c}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{9783864915338}
+      \field{note}{Description based on publisher supplied metadata and other sources.}
+      \field{pagetotal}{1296}
+      \field{subtitle}{Der praktische Einstieg}
+      \field{title}{MongoDB}
+      \field{year}{2014}
+    \endentry
+    \entry{MySQL}{online}{}{}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labeltitlesource}{title}
+      \field{title}{MySQL Documentation}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://dev.mysql.com/doc/
+      \endverb
+      \verb{url}
+      \verb https://dev.mysql.com/doc/
+      \endverb
+    \endentry
+    \entry{MongoSQL}{online}{}{}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labeltitlesource}{title}
+      \field{title}{Comparing MongoDB vs MySQL}
+      \field{urlday}{23}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.mongodb.com/de-de/resources/compare/mongodb-mysql
+      \endverb
+      \verb{url}
+      \verb https://www.mongodb.com/de-de/resources/compare/mongodb-mysql
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
 \endinput
 

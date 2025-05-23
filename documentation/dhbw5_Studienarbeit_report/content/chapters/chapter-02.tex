@@ -9,7 +9,7 @@
 \section{Anforderungen} \label{Anforderungen}
 In diesem Kapitel werden die Anforderungen an das Projekt analysiert, definiert und strukturiert. Dabei wird zwischen funktionalen und nicht-funktionalen Anforderungen unterschieden, die in den Abschnitten \nameref{f_Anforderungen} und \nameref{nf_Anforderungen} näher erläutert werden.
 \subsection{Anforderungsanalyse}
-Die Anforderungsanalyse ist ein zentraler Prozess in der Systementwicklung, der sich mit der Analyse, Dokumentation und Verwaltung der Anforderungen an ein System beschäftigt. Sie umfasst die Identifizierung der Bedürfnisse und Erwartungen der Stakeholder, die Definition der Anforderungen an das System und die Sicherstellung, dass diese Anforderungen verstanden und umgesetzt werden können. Laut der Definition des \ac{IEEE} beinhaltet die Anforderungsanalyse zwei Hauptprozesse: das Studium der Benutzerbedürfnisse, um eine klare Definition der System-, Hardware- oder Softwareanforderungen zu erstellen, sowie die Verfeinerung und Detaillierung dieser Anforderungen im Verlauf des Projekts. Eine kontinuierliche Anforderungsanalyse ist notwendig, da Anforderungen sich während des Projektlebenszyklus ändern und diese Änderungen identifiziert, überprüft und integriert werden müssen. 
+Die Anforderungsanalyse ist ein zentraler Prozess in der Systementwicklung, der sich mit der Analyse, Dokumentation und Verwaltung der Anforderungen an ein System beschäftigt. Sie umfasst die Identifizierung der Bedürfnisse und Erwartungen der Stakeholder, die Definition der Anforderungen an das System und die Sicherstellung, dass diese Anforderungen verstanden und umgesetzt werden können. Laut der Definition des \ac{IEEE} beinhaltet die Anforderungsanalyse zwei Hauptprozesse: das Studium der Benutzerbedürfnisse, um eine klare Definition der System-, Hardware- oder Softwareanforderungen zu erstellen, sowie die Verfeinerung und Detaillierung dieser Anforderungen im Verlauf des Projekts. Eine kontinuierliche Anforderungsanalyse ist notwendig, da Anforderungen sich während des Projektlebenszyklus ändern und diese Änderungen identifiziert, überprüft und integriert werden müssen. \cite[Vgl.][]{IEEE} \cite[Vgl.][S. 83-84]{Sommerville}
 
 Die Bedeutung der Anforderungsanalyse ergibt sich aus mehreren zentralen Aspekten.
  Erstens stellt die Anforderungsanalyse sicher, dass die Wünsche und Bedürfnisse der
@@ -23,9 +23,11 @@ Die Bedeutung der Anforderungsanalyse ergibt sich aus mehreren zentralen Aspekte
  bei der Auswahl technischer Lösungen, die diese Anforderungen bestmöglich erfüllen.
  Zudem trägt die Anforderungsanalyse zur Komplexitätskontrolle bei, indem sie das System
  in verständliche Teilmodelle zerlegt, was das Verständnis und die Nutzung des Systems
- erleichtert. 
+ erleichtert. \cite[Vgl.][S. 83-84]{Sommerville} \cite[Vgl.][S. 55-70]{Kleuker} \cite[Vgl.][S. 55-70]{Herrmann} \cite[Vgl.][S. 55-70]{Meyer} 
 
 Zusammenfassend ist die Anforderungsanalyse ein unverzichtbarer Bestandteil des Projektmanagements, der die Grundlage für die erfolgreiche Entwicklung und Implementierung eines Systems bildet. Sie gewährleistet, dass die entwickelten Lösungen den Bedürfnissen der Benutzer entsprechen, und trägt wesentlich zur Qualität des gesamten Entwicklungsprozesses bei.
+
+Die nachfolgenden Anforderungen sind im Rahmen einer systematischen Anforderungsanalyse erarbeitet. Sie stellen das Ergebnis dieses Prozesses dar und dienen als Grundlage für die Konzeption und Umsetzung des Projekts.
 
 \subsection{Funktionale Anforderungen} \label{f_Anforderungen}
 \subsection*{Muss-Anforderungen}
@@ -95,7 +97,7 @@ Die Struktur der \ac{EPK} basiert auf festen Regeln: Jede \ac{EPK} beginnt und e
 \newpage
 Die \autoref{img:EPK} dient als Beispiel, um den Ablauf einer \ac{EPK} zu veranschaulichen. Es zeigt den Prozess eines Auftrags, der mit dem Ereignis „Auftrag zur Prüfung eingegangen“ beginnt.
 Darauf folgt die Funktion „Auftrag wird geprüft“. Anschließend wird über einen logischen Operator, dargestellt durch ein \ac{XOR}-Gatter, der weitere Verlauf bestimmt.
-Es gibt zwei mögliche Wege: Wird der Auftrag angenommen, erfolgt die Funktion „Auftrag wird bearbeitet“, gefolgt vom Abschluss durch das Ereignis „Auftrag fertiggestellt“. Wird der Auftrag abgelehnt, wird der Auftrag zurückgesendet, was mit dem Ereignis „Auftrag zurückgesendet“ endet. Das Diagramm zeigt den typischen Wechsel zwischen Ereignissen (rot) und Funktionen (grün) sowie die strukturierte Modellierung von oben nach unten.
+Es gibt zwei mögliche Wege: Wird der Auftrag angenommen, erfolgt die Funktion „Auftrag wird bearbeitet“, gefolgt vom Abschluss durch das Ereignis „Auftrag fertiggestellt“. Wird der Auftrag abgelehnt, wird der Auftrag zurückgesendet, was mit dem Ereignis „Auftrag zurückgesendet“ endet. Das Diagramm zeigt den typischen Wechsel zwischen Ereignissen (rot) und Funktionen (grün) sowie die strukturierte Modellierung von oben nach unten. \cite[Vgl.][S. 202-214]{Gadatsch} \cite[Vgl.][S. 9-11]{Scheer} \cite[Vgl.][]{Durst}
 
 \newpage
 \subsection{Business Process Model and Notation}
@@ -108,7 +110,7 @@ Gateways, visualisiert durch Rauten, dienen als Entscheidungs- oder Verzweigungs
 \textbf{Pools und Lanes} organisieren die Verantwortlichkeiten innerhalb eines \ac{BPMN}-Diagramms. Ein Pool repräsentiert einen übergeordneten Prozessbeteiligten oder eine Organisationseinheit und definiert den Rahmen eines Ablaufs. Innerhalb dieses Rahmens unterteilen Lanes die Verantwortlichkeiten weiter, indem sie spezifische Rollen oder Abteilungen darstellen. Diese visuelle Trennung erleichtert das Verständnis der Beziehungen zwischen den verschiedenen Prozessteilnehmern.\\
 \textbf{Artefakte} bieten zusätzliche Informationen über den Prozess und kategorisieren Aktivitäten. Dazu gehören Datenobjekte, die notwendige Informationen für den Prozess darstellen; Gruppen, die verschiedene Aktivitäten zusammenfassen; und Textanmerkungen, die erläuternde Informationen liefern.
 
-Insgesamt ermöglicht \ac{BPMN} durch diese vier Hauptkategorien eine klare und strukturierte Darstellung von Geschäftsprozessen, was zu einer verbesserten Kommunikation zwischen den beteiligten Akteuren führt und die Analyse sowie Optimierung von Abläufen unterstützt.
+Insgesamt ermöglicht \ac{BPMN} durch diese vier Hauptkategorien eine klare und strukturierte Darstellung von Geschäftsprozessen, was zu einer verbesserten Kommunikation zwischen den beteiligten Akteuren führt und die Analyse sowie Optimierung von Abläufen unterstützt. \cite[Vgl.][]{OMG} \cite[Vgl.][]{Lindenbach} \cite[Vgl.][S. 27-111]{Freund}
 
 \newpage
 \useimage{BPMN}
@@ -123,9 +125,9 @@ Die Entscheidung fällt auf die \ac{BPMN}, da sie in mehreren zentralen Aspekten
  
 \begin{enumerate}
     \item \textbf{Internationale Verbreitung und Standardisierung:} \\
-    \ac{BPMN} ist ein von der \ac{OMG} standardisiertes Notationssystem, das international weit verbreitet ist. Diese breite Akzeptanz gewährleistet eine hohe Kompatibilität mit modernen \ac{IT}-Systemen und Geschäftsprozessmanagement-Tools, was insbesondere im Hinblick auf langfristige Wartbarkeit und Interoperabilität von Vorteil ist.
+    \ac{BPMN} ist ein von der \ac{OMG} standardisiertes Notationssystem, das international weit verbreitet ist. Diese breite Akzeptanz gewährleistet eine hohe Kompatibilität mit modernen \ac{IT}-Systemen und Geschäftsprozessmanagement-Tools, was insbesondere im Hinblick auf langfristige Wartbarkeit und Interoperabilität von Vorteil ist. \cite[Vgl.][]{OMG} \cite[Vgl.][]{Lindenbach} 
     \item \textbf{Hohe Ausdrucksstärke und Flexibilität:} \\
-    Die Notation ermöglicht durch ihre differenzierte Symbolik -- etwa durch die Nutzung von Pools, Lanes sowie diversen Ereignis- und Aufgabenarten -- eine präzise und strukturierte Abbildung selbst komplexer, unternehmensübergreifender Prozesse. Diese Ausdrucksstärke unterstützt die klare Kommunikation zwischen fachlichen und technischen Stakeholdern und trägt somit zur Qualität der Prozessdokumentation bei.
+    Die Notation ermöglicht durch ihre differenzierte Symbolik -- etwa durch die Nutzung von Pools, Lanes sowie diversen Ereignis- und Aufgabenarten -- eine präzise und strukturierte Abbildung selbst komplexer, unternehmensübergreifender Prozesse. Diese Ausdrucksstärke unterstützt die klare Kommunikation zwischen fachlichen und technischen Stakeholdern und trägt somit zur Qualität der Prozessdokumentation bei. \cite[Vgl.][]{OMG} \cite[Vgl.][]{Lindenbach} 
     \item \textbf{Technische Umsetzbarkeit durch verfügbare Bibliotheken:} \\
     Für \ac{BPMN} existieren etablierte Softwarebibliotheken, die eine Drag-and-Drop-Umsetzung sowie die Einhaltung der BPMN-Spezifikation ermöglichen. Diese Bibliotheken erleichtern die technische Implementierung erheblich, da sie eine robuste Grundlage für die Modellierung und Validierung von Prozessen bieten. Dadurch kann der Entwicklungsaufwand deutlich reduziert und die Umsetzung effizient gestaltet werden.
 \end{enumerate}
@@ -223,20 +225,20 @@ Unabhängig vom Szenario wird beim Löschen eines Prozesses nicht direkt alle ak
 
 
 \subsection{Rollenmanagement} \label{Rollenmanagement}
-Das Rollenmanagement ist ein essenzieller Bestandteil moderner Organisationsstrukturen und \ac{IT}-Systeme, da es sicherstellt, dass nur autorisierte Personen Zugriff auf sensible Daten und Prozesse haben und dass Verantwortlichkeiten klar zugewiesen werden. Ein fundiertes Rollenmanagement trägt zur Verbesserung der Sicherheit, Effizienz und Nachvollziehbarkeit von Arbeitsprozessen bei.
+Das Rollenmanagement ist ein essenzieller Bestandteil moderner Organisationsstrukturen und \ac{IT}-Systeme, da es sicherstellt, dass nur autorisierte Personen Zugriff auf sensible Daten und Prozesse haben und dass Verantwortlichkeiten klar zugewiesen werden. Ein fundiertes Rollenmanagement trägt zur Verbesserung der Sicherheit, Effizienz und Nachvollziehbarkeit von Arbeitsprozessen bei. \cite[Vgl.][]{Sandhu1998} \cite[Vgl.][]{Sandhu}
 
 \subsection*{Zugang}
 Ein zentraler Aspekt des Rollenmanagements ist die Regelung des Zugangs zu vertraulichen Prozessen und Informationen. Unberechtigte Personen sollten keinen Zugriff erhalten, um Sicherheitsrisiken wie Datenlecks oder unbefugte Manipulation zu minimieren. Dies wird durch die Implementierung von rollenbasierten Zugriffsmechanismen (\acs{RBAC}) erreicht.\\
-\ac{RBAC} basiert auf der Zuweisung von Rollen, die spezifische Rechte und Pflichten definieren. Eine Person kann je nach Funktion eine oder mehrere Rollen übernehmen. Diese Rollen beschränken den Zugang zu Ressourcen und Prozessen auf das notwendige Minimum, was nicht nur die Sicherheit erhöht, sondern auch die Einhaltung gesetzlicher und organisatorischer Vorschriften erleichtert, wie beispielsweise das Datenschutz-Gesetz.
+\ac{RBAC} basiert auf der Zuweisung von Rollen, die spezifische Rechte und Pflichten definieren. Eine Person kann je nach Funktion eine oder mehrere Rollen übernehmen. Diese Rollen beschränken den Zugang zu Ressourcen und Prozessen auf das notwendige Minimum, was nicht nur die Sicherheit erhöht, sondern auch die Einhaltung gesetzlicher und organisatorischer Vorschriften erleichtert, wie beispielsweise das Datenschutz-Gesetz. \cite[Vgl.][]{Sandhu1998} \cite[Vgl.][]{Sandhu}
 
 \subsection*{Kontrolle über Prozess-Aktivitäten}
 \textbf{Rollenspezifische Aktivitäten}\\
 Die Zuweisung von Prozess-Aktivitäten an spezifische Rollen gewährleistet, dass nur qualifizierte und autorisierte Personen bestimmte Aufgaben übernehmen. Jede Aktivität innerhalb eines Prozesses wird einer verantwortlichen Rolle zugeordnet, die entweder die Aufgabe eigenständig durchführt oder deren Ausführung überwacht und die Verantwortung übernimmt.
-Diese klare Rollenverteilung fördert Transparenz und Rückverfolgbarkeit, wodurch Sicherheitsvorfälle oder ineffiziente Abläufe effizient adressiert werden können. Insbesondere in stark regulierten Sektoren wie dem Finanzwesen, dem Gesundheitssektor oder der Automobilindustrie ist diese Nachvollziehbarkeit unverzichtbar.
+Diese klare Rollenverteilung fördert Transparenz und Rückverfolgbarkeit, wodurch Sicherheitsvorfälle oder ineffiziente Abläufe effizient adressiert werden können. Insbesondere in stark regulierten Sektoren wie dem Finanzwesen, dem Gesundheitssektor oder der Automobilindustrie ist diese Nachvollziehbarkeit unverzichtbar. \cite[Vgl.][]{Sandhu1998} \cite[Vgl.][]{Sandhu}
 
 \textbf{Löschen von Prozessen}\\
 Das Löschen von Prozessen ist eine kritische Aktion, die einer strengen Kontrolle unterliegt. Nur Rollen mit spezifischen Berechtigungen dürfen diese Aufgabe ausführen, um das Risiko von Datenverlusten oder unautorisierter Löschung sensibler Informationen zu minimieren.
-Ein mehrstufiger Genehmigungsprozess, der eine unabhängige Überprüfung vorsieht, bietet zusätzliche Sicherheit. Solche Mechanismen senken das Risiko von Fehlern oder Missbrauch und gewährleisten, dass alle Löschvorgänge dokumentiert werden und so nachvollziehbar bleiben.
+Ein mehrstufiger Genehmigungsprozess, der eine unabhängige Überprüfung vorsieht, bietet zusätzliche Sicherheit. Solche Mechanismen senken das Risiko von Fehlern oder Missbrauch und gewährleisten, dass alle Löschvorgänge dokumentiert werden und so nachvollziehbar bleiben. \cite[Vgl.][]{Sandhu1998} \cite[Vgl.][]{Sandhu} \cite[Vgl.][]{RedHat}
 
 \subsection*{Fazit des Rollenmanagements}
 Das Rollenmanagement stellt sicher, dass Zugang und Kontrolle über Prozess-Aktivitäten klar geregelt sind. Durch den Einsatz von \ac{RBAC} und anderen Kontrollmechanismen werden Sicherheit und Effizienz verbessert, während die Einhaltung gesetzlicher und organisatorischer Vorschriften gewährleistet wird. Die sorgfältige Gestaltung und Implementierung solcher Systeme sind daher unerlässlich für jede Organisation.
@@ -248,7 +250,7 @@ Das Löschen von Prozessen stellt eine kritische Operation dar, die sowohl techn
 \subsection*{Grundprinzipien beim Löschen von Prozessen}
 Das Löschen von Prozessen erfordert eine sorgfältige Abwägung und Kontrolle. Dabei sollten die im Folgenden behandelten Prinzipien berücksichtigt werden.
 
-Das Löschen von Prozessen erfordert eine klare \textbf{Regelung von Berechtigungen und Verantwortlichkeiten}. Hierfür bietet sich ein rollenbasiertes Zugriffskontrollsystem, wie in Kapitel \nameref{Rollenmanagement} beschrieben, an. Diese Regelung sorgt dafür, dass nur qualifizierte und berechtigte Akteure in der Lage sind Prozesse zu löschen, was die Sicherheit erhöht. Durch die strikte Zuordnung der Verantwortlichkeiten können außerdem unbefugte und fehlerhafte Eingriffe minimiert oder komplett verhindert werden.
+Das Löschen von Prozessen erfordert eine klare \textbf{Regelung von Berechtigungen und Verantwortlichkeiten}. Hierfür bietet sich ein rollenbasiertes Zugriffskontrollsystem, wie in Kapitel \nameref{Rollenmanagement} beschrieben, an. Diese Regelung sorgt dafür, dass nur qualifizierte und berechtigte Akteure in der Lage sind Prozesse zu löschen, was die Sicherheit erhöht. Durch die strikte Zuordnung der Verantwortlichkeiten können außerdem unbefugte und fehlerhafte Eingriffe minimiert oder komplett verhindert werden. \cite[Vgl.][]{Sandhu1998} \cite[Vgl.][]{ISO27001}
 
 Die Löschung von Prozessen erfordert eine sorgfältige \textbf{Prüfung des Status}. Ein Prozess kann entweder als angelegte, aber nicht gestartete Instanz oder als aktive, laufende Instanz vorliegen.\\
 Angelegte Instanzen stellen keine kritischen Anforderungen, da sie noch nicht aktiv sind und keine laufenden Aufgaben oder Abhängigkeiten aufweisen. Diese Instanzen können direkt gelöscht werden.\\
@@ -262,12 +264,12 @@ Um Risiken beim Löschen von Prozessen zu minimieren, sind \textbf{Sicherheitsma
 Für eine effiziente Umsetzung eines Löschvorgangs müssen zunächst die Berechtigungen und Verantwortlichkeiten geklärt werden. Danach erfolgt eine Prüfung des Prozessstatus, um zwischen angelegten und aktiven Instanzen zu unterscheiden. Um Nachvollziehbarkeit und Sicherheit zu gewährleisten, ist eine lückenlose Protokollierung sowie ein mehrstufiger Genehmigungsprozess erforderlich. Vor der Löschung sollte zudem ein vollständiges Backup erstellt werden. Nach Abschluss des Löschvorgangs ist eine Überprüfung der Systemintegrität durchzuführen, und der gesamte Prozess sollte dokumentiert werden.
 
 \subsection*{Schlussfolgerung}
-Dieser Ablauf stellt den optimalen Fall eines Löschvorgangs dar. In der tatsächlichen Umsetzung können jedoch aufgrund des begrenzten Entwicklungszeitraums und des umfangreichen Projektumfangs Abstriche erforderlich sein. Um den Prioritäten gerecht zu werden, müssen möglicherweise einige Schritte wie etwa detaillierte Protokollierung oder umfangreiche Sicherheitsvorkehrungen, angepasst oder vereinfacht werden, um eine effiziente Durchführung zu gewährleisten.
+Dieser Ablauf stellt den optimalen Fall eines Löschvorgangs dar. In der tatsächlichen Umsetzung können jedoch aufgrund des begrenzten Entwicklungszeitraums und des umfangreichen Projektumfangs Abstriche erforderlich sein. Um den Prioritäten gerecht zu werden, müssen möglicherweise einige Schritte wie etwa detaillierte Protokollierung oder Backups, angepasst oder vereinfacht werden, um eine effiziente Durchführung zu gewährleisten.
 
 \subsection{Benachrichtigungen} \label{Benachrichtigungen}
 Benachrichtigungen spielen eine zentrale Rolle im ProcessManager-System und sind essenziell für die effektive Realisierung des gesamten Projekts. Sie dienen als Kommunikationsmechanismus, der Benutzer über wichtige Ereignisse, Statusänderungen und erforderliche Aktionen innerhalb des Prozessablaufs informiert. Die Implementierung eines robusten Benachrichtigungssystems erfüllt die Muss-Anforderung \ref{M8}, die explizit einen Mechanismus zur Information anderer Rollen bei Bedarf vorsieht.
 
-Im Kontext des Process-Managers sind Benachrichtigungen besonders wichtig für die Koordination rollenbasierter Aktionen. Da das System jedem Event im Prozess eine spezifische Rolle zuweist (\ref{M6}) und sicherstellt, dass nur Benutzer mit der entsprechenden Rolle ein Event ausführen können (\ref{M7}), sind Benachrichtigungen unerlässlich, um die beteiligten Akteure über ihre Aufgaben und Verantwortlichkeiten zu informieren.
+Im Kontext des Process-Managers sind Benachrichtigungen besonders wichtig für die Koordination rollenbasierter Aktionen. Da das System jedem Event im Prozess eine spezifische Rolle zuweist (\ref{M6}) und sicherstellt, dass nur Benutzer mit der entsprechenden Rolle ein Event ausführen können (\ref{M7}), sind Benachrichtigungen unerlässlich, um die beteiligten Akteure über ihre Aufgaben und Verantwortlichkeiten zu informieren. \cite[Vgl.][]{Magicbell} \cite[Vgl.][]{Skillable}
 
 Die Umsetzung des Benachrichtigungssystems erfolgt durch Integration in die Benutzeroberfläche, wie in \autoref{img:Startseite} ersichtlich. Hier ist ein spezieller Bereich für Benachrichtigungen in der unteren rechten Ecke der Startseite vorgesehen. Diese Position gewährleistet, dass Benutzer wichtige Mitteilungen leicht wahrnehmen können, ohne den Arbeitsfluss zu unterbrechen.
 
@@ -300,42 +302,38 @@ Desktop-Anwendungen bieten hingegen eine stärkere Kontrolle über die Nutzung l
 \subsection*{Schlussfolgerung}
 Nach Abwägung aller Kriterien erscheint eine Web-Anwendung als die am besten geeignete Wahl für das vorliegende Projekt. Sie bietet Vorteile hinsichtlich Zugänglichkeit, Benutzerfreundlichkeit, Wartbarkeit und den projektspezifischen Anforderungen. Desktop-Anwendungen wären nur dann vorzuziehen, wenn die Anforderungen an Offline-Funktionalität oder Performance eine zentrale Rolle spielen. Die Projekt-Anforderungen legen jedoch nahe, dass diese Aspekte im vorliegenden Fall keine Priorität haben, wodurch die Vorteile einer Web-Anwendung überwiegen.
 
-
-\iffalse
-\subsection*{Webbassierte Anwendung}
-\subsection*{Desktop-Anwendung}
-\fi
+\cite[Vgl.][]{Mika} \cite[Vgl.][]{Medium} \cite[Vgl.][]{iFour} 
 
 \newpage
 \section{Wahl der Applikation-Technologie}
 Basierend auf den Anforderungen des ProcessManager-Projekts und einer detaillierten Analyse relevanter Technologien werden im Folgenden die jeweils besten Optionen für Frontend, Backend und Datenbank evaluiert. Die Bewertung erfolgt anhand von Kriterien wie Performanz, Skalierbarkeit, Wartbarkeit, Entwicklungseffizienz und der Unterstützung durch die Community.
 
 \subsection{Frontend-Technologien}
-\textbf{React} bietet eine hervorragende Performanz, insbesondere bei komplexen Benutzeroberflächen, da der Virtual DOM eine effiziente Aktualisierung von UI-Elementen ermöglicht. Als Bibliothek statt Framework gewährt React den Entwicklern große Flexibilität in der Strukturierung und Integration von Anwendungen. Die flache Lernkurve ermöglicht eine schnelle Einarbeitung neuer Teammitglieder, und die modulare Struktur von React-Komponenten erleichtert Wartung und Erweiterung. Mit einer großen Community und einem reichhaltigen Ökosystem bietet React einfachen Zugang zu Bibliotheken und Tools, was die Entwicklung effizienter macht.
+\textbf{React} bietet eine hervorragende Performanz, insbesondere bei komplexen Benutzeroberflächen, da der Virtual DOM eine effiziente Aktualisierung von UI-Elementen ermöglicht. Als Bibliothek statt Framework gewährt React den Entwicklern große Flexibilität in der Strukturierung und Integration von Anwendungen. Die flache Lernkurve ermöglicht eine schnelle Einarbeitung neuer Teammitglieder, und die modulare Struktur von React-Komponenten erleichtert Wartung und Erweiterung. Mit einer großen Community und einem reichhaltigen Ökosystem bietet React einfachen Zugang zu Bibliotheken und Tools, was die Entwicklung effizienter macht. \cite[Vgl.][S. 35-48]{Springer} \cite[Vgl.][]{React} \cite[Vgl.][Kapitel 1]{Thomas} 
 
-\textbf{Angular}, ein Framework, zeichnet sich durch eine umfassende Struktur aus, die für große Unternehmensanwendungen geeignet ist. Es bietet Optimierungen wie Tree-Shaking und Ahead-of-Time Compilation, was die Performanz verbessert. Jedoch ist die Lernkurve steil, und die Komplexität der Architektur kann die Entwicklungszeit verlängern. Angular überzeugt bei der Wartbarkeit durch starke Typisierung und integrierte Tools.
+\textbf{Angular}, ein Framework, zeichnet sich durch eine umfassende Struktur aus, die für große Unternehmensanwendungen geeignet ist. Es bietet Optimierungen wie Tree-Shaking und Ahead-of-Time Compilation, was die Performanz verbessert. Jedoch ist die Lernkurve steil, und die Komplexität der Architektur kann die Entwicklungszeit verlängern. Angular überzeugt bei der Wartbarkeit durch starke Typisierung und integrierte Tools. \cite[Vgl.][]{Murray} \cite[Vgl.][Kapitel 1]{Wilken} \cite[Vgl.][]{Angular} \cite[Vgl.][]{Holmes}
 
-\textbf{Vue.js} punktet mit einer intuitiven Lernkurve und einer effizienten Rendering-Engine. Es ist skalierbar und einfach zu implementieren, eignet sich jedoch weniger für sehr große Anwendungen aufgrund der begrenzten Flexibilität und einer kleineren Community im Vergleich zu React.
+\textbf{Vue.js} punktet mit einer intuitiven Lernkurve und einer effizienten Rendering-Engine. Es ist skalierbar und einfach zu implementieren, eignet sich jedoch weniger für sehr große Anwendungen aufgrund der begrenzten Flexibilität und einer kleineren Community im Vergleich zu React. \cite[Vgl.][]{Vue}
 
 \textbf{Empfehlung:} React wird für das Frontend des ProcessManager-Projekts empfohlen, da es eine ideale Balance zwischen Flexibilität, Performanz und Entwicklungseffizienz bietet. Die große Community-Unterstützung erleichtert zudem die langfristige Wartung und Erweiterung.
 
 \subsection{Backend-Technologien}
-Node.js bietet eine hohe Performanz, insbesondere bei I/O-intensiven Anwendungen, dank seiner ereignisgesteuerten, asynchronen Architektur. Die einheitliche Nutzung von JavaScript im Frontend und Backend reduziert den Entwicklungsaufwand erheblich. Eine große und aktive Community sowie eine Vielzahl von Bibliotheken ermöglichen die schnelle Implementierung von Funktionalitäten. Node.js zeichnet sich zudem durch seine Skalierbarkeit aus, was für das ProcessManager-Projekt essenziell ist.
+Node.js bietet eine hohe Performanz, insbesondere bei I/O-intensiven Anwendungen, dank seiner ereignisgesteuerten, asynchronen Architektur. Die einheitliche Nutzung von JavaScript im Frontend und Backend reduziert den Entwicklungsaufwand erheblich. Eine große und aktive Community sowie eine Vielzahl von Bibliotheken ermöglichen die schnelle Implementierung von Funktionalitäten. Node.js zeichnet sich zudem durch seine Skalierbarkeit aus, was für das ProcessManager-Projekt essenziell ist. \cite[Vgl.][]{Holmes} \cite[Vgl.][]{Node} \cite[Vgl.][]{Syed}
 
-Spring Boot, basierend auf Java, liefert hervorragende Performance für rechenintensive Aufgaben und eine robuste Architektur. Allerdings ist die Komplexität höher, was die Entwicklungszeit und den Schulungsaufwand für neue Entwickler erhöht. Spring Boot ist besonders für Unternehmensanwendungen geeignet, die strenge Typisierung und ausgefeilte Sicherheitsmechanismen benötigen.
+Spring Boot, basierend auf Java, liefert hervorragende Performance für rechenintensive Aufgaben und eine robuste Architektur. Allerdings ist die Komplexität höher, was die Entwicklungszeit und den Schulungsaufwand für neue Entwickler erhöht. Spring Boot ist besonders für Unternehmensanwendungen geeignet, die strenge Typisierung und ausgefeilte Sicherheitsmechanismen benötigen. \cite[Vgl.][]{SpringBoot} \cite[Vgl.][]{Microsoft}
 
-Django, ein Framework auf Basis von Python, bietet dank seiner "Batteries included"-Philosophie eine hohe Entwicklungseffizienz. Es ist gut strukturiert und eignet sich für mittlere bis große Anwendungen. Im Bereich der Skalierbarkeit bleibt es jedoch hinter Node.js zurück.
+Django, ein Framework auf Basis von Python, bietet dank seiner "Batteries included"-Philosophie eine hohe Entwicklungseffizienz. Es ist gut strukturiert und eignet sich für mittlere bis große Anwendungen. Im Bereich der Skalierbarkeit bleibt es jedoch hinter Node.js zurück. \cite[Vgl.][]{Django}
 
 Empfehlung: Node.js ist die beste Wahl für das Backend des ProcessManager-Projekts, da es eine hohe Performanz, Skalierbarkeit und Flexibilität bietet. Die einheitliche JavaScript-Umgebung erleichtert die Zusammenarbeit zwischen Frontend- und Backend-Teams.
 
 \subsection{Datenbank-Technologie}
-MongoDB ist eine NoSQL-Datenbank, die sich durch ein dynamisches Schema und eine hervorragende horizontale Skalierbarkeit auszeichnet. Sie ist besonders geeignet für Anwendungen mit dynamischen Datenmodellen wie im ProcessManager-Projekt. MongoDB ermöglicht schnelle Anpassungen und bietet eine hohe Performanz bei Lese- und Schreiboperationen. Die Community und das Ökosystem sind umfangreich, was die Integration in bestehende Systeme erleichtert.
+MongoDB ist eine NoSQL-Datenbank, die sich durch ein dynamisches Schema und eine hervorragende horizontale Skalierbarkeit auszeichnet. Sie ist besonders geeignet für Anwendungen mit dynamischen Datenmodellen wie im ProcessManager-Projekt. MongoDB ermöglicht schnelle Anpassungen und bietet eine hohe Performanz bei Lese- und Schreiboperationen. Die Community und das Ökosystem sind umfangreich, was die Integration in bestehende Systeme erleichtert. \cite[Vgl.][]{Holmes} \cite[Vgl.][]{Mongo} \cite[Vgl.][]{Trelle}
 
-Relationale Datenbanken wie MySQL oder PostgreSQL bieten strenge ACID-Eigenschaften und eignen sich besonders für Anwendungen mit komplexen Abfragen und hohem Bedarf an Datenintegrität. Sie sind jedoch durch ihr festes Schema weniger flexibel und primär vertikal skalierbar, was sie weniger geeignet für dynamische und skalierbare Anwendungen macht.
+Relationale Datenbanken wie MySQL oder PostgreSQL bieten strenge ACID-Eigenschaften und eignen sich besonders für Anwendungen mit komplexen Abfragen und hohem Bedarf an Datenintegrität. Sie sind jedoch durch ihr festes Schema weniger flexibel und primär vertikal skalierbar, was sie weniger geeignet für dynamische und skalierbare Anwendungen macht. \cite[Vgl.][]{MySQL} \cite[Vgl.][]{MongoSQL}
 
 Oracle bietet höchste Performanz und strenge Datenkonsistenz, ist jedoch mit hohen Lizenzkosten und einem hohen Wartungsaufwand verbunden. Für kleinere und dynamische Anwendungen wie den ProcessManager ist Oracle überdimensioniert.
 
-Empfehlung: MongoDB wird als optimale Wahl empfohlen, da es die Flexibilität und Skalierbarkeit bietet, die für die dynamischen Prozessmodelle des Projekts erforderlich sind. Die einfache Integration und hohe Performanz machen es zur idealen Datenbank-Technologie.
+Empfehlung: MongoDB wird als optimale Wahl empfohlen, da es die Flexibilität und Skalierbarkeit bietet, die für die dynamischen Prozessmodelle des Projekts erforderlich sind. Die einfache Integration und hohe Performanz machen es zur idealen Datenbank-Technologie. \cite[Vgl.][]{MongoSQL}
 %ENDE BEARBEITUNG
 
 \subsection{Fazit}

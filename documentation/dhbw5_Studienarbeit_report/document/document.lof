@@ -3,8 +3,8 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Beispiel für EPK-Aufbau}}{8}{figure.3.1}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Beispiel für BPMN-Aufbau}}{10}{figure.3.2}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Beispiel für EPK-Aufbau \blx@tocontentsinit {0}\cite {EPKProcess}}}{8}{figure.3.1}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Beispiel für BPMN-Aufbau \blx@tocontentsinit {0}\cite {BPMNProcess}}}{10}{figure.3.2}%
 \contentsline {figure}{\numberline {3.3}{\ignorespaces Login-Fenster des ProcessManagers}}{13}{figure.3.3}%
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Startseite des ProcessManagers}}{13}{figure.3.4}%
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Drag-and-Drop- und Code-basierte Methode}}{14}{figure.3.5}%
@@ -68,21 +68,22 @@
 \contentsline {figure}{\numberline {4.50}{\ignorespaces Hinweis auf keine passende Instanzen mit den gewählten Filter}}{81}{figure.4.50}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {A1}{\ignorespaces Fehlernachricht beim Login -- leeres Login-Feld}}{A}{figure.Alph0.1}%
-\contentsline {figure}{\numberline {A2}{\ignorespaces Fehlernachricht beim Login -- falsche Anmeldedaten}}{A}{figure.Alph0.2}%
-\contentsline {figure}{\numberline {A3}{\ignorespaces Die Admin Start-Seite}}{D}{figure.Alph0.3}%
-\contentsline {figure}{\numberline {A4}{\ignorespaces Die vollständige Projektverwaltungs-Seite}}{E}{figure.Alph0.4}%
-\contentsline {figure}{\numberline {A5}{\ignorespaces Sicherheitsabfrage vor dem Löschen eines erstellten Projekts}}{E}{figure.Alph0.5}%
-\contentsline {figure}{\numberline {A6}{\ignorespaces Die vollständige Benutzerverwaltungs-Seite}}{F}{figure.Alph0.6}%
-\contentsline {figure}{\numberline {A7}{\ignorespaces Sicherheitsabfrage vor dem Löschen eines erstellten Benutzers}}{F}{figure.Alph0.7}%
-\contentsline {figure}{\numberline {A8}{\ignorespaces Fehlernachricht aufgrund eines falschen aktuellen Passwort}}{G}{figure.Alph0.8}%
-\contentsline {figure}{\numberline {A9}{\ignorespaces Fehlernachricht aufgrund nicht übereinstimmende neue Passwörter}}{H}{figure.Alph0.9}%
-\contentsline {figure}{\numberline {A10}{\ignorespaces Erfolgreiche Änderung des Passworts durch den Benutzer}}{I}{figure.Alph0.10}%
-\contentsline {figure}{\numberline {A11}{\ignorespaces Das Prozess-Informationsfenster eines Benutzers}}{M}{figure.Alph0.11}%
-\contentsline {figure}{\numberline {A12}{\ignorespaces Das Prozess-Informationsfenster eines Managers mit Änderungen}}{M}{figure.Alph0.12}%
-\contentsline {figure}{\numberline {A13}{\ignorespaces Die Fehlernachricht bei fehlendem Prozess-Namen}}{M}{figure.Alph0.13}%
-\contentsline {figure}{\numberline {A14}{\ignorespaces Die Fehlernachricht bei fehlendem Projekt}}{N}{figure.Alph0.14}%
-\contentsline {figure}{\numberline {A15}{\ignorespaces Die positive Rückmeldung des Änderungsantrags}}{N}{figure.Alph0.15}%
-\contentsline {figure}{\numberline {A16}{\ignorespaces Die negative Rückmeldung nach Anfrage zum Löschen}}{N}{figure.Alph0.16}%
-\contentsline {figure}{\numberline {A17}{\ignorespaces Die negative Rückmeldung auf die Genehmigungsanfrage}}{O}{figure.Alph0.17}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A1}{\ignorespaces Fehlernachricht beim Login -- leeres Login-Feld}}{E}{figure.Alph0.1}%
+\contentsline {figure}{\numberline {A2}{\ignorespaces Fehlernachricht beim Login -- falsche Anmeldedaten}}{E}{figure.Alph0.2}%
+\contentsline {figure}{\numberline {A3}{\ignorespaces Die Admin Start-Seite}}{H}{figure.Alph0.3}%
+\contentsline {figure}{\numberline {A4}{\ignorespaces Die vollständige Projektverwaltungs-Seite}}{I}{figure.Alph0.4}%
+\contentsline {figure}{\numberline {A5}{\ignorespaces Sicherheitsabfrage vor dem Löschen eines erstellten Projekts}}{I}{figure.Alph0.5}%
+\contentsline {figure}{\numberline {A6}{\ignorespaces Die vollständige Benutzerverwaltungs-Seite}}{J}{figure.Alph0.6}%
+\contentsline {figure}{\numberline {A7}{\ignorespaces Sicherheitsabfrage vor dem Löschen eines erstellten Benutzers}}{J}{figure.Alph0.7}%
+\contentsline {figure}{\numberline {A8}{\ignorespaces Fehlernachricht aufgrund eines falschen aktuellen Passwort}}{K}{figure.Alph0.8}%
+\contentsline {figure}{\numberline {A9}{\ignorespaces Fehlernachricht aufgrund nicht übereinstimmende neue Passwörter}}{L}{figure.Alph0.9}%
+\contentsline {figure}{\numberline {A10}{\ignorespaces Erfolgreiche Änderung des Passworts durch den Benutzer}}{M}{figure.Alph0.10}%
+\contentsline {figure}{\numberline {A11}{\ignorespaces Das Prozess-Informationsfenster eines Benutzers}}{Q}{figure.Alph0.11}%
+\contentsline {figure}{\numberline {A12}{\ignorespaces Das Prozess-Informationsfenster eines Managers mit Änderungen}}{Q}{figure.Alph0.12}%
+\contentsline {figure}{\numberline {A13}{\ignorespaces Die Fehlernachricht bei fehlendem Prozess-Namen}}{Q}{figure.Alph0.13}%
+\contentsline {figure}{\numberline {A14}{\ignorespaces Die Fehlernachricht bei fehlendem Projekt}}{R}{figure.Alph0.14}%
+\contentsline {figure}{\numberline {A15}{\ignorespaces Die positive Rückmeldung des Änderungsantrags}}{R}{figure.Alph0.15}%
+\contentsline {figure}{\numberline {A16}{\ignorespaces Die negative Rückmeldung nach Anfrage zum Löschen}}{R}{figure.Alph0.16}%
+\contentsline {figure}{\numberline {A17}{\ignorespaces Die negative Rückmeldung auf die Genehmigungsanfrage}}{S}{figure.Alph0.17}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
