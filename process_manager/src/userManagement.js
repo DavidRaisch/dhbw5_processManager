@@ -430,8 +430,3 @@ function UserManagement() {
 }
 
 export default UserManagement;
-
-
-
-
-//TODO: A Project must be assigned to a user

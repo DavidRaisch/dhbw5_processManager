@@ -1095,17 +1095,8 @@ function ManageProcess() {
 
 export default ManageProcess;
 
-//TODO: Employee cant create processes => only required processes to create and also cant modify processes => only request modifications => DONE
-//TODO: Manager gets Info on modifications
-
 
 //** Additional */
+//** These are suggestions for further implementations in the future */
 //TODO: OPTIONAL: load xml file to create new process
 //TODO: OPTIONAL: option to make process builder full screen
-//TODO: OPTIONAL: make description of flows after Gateway requiered
-
-
-/** Things to clear */
-//does flows and process need a role and description? Do role and description have to be mandatory in general?
-//should the creating a new process be priveliged to some user?
-//make creating a process dependable on role of the user: Employer: needs permission from supervisior to create new process; Manager: can simply create a new Process

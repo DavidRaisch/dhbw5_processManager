@@ -505,6 +505,3 @@ app.put('/api/instances/:id', async (req, res) => {
 // Start the server
 const PORT = 5001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-
-
-//TODO: structure this code in to more backend classes

@@ -89,7 +89,3 @@ function App() {
 
 export default App;
 
-//TODO: structure the code in project a little (javascript folder, html, css, etc.)
-
-//TODO:OPTIONAL/AUSBLICK: use a cloud database for persistence of the data along multiple pcs
-
