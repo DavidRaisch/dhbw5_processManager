@@ -215,7 +215,5 @@ The Notification Center consolidates all in-app alerts:
 **All Rights Reserved.**  
 This project and its source code are authored exclusively by the repository owner. Documentation sources are contained within the `/documentation` folder of this repository. Any external references or images used for illustration are properly attributed in the documentation files.
 
-
-> **Note:** A detailed documentation and elaboration can be found at  
-> `documentation/dhbw5_Studienarbeit_report/document/document.pdf`,  
-> if a very comprehensive report is of interest.
+---
+> **Note:** A detailed documentation and elaboration can be found at `documentation/dhbw5_Studienarbeit_report/document/document.pdf`, if a very comprehensive report is of interest.
