@@ -204,14 +204,18 @@ All roles can view and start processes; Employees and Managers execute events.
 ### Notifications
 The Notification Center consolidates all in-app alerts:
 
-- **Deletion Requests**: When a Manager or Employee requests to delete a process definition, an Admin or designated Manager sees a notification.  
-- **Change Requests**: If a Manager edits a process but lacks direct save privileges, the request goes to a higher-level Manager or Admin.  
-- **Execution Approval**: When an Employee lacks the role for a task, they can send a request; Managers/Admins receive the notification to approve or reject.
+- **Deletion Requests**: When an Employee requests to delete a process definition, an designated Manager sees a notification.  
+- **Change Requests**: If a Employee edits a process but lacks direct save privileges, the request goes to a Manager.  
+- **Execution Approval**: When an Employee lacks the role for a task, they can send a request; Managers receive the notification to approve or reject.
 
-Notifications can be marked as “Read” once handled or clicked to view details.
 
 ---
 
 ## License
 **All Rights Reserved.**  
 This project and its source code are authored exclusively by the repository owner. Documentation sources are contained within the `/documentation` folder of this repository. Any external references or images used for illustration are properly attributed in the documentation files.
+
+
+> **Note:** A detailed documentation and elaboration can be found at  
+> `documentation/dhbw5_Studienarbeit_report/document/document.pdf`,  
+> if a very comprehensive report is of interest.
