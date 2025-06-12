@@ -1,21 +1,22 @@
 # Fdb version 4
-["biber document"] 1748013305.69491 "document.bcf" "document.bbl" "document" 1748875260.48564 0
+["biber document"] 1748013305.69491 "document.bcf" "document.bbl" "document" 1749744814.26677 0
   "../content/bibliographie.bib" 1748013268.82793 9846 0047bd87e24eabe144037014a133257d ""
-  "document.bcf" 1748875260.23217 111345 dda70fa3b5c5f2b24f967d326137fd7c "pdflatex"
+  "document.bcf" 1749744813.99592 111345 dda70fa3b5c5f2b24f967d326137fd7c "pdflatex"
   (generated)
   "document.bbl"
   "document.blg"
   (rewritten before read)
-["cusdep glo gls document"] 1747398659.43385 "document.glo" "document.gls" "document" 1748875260.48545 0
-  "document.glo" 1748875260.23316 194 70f923999e2a9050b786c66b9b0963c3 "pdflatex"
+["cusdep glo gls document"] 1747398659.43385 "document.glo" "document.gls" "document" 1749744814.26664 0
+  "document.glo" 1749744813.99733 194 70f923999e2a9050b786c66b9b0963c3 "pdflatex"
   (generated)
   "document.gls"
   (rewritten before read)
-["pdflatex"] 1748875252.48613 "/Users/davidraisch/DHBW/Studienarbeit_S3/dhbw5_Studienarbeit_report/document/document.tex" "document.pdf" "document" 1748875260.4859 0
+["pdflatex"] 1749744804.10336 "/Users/davidraisch/DHBW/Studienarbeit_S3/dhbw5_Studienarbeit_report/document/document.tex" "document.pdf" "document" 1749744814.26702 0
   "../config/additionals/acronyms.tex" 1743090896 344 72e04cf75aaf31e67383c6141f3727f2 ""
   "../config/additionals/appendix.tex" 1743090896 1189 6c557e390ab44911ce39f3504753a926 ""
   "../config/additionals/code.tex" 1743090896 4163 4fedab1ad8fa311364ec57134538be69 ""
   "../config/additionals/cover_sheet.tex" 1743090896 2789 d2d23a278fab451ba112d3886a09b45b ""
+  "../config/additionals/declaration.tex" 1743424129.47456 871 734f53b2e9ed9a5b6cb976b36c7da0ce ""
   "../config/additionals/equations.tex" 1743090896 1115 d4dbf92c46d557e9efdc90f1af40536f ""
   "../config/additionals/images.tex" 1743090896 1222 cc5becb9a5d5da8a8243442f18cffb73 ""
   "../config/additionals/pdfs.tex" 1743090896 2780 879ca7c9015a9a14e8ef1ef7d392b5dc ""
@@ -37,7 +38,7 @@
   "../content/additionals/pdfs.tex" 1743090896 946 b2b0fae3460e54f52d4734d445ed23f4 ""
   "../content/additionals/tables.tex" 1743090896 1279 2f594c3f0986bc7e8661f6f79e6727be ""
   "../content/chapters/chapter-01.tex" 1748875132.28723 2523 265e32996b0c731b55880097b882cdb6 ""
-  "../content/chapters/chapter-02.tex" 1748874651.74974 53057 b5c83e0b3d32df5e7f9caab0a8a06629 ""
+  "../content/chapters/chapter-02.tex" 1749744803.32964 53057 b5c83e0b3d32df5e7f9caab0a8a06629 ""
   "../content/chapters/chapter-03.tex" 1748874830.28964 79224 c2777cdc895985d2689658107ddf26df ""
   "../content/chapters/chapter-04.tex" 1748875156.31952 6655 33de589e1f9e0565793270d3e5547d97 ""
   "../content/non_tex_files/code/pm_backend/connection_mongodb_pm.js" 1744981010.41415 242 cd7ac6fd5717e4f739be3b0b7aebd41f ""
@@ -129,12 +130,13 @@
   "../content/non_tex_files/images/project_info_modal_pm.jpg" 1745363036.22362 28225 5747fd79d9e07277323384438ed76259 ""
   "../content/non_tex_files/images/project_structure_pm.jpeg" 1744641951.62114 100618 beb4f86a73041ecdc6cde1ed2b7ae841 ""
   "../content/non_tex_files/images/roleDescribtion_manageProcess_pm.jpg" 1746090783.91358 89948 c87486a77f4d1bea417f331852665df1 ""
+  "../content/non_tex_files/images/signature.jpg" 1749744797.51079 42078 a287c00747fdc76a8d3701e05242eedf ""
   "../content/non_tex_files/images/successfulPasswordChange_user_pm.jpg" 1745506959.39268 114460 1b8f3ffe0597038796c505fcbd9148ff ""
   "../content/non_tex_files/images/userDeletion_messages_pm.jpg" 1745334273.29316 33518 ae55691fd4da8eb3d2b5646b2e1902ee ""
   "../content/non_tex_files/images/userInfo_dropdown_pm.jpg" 1745505781.15649 53395 449f78a1fabb2a93fe7114c07ae9cddd ""
   "../content/non_tex_files/images/user_startPage_pm.jpg" 1745136505.05261 68891 d1d606766db361faa168a94627bf3c43 ""
   "../content/non_tex_files/images/wrong_credentials_pm.png" 1744703439.75988 275258 325620f7c5449de922a902636d94630b ""
-  "../content/user_settings.tex" 1748875243.4223 3423 bcdff7bc86d79d6512a4e9dad2395edb ""
+  "../content/user_settings.tex" 1749744642.96628 3422 b2b316a38bae9b7218a6f62ae3054e28 ""
   "/Users/davidraisch/DHBW/Studienarbeit_S3/dhbw5_Studienarbeit_report/document/document.tex" 1743090896 2649 c922502d6e0459ffdc1911662213b713 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc" 1254269338 3031 6c4d3515bf7115d8518af1c9ab97ca44 ""
@@ -423,15 +425,15 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1743453547 5501089 f2ffe622267f7d8bfaba0244ab87ba6f ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1743453566 3345742 c7c465962ab2e1697639d33110d185de ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "document.aux" 1748875260.2138 61607 ce64d3fbc191ab8b842c268e35a30c9b "pdflatex"
+  "document.aux" 1749744813.97962 62277 29bf05282da289e006a949b4ff0a3a37 "pdflatex"
   "document.bbl" 1748013307.15813 37078 00e3e8300245ec5943a7e7592002b976 "biber document"
   "document.gls" 1747398659.58492 445 143a0e83a32fd75f9994e6833ad8169b "cusdep glo gls document"
-  "document.glsdefs" 1748875260.20731 3993 5dc14a4e0f4a16ba9f69b719fa58a5a1 "pdflatex"
-  "document.lof" 1748875260.23321 9993 585967d0643de16182cf9edd6f65b69e "pdflatex"
-  "document.lol" 1748875260.23324 1786 b70b243f5d0373f026d1aaf01734b2ef "pdflatex"
-  "document.run.xml" 1748875260.23308 2505 66088c808747d4260d93c3b370e6e9eb "pdflatex"
+  "document.glsdefs" 1749744813.97446 3993 5dc14a4e0f4a16ba9f69b719fa58a5a1 "pdflatex"
+  "document.lof" 1749744813.99739 10013 451e61b448661c9cea0d7a8738d7b939 "pdflatex"
+  "document.lol" 1749744813.99743 1806 70139e716c08d1d813b02e53acb2bdb5 "pdflatex"
+  "document.run.xml" 1749744813.99726 2505 66088c808747d4260d93c3b370e6e9eb "pdflatex"
   "document.tex" 1743090896 2649 c922502d6e0459ffdc1911662213b713 ""
-  "document.toc" 1748875260.23318 3567 4bad513974aef1c33d7b6eb896c62b73 "pdflatex"
+  "document.toc" 1749744813.99736 3651 286341bffaa47e4cf1dfc427638672be "pdflatex"
   (generated)
   "document.aux"
   "document.bcf"
